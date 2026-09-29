@@ -1,22 +1,29 @@
 {
   "name": "toytown-gl",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Drop-in MapLibre plugin that renders OpenStreetMap as a cartoony toy town.",
   "license": "MIT",
   "type": "module",
   "sideEffects": [
-    "./dist/worker.js"
+    "./dist/worker.js",
+    "./dist/toytown-gl.umd.js"
   ],
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+      "import": "./dist/index.js",
+      "require": "./dist/toytown-gl.umd.js",
+      "default": "./dist/index.js"
+    },
+    "./umd": "./dist/toytown-gl.umd.js",
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "maplibre",
@@ -27,8 +34,9 @@
     "low-poly"
   ],
   "scripts": {
-    "build": "tsup",
-    "typecheck": "tsc --noEmit"
+    "build": "tsup && tsup --config tsup.umd.config.ts",
+    "typecheck": "tsc --noEmit",
+    "prepack": "pnpm build"
   },
   "devDependencies": {
     "@types/three": "~0.186.0",
@@ -40,5 +48,24 @@
   },
   "dependencies": {
     "three": "^0.186.1"
+  },
+  "author": "Brian Power",
+  "homepage": "https://github.com/bpowerie25/Toytown#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpowerie25/Toytown.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/bpowerie25/Toytown/issues"
+  },
+  "unpkg": "./dist/toytown-gl.umd.js",
+  "jsdelivr": "./dist/toytown-gl.umd.js",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

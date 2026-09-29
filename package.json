@@ -20,9 +20,12 @@
     "data:waterford": "node packages/cli/dist/index.js build-data --bbox=-7.17,52.22,-7.05,52.28 --out examples/waterford/public/data/waterford.geojson --stats .cache/stats/waterford.json",
     "data:tramore": "node packages/cli/dist/index.js build-data --bbox=-7.18,52.135,-7.12,52.18 --out examples/tramore/public/data/tramore.geojson --stats .cache/stats/tramore.json",
     "data:report": "node packages/cli/dist/index.js report Waterford=.cache/stats/waterford.json Tramore=.cache/stats/tramore.json --out docs/classification-report.md",
-    "data:build": "pnpm --filter toytown-gl --filter @toytown/cli build && pnpm data:waterford && pnpm data:tramore && pnpm data:report"
+    "data:build": "pnpm --filter toytown-gl --filter @toytown/cli build && pnpm data:waterford && pnpm data:tramore && pnpm data:report",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only && prettier --write \"**/CHANGELOG.md\""
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.63.0",
     "@types/node": "^24.19.0",

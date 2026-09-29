@@ -2,17 +2,79 @@
 
 Updated at the end of each phase.
 
-| Phase           | Status   | Notes                                                                      |
-| --------------- | -------- | -------------------------------------------------------------------------- |
-| 0 Scaffold      | done     | Workspace, tooling, kit validation, CI, licences, examples.                |
-| 1 Style         | done     | toytown.json, Nunito labels, Playwright screenshot tests.                  |
-| 2 Data          | done     | build-data CLI, tag-map.json, both datasets, report.                       |
-| 2.5 Spike       | approved | deck.gl spike; model kit colour fix. See docs/spike/README.md.             |
-| 3 Buildings     | done     | Procedural buildings, worker meshing, minimal render layer.                |
-| 4 Toon + models | done     | Toon/ink rendering, fit/decorate/point, props, instancing.                 |
-| 4b Model kit    | done     | @toytown/models + zip, variants, kit CI, adding-models guide.              |
-| 5 Performance   | done     | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs.     |
-| 6 API + demos   | done     | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages. |
+| Phase           | Status               | Notes                                                                          |
+| --------------- | -------------------- | ------------------------------------------------------------------------------ |
+| 0 Scaffold      | done                 | Workspace, tooling, kit validation, CI, licences, examples.                    |
+| 1 Style         | done                 | toytown.json, Nunito labels, Playwright screenshot tests.                      |
+| 2 Data          | done                 | build-data CLI, tag-map.json, both datasets, report.                           |
+| 2.5 Spike       | approved             | deck.gl spike; model kit colour fix. See docs/spike/README.md.                 |
+| 3 Buildings     | done                 | Procedural buildings, worker meshing, minimal render layer.                    |
+| 4 Toon + models | done                 | Toon/ink rendering, fit/decorate/point, props, instancing.                     |
+| 4b Model kit    | done                 | @toytown/models + zip, variants, kit CI, adding-models guide.                  |
+| 5 Performance   | done                 | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs.         |
+| 6 API + demos   | done                 | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages.     |
+| 7 Release       | ready, not published | ESM+UMD, changesets 0.1.0, release workflow, acceptance test. Publish pending. |
+
+## Phase 7: Packaging and release (2026-09-29), ready but not published
+
+### What was done
+
+- **Builds**: `toytown-gl` ships ESM with types (`dist/index.js`, with `three` and `maplibre-gl`
+  external and `dist/worker.js` loaded via `import.meta.url`) and a **self-contained UMD build**
+  (`dist/toytown-gl.umd.js`, 939 KB minified, global `ToyTownGL`, three bundled). The UMD build
+  inlines the chunk worker as a Blob (a worker IIFE built first and loaded as text); if the page
+  blocks blob workers, meshing falls back to the main thread. `package.json` has `unpkg`,
+  `jsdelivr`, `require` → UMD, `import` → ESM, and `VERSION` set from `package.json` at build time.
+- **UMD proof**: `examples/umd`, a no-bundler page with plain script tags, served by the e2e
+  server. An e2e test checks it draws Tramore with models and no errors.
+- **Versions**: changesets (`.changeset/`, private packages not versioned). The first-release
+  changeset was applied, so `toytown-gl` and `@toytown/models` are at **0.1.0**, with
+  `CHANGELOG.md` files. Use `pnpm changeset` and `pnpm version-packages`.
+- **Release workflow** (`.github/workflows/release.yml`, on `v*` tags):
+  - checks the tag matches both versions and builds the release notes from the changelogs
+    (`scripts/release-notes.mjs`);
+  - lints, builds and tests;
+  - zips the kit, runs `pnpm -r publish` with provenance, and creates a GitHub release with
+    `toytown-models-0.1.0.zip`.
+- **Acceptance** (`scripts/acceptance.mjs`, also a new CI job): packs both packages, runs
+  `npm create vite@8` with vanilla-ts, installs the tarballs and MapLibre with npm, copies the
+  **package README's quick-start code verbatim** into `src/main.ts`, follows the README's setup
+  (copy the kit, add data), runs `npm run build` (which type-checks it) and renders it in Chrome.
+  **It passes locally**: Tramore draws (9 chunks, 2,186 model instances) with no errors and no
+  failed requests. This is the phase's acceptance criterion, verified before publishing.
+- **Demo GIF**: `docs/demo.gif` is now 27.6 s covering both towns: Waterford by day to Reginald's
+  Tower, Tramore by day, Tramore at night, Waterford at night. It's 160 frames at 480×300, 6.9 MB,
+  with one shared 96-colour palette.
+- **Package READMEs**: `toytown-gl` has its own README with absolute GitHub links (the repo
+  README's relative links break on npmjs.com) and a LICENSE copy. `@toytown/models` has repository
+  metadata. `docs/releasing.md` covers the workflow and one-time setup.
+
+### Not done, and why
+
+Publishing to npm, pushing the `v0.1.0` tag and the GitHub release all need your accounts and
+decisions (see "Blocking" below). The Pages deploy needs a repository setting, and the workflow
+has been in place since phase 6.
+
+### Blocking: decisions for the owner
+
+1. **npm scope**: create the `toytown` npm organisation for `@toytown/models` (`toytown-gl` is
+   unscoped, and both names were still free on 2026-09-29).
+2. **npm auth for CI**: an `NPM_TOKEN` repository secret, or npm trusted publishing for
+   `release.yml`.
+3. **Provenance needs a public repository.** The repo is private, so either make it public before
+   tagging, or drop provenance (`NPM_CONFIG_PROVENANCE` in `release.yml` and
+   `publishConfig.provenance` in both package.json files).
+4. **The repo is also referenced publicly**: the package README's GIF and doc links point at
+   `github.com/bpowerie25/Toytown`, which npm users can't see while it's private.
+5. **Pages**: enable GitHub Pages (Source: GitHub Actions) and set `PAGES_ENABLED=true`.
+
+### Decisions
+
+- **The UMD build bundles three.js.** three r160+ no longer ships a global build, so a script-tag
+  user couldn't provide `THREE` themselves.
+- **`@changesets/cli` v3's `init` is interactive**, so `.changeset/config.json` was written by hand.
+- **The demo is a GIF, not MP4**: GitHub renders GIFs in a README from the repo, and there's no
+  video encoder locally (no ffmpeg).
 
 ## Phase 6: Public API, examples, docs (2026-09-29)
 

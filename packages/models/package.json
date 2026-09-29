@@ -1,6 +1,6 @@
 {
   "name": "@toytown/models",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "CC0 low-poly toy-town building models (GLB) with a manifest: houses, shops, schools, churches, props and more.",
   "license": "CC0-1.0",
   "type": "module",
@@ -25,6 +25,21 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "zip": "node scripts/build.mjs && node scripts/zip.mjs"
+    "zip": "node scripts/build.mjs && node scripts/zip.mjs",
+    "prepack": "node scripts/build.mjs"
+  },
+  "author": "Brian Power",
+  "homepage": "https://github.com/bpowerie25/Toytown/tree/main/packages/models#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpowerie25/Toytown.git",
+    "directory": "packages/models"
+  },
+  "bugs": {
+    "url": "https://github.com/bpowerie25/Toytown/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

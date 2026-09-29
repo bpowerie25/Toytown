@@ -1,0 +1,13 @@
+{
+  "name": "@toytown/example-umd",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The UMD build in a plain HTML page with script tags (no bundler). Used by the e2e tests.",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "maplibre-gl": "^5.24.0",
+    "toytown-gl": "workspace:*"
+  }
+}

@@ -1,0 +1,43 @@
+name: Release
+
+# Push a tag like v0.1.0 (after `pnpm version-packages`) to publish toytown-gl and
+# @toytown/models to npm with provenance, and create a GitHub release with the models zip.
+# Needs: the npm @toytown scope, and an NPM_TOKEN secret (or npm trusted publishing for this
+# workflow). npm provenance requires a public repository. See docs/releasing.md.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # the GitHub release
+  id-token: write # npm provenance
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - name: Check the tag matches the package versions
+        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > release-notes.md
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm test
+      - run: pnpm --filter @toytown/models zip
+      - name: Publish to npm
+        run: pnpm -r publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
+      - name: GitHub release with the models zip
+        run: gh release create "$GITHUB_REF_NAME" packages/models/dist/*.zip --title "$GITHUB_REF_NAME" --notes-file release-notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}

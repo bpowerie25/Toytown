@@ -243,3 +243,24 @@ test.describe('demo', () => {
     expect(errors).toEqual([]);
   });
 });
+
+test('UMD build works from plain script tags', async ({ page }) => {
+  type U = Window & {
+    ToyTownGL: { VERSION: string };
+    toy: { ready: Promise<void>; stats(): { chunks: { ready: number }; visibleInstances: number } };
+  };
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  await page.goto('/umd/');
+  await page.waitForFunction(() => !!(window as unknown as U).toy);
+  await page.evaluate(() => (window as unknown as U).toy.ready);
+  const r = await page.evaluate(() => ({
+    version: (window as unknown as U).ToyTownGL.VERSION,
+    stats: (window as unknown as U).toy.stats(),
+  }));
+  expect(r.version).toMatch(/^\d+\.\d+\.\d+/);
+  expect(r.stats.chunks.ready).toBeGreaterThan(0);
+  expect(r.stats.visibleInstances).toBeGreaterThan(20);
+  expect(errors.filter((e) => !/could not be loaded/.test(e))).toEqual([]);
+});

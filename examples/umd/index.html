@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>toytown-gl · script tags (UMD)</title>
+    <link rel="stylesheet" href="lib/maplibre-gl.css" />
+    <style>
+      html,
+      body,
+      #map {
+        margin: 0;
+        height: 100%;
+      }
+    </style>
+    <!-- From a CDN these would be unpkg.com/maplibre-gl@5 and unpkg.com/toytown-gl. -->
+    <script src="lib/maplibre-gl.js"></script>
+    <script src="lib/toytown-gl.umd.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      const { ToyTown } = ToyTownGL;
+      const map = new maplibregl.Map({
+        container: 'map',
+        style: ToyTown.style(),
+        center: [-7.15, 52.162],
+        zoom: 16.2,
+        pitch: 55,
+      });
+      const toy = new ToyTown({ data: './data/tramore.geojson', models: './models/manifest.json' });
+      toy.addTo(map);
+      window.map = map;
+      window.toy = toy;
+    </script>
+  </body>
+</html>

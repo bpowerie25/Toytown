@@ -1,6 +1,17 @@
 import { processChunk } from './chunk';
 import type { ChunkRequest, ChunkResponse, ChunkResult } from './protocol';
 
+let workerFactory: () => Worker = () =>
+  new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+
+/**
+ * Replace how chunk workers are created. The ESM build loads `worker.js` next to itself; the UMD
+ * build, which has no module URL, uses an inlined worker instead.
+ */
+export function setWorkerFactory(factory: () => Worker): void {
+  workerFactory = factory;
+}
+
 /**
  * Processes chunks (plan + mesh) on a small pool of Web Workers. Falls back to the calling thread
  * when Workers aren't available (Node, some sandboxes).
@@ -19,7 +30,7 @@ export class ChunkPool {
     if (typeof Worker === 'undefined') return;
     try {
       for (let i = 0; i < size; i++) {
-        const w = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+        const w = workerFactory();
         w.onmessage = (e: MessageEvent<ChunkResponse>) => this.settle(e.data);
         this.workers.push(w);
       }

@@ -67,4 +67,7 @@ export {
 } from './render/layer';
 export { SceneFrame } from './render/frame';
 
-export const VERSION = '0.0.0';
+declare const __VERSION__: string;
+
+/** The toytown-gl version (from package.json, set at build time). */
+export const VERSION: string = typeof __VERSION__ === 'string' ? __VERSION__ : '0.0.0-dev';

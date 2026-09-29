@@ -7,9 +7,9 @@ churches and more.
 
 ![Waterford City as a toy town, by day and by night](docs/demo.gif)
 
-> **Status: early development.** Nothing is published to npm yet; phase 7 publishes `v0.1.0`.
-> The demos are Waterford City and Tramore, Ireland, but nothing in the plugin is specific to
-> them.
+> **Status: `v0.1.0` is ready to publish** (versions, changelogs and release workflow are in
+> place, and the fresh-project install is tested from packed tarballs). The demos are Waterford
+> City and Tramore, Ireland, but nothing in the plugin is specific to them.
 
 ## What you get
 
@@ -37,7 +37,9 @@ pnpm install && pnpm build
 node packages/cli/dist/index.js build-data --bbox -7.17,52.22,-7.05,52.28 --out public/data/town.geojson
 ```
 
-**2. Add it to a MapLibre map:**
+**2. Install** (`npm i toytown-gl maplibre-gl @toytown/models`), copy the model kit into your
+static files (`cp -r node_modules/@toytown/models/models public/models`), **and add it to a
+MapLibre map:**
 
 ```ts
 import maplibregl from 'maplibre-gl';
@@ -64,7 +66,9 @@ toy.setCategoryModel('hospital', '/models/my-hospital.glb'); // use your own mod
 toy.addPack('/models/ireland/manifest.json'); // a regional pack: landmark models and overrides
 ```
 
-The full API is in [docs/api.md](docs/api.md).
+The full API is in [docs/api.md](docs/api.md). Without a bundler, use the UMD build:
+`<script src="https://unpkg.com/toytown-gl/dist/toytown-gl.umd.js">` gives a global
+`ToyTownGL`.
 
 ## Add your own model
 
@@ -96,6 +100,7 @@ combinations, and add rules. See [docs/tag-mapping.md](docs/tag-mapping.md).
 - [Rendering: toon shading, hero models and trees](docs/rendering.md)
 - [Performance and levels of detail](docs/performance.md)
 - [Adding models](docs/adding-models.md) and the kit package, [`@toytown/models`](packages/models/README.md)
+- [Releasing](docs/releasing.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## Repository layout
@@ -152,8 +157,9 @@ python3 -m venv .venv && .venv/bin/pip install -r assets/generator/requirements.
 
 - [x] Cartoon base style, building data pipeline, procedural buildings, toon rendering, hero
       models, props, variants, LOD, day and night themes, click events
-- [ ] Publish `toytown-gl` and `@toytown/models` to npm (ESM + UMD), and attach a models zip to
-      releases (phase 7)
+- [x] ESM + UMD builds, changesets, release workflow (npm with provenance, and a GitHub release
+      with the models zip)
+- [ ] Publish `v0.1.0` to npm and deploy the demos to GitHub Pages
 - [ ] Measure on real mid-range laptops and phones, then add a DPR cap and distance LOD if needed
 - [ ] More variants and regional packs (Contributions welcome!)
 - [ ] 3D in globe view (currently 3D switches on once MapLibre's globe has blended to flat)
