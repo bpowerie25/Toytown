@@ -1,0 +1,6 @@
+# Pinned so regenerated GLBs match the committed kit. Bump deliberately and re-run check_reproducible.py.
+numpy==2.0.2
+scipy==1.13.1
+networkx==3.2.1
+trimesh==4.12.2
+matplotlib==3.9.4

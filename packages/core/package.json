@@ -1,0 +1,36 @@
+{
+  "name": "toytown-gl",
+  "version": "0.0.0",
+  "description": "Drop-in MapLibre plugin that renders OpenStreetMap as a cartoony toy town.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "maplibre",
+    "openstreetmap",
+    "three",
+    "3d",
+    "toy",
+    "low-poly"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "gltf-validator": "2.0.0-dev.3.10"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@toytown/cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "toytown build-data: fetch and classify OSM buildings into a compact data file.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "toytown": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "toytown-gl": "workspace:*"
+  }
+}

@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+dist/
+coverage/
+.venv/
+assets/models/manifest.json
+*.glb
+PLAN.md

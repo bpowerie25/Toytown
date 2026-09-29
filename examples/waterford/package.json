@@ -1,0 +1,16 @@
+{
+  "name": "@toytown/example-waterford",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "maplibre-gl": "^5.24.0",
+    "toytown-gl": "workspace:*"
+  }
+}

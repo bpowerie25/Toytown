@@ -1,0 +1,649 @@
+{
+  "version": 1,
+  "units": "metres",
+  "up": "+Y",
+  "front": "+Z",
+  "palette": {
+    "wall_cream": "#F4E9D8",
+    "wall_pink": "#F2B5A7",
+    "wall_mint": "#BFE3C9",
+    "wall_yellow": "#F6D57A",
+    "wall_blue": "#A9CBE8",
+    "stone": "#CFC6B8",
+    "brick": "#E07A5F",
+    "white": "#FFFFFF",
+    "offwhite": "#F7F7F2",
+    "roof_red": "#D9644A",
+    "roof_slate": "#5B6C8F",
+    "roof_flat": "#B8B2A7",
+    "window": "#7EC8E3",
+    "glass": "#9AD1D4",
+    "glass_band": "#4A7C8C",
+    "door": "#8B5A3C",
+    "red": "#E63946",
+    "garda_blue": "#1D4E89",
+    "fire_red": "#D62828",
+    "pub_green": "#2A6F4E",
+    "gold": "#E9C46A",
+    "awning": "#F2A541",
+    "leaf": "#6BAA5E",
+    "trunk": "#8B5A3C",
+    "skin": "#F2C9A0",
+    "metal": "#8D99AE",
+    "black": "#2B2D42",
+    "concrete": "#D8D4CC",
+    "barn_red": "#B23A48",
+    "green_cross": "#2BA84A"
+  },
+  "models": {
+    "house": {
+      "file": "generic/house.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=house",
+        "building=detached"
+      ],
+      "materials": [
+        "wall_cream",
+        "roof_red",
+        "door",
+        "window",
+        "brick"
+      ],
+      "footprint_m": [
+        8.6,
+        7.8
+      ],
+      "height_m": 8.7
+    },
+    "bungalow": {
+      "file": "generic/bungalow.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=bungalow",
+        "building=house + building:levels=1"
+      ],
+      "materials": [
+        "offwhite",
+        "roof_slate",
+        "window",
+        "door"
+      ],
+      "footprint_m": [
+        13.6,
+        8.6
+      ],
+      "height_m": 5.8
+    },
+    "semi_detached": {
+      "file": "generic/semi_detached.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=semidetached_house"
+      ],
+      "materials": [
+        "wall_cream",
+        "roof_red",
+        "door",
+        "window",
+        "brick"
+      ],
+      "footprint_m": [
+        14.6,
+        8.8
+      ],
+      "height_m": 9.5
+    },
+    "terraced_house": {
+      "file": "generic/terraced_house.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=terrace"
+      ],
+      "materials": [
+        "wall_pink",
+        "door",
+        "window",
+        "wall_yellow",
+        "wall_blue",
+        "roof_slate"
+      ],
+      "footprint_m": [
+        16.8,
+        8.8
+      ],
+      "height_m": 9.0
+    },
+    "apartment": {
+      "file": "generic/apartment.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=apartments",
+        "building=residential"
+      ],
+      "materials": [
+        "wall_cream",
+        "window",
+        "roof_flat",
+        "white",
+        "door"
+      ],
+      "footprint_m": [
+        14.4,
+        11.4
+      ],
+      "height_m": 13.8
+    },
+    "tower_block": {
+      "file": "generic/tower_block.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=apartments + building:levels>=8"
+      ],
+      "materials": [
+        "concrete",
+        "window",
+        "roof_flat",
+        "metal"
+      ],
+      "footprint_m": [
+        16.6,
+        16.6
+      ],
+      "height_m": 43.8
+    },
+    "shop": {
+      "file": "generic/shop.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "shop=*",
+        "building=retail"
+      ],
+      "materials": [
+        "wall_mint",
+        "glass",
+        "black",
+        "awning",
+        "white",
+        "window",
+        "roof_flat"
+      ],
+      "footprint_m": [
+        8.4,
+        9.8
+      ],
+      "height_m": 7.5
+    },
+    "supermarket": {
+      "file": "generic/supermarket.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "shop=supermarket",
+        "building=supermarket"
+      ],
+      "materials": [
+        "wall_cream",
+        "metal",
+        "glass",
+        "red",
+        "white"
+      ],
+      "footprint_m": [
+        40.4,
+        33.2
+      ],
+      "height_m": 7.6
+    },
+    "cafe": {
+      "file": "generic/cafe.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=cafe",
+        "amenity=restaurant",
+        "amenity=fast_food"
+      ],
+      "materials": [
+        "wall_pink",
+        "glass",
+        "red",
+        "white",
+        "roof_flat",
+        "black"
+      ],
+      "footprint_m": [
+        7.4,
+        10.3
+      ],
+      "height_m": 4.4
+    },
+    "pub": {
+      "file": "generic/pub.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=pub",
+        "amenity=bar"
+      ],
+      "materials": [
+        "wall_cream",
+        "pub_green",
+        "gold",
+        "door",
+        "window",
+        "black",
+        "roof_slate"
+      ],
+      "footprint_m": [
+        9.6,
+        11.2
+      ],
+      "height_m": 10.0
+    },
+    "pharmacy": {
+      "file": "generic/pharmacy.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=pharmacy",
+        "shop=chemist"
+      ],
+      "materials": [
+        "offwhite",
+        "glass",
+        "green_cross",
+        "black",
+        "window",
+        "roof_flat"
+      ],
+      "footprint_m": [
+        8.4,
+        10.2
+      ],
+      "height_m": 7.5
+    },
+    "bank": {
+      "file": "generic/bank.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=bank"
+      ],
+      "materials": [
+        "stone",
+        "offwhite",
+        "roof_slate",
+        "door",
+        "gold"
+      ],
+      "footprint_m": [
+        14.6,
+        20.9
+      ],
+      "height_m": 13.7
+    },
+    "office": {
+      "file": "generic/office.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=office",
+        "office=*",
+        "building=commercial"
+      ],
+      "materials": [
+        "glass",
+        "glass_band",
+        "metal",
+        "black"
+      ],
+      "footprint_m": [
+        14.6,
+        12.6
+      ],
+      "height_m": 24.8
+    },
+    "hotel": {
+      "file": "generic/hotel.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "tourism=hotel",
+        "building=hotel"
+      ],
+      "materials": [
+        "wall_cream",
+        "window",
+        "roof_flat",
+        "pub_green",
+        "glass",
+        "metal",
+        "red"
+      ],
+      "footprint_m": [
+        22.6,
+        15.3
+      ],
+      "height_m": 15.8
+    },
+    "petrol_station": {
+      "file": "generic/petrol_station.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=fuel"
+      ],
+      "materials": [
+        "offwhite",
+        "glass",
+        "red",
+        "metal",
+        "white",
+        "garda_blue"
+      ],
+      "footprint_m": [
+        14.3,
+        20.8
+      ],
+      "height_m": 9.4
+    },
+    "hospital": {
+      "file": "generic/hospital.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=hospital",
+        "building=hospital"
+      ],
+      "materials": [
+        "white",
+        "window",
+        "roof_flat",
+        "red",
+        "roof_slate"
+      ],
+      "footprint_m": [
+        30.4,
+        29.2
+      ],
+      "height_m": 16.2
+    },
+    "school": {
+      "file": "generic/school.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=school",
+        "amenity=college",
+        "building=school"
+      ],
+      "materials": [
+        "brick",
+        "window",
+        "roof_slate",
+        "white",
+        "door",
+        "metal",
+        "garda_blue"
+      ],
+      "footprint_m": [
+        28.4,
+        27.6
+      ],
+      "height_m": 10.0
+    },
+    "library": {
+      "file": "generic/library.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=library"
+      ],
+      "materials": [
+        "brick",
+        "roof_slate",
+        "window",
+        "stone",
+        "door"
+      ],
+      "footprint_m": [
+        20.6,
+        15.4
+      ],
+      "height_m": 12.0
+    },
+    "town_hall": {
+      "file": "generic/town_hall.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=townhall",
+        "building=civic"
+      ],
+      "materials": [
+        "stone",
+        "roof_slate",
+        "window",
+        "white",
+        "pub_green",
+        "door"
+      ],
+      "footprint_m": [
+        22.6,
+        14.6
+      ],
+      "height_m": 22.0
+    },
+    "police_station": {
+      "file": "generic/police_station.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=police"
+      ],
+      "materials": [
+        "offwhite",
+        "window",
+        "roof_slate",
+        "garda_blue"
+      ],
+      "footprint_m": [
+        14.6,
+        11.0
+      ],
+      "height_m": 10.0
+    },
+    "fire_station": {
+      "file": "generic/fire_station.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=fire_station"
+      ],
+      "materials": [
+        "brick",
+        "fire_red",
+        "roof_flat",
+        "white"
+      ],
+      "footprint_m": [
+        18.4,
+        12.4
+      ],
+      "height_m": 14.6
+    },
+    "church": {
+      "file": "generic/church.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=place_of_worship",
+        "building=church",
+        "building=cathedral"
+      ],
+      "materials": [
+        "stone",
+        "roof_slate",
+        "door",
+        "window",
+        "gold"
+      ],
+      "footprint_m": [
+        10.8,
+        28.7
+      ],
+      "height_m": 32.5
+    },
+    "train_station": {
+      "file": "generic/train_station.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=train_station",
+        "railway=station"
+      ],
+      "materials": [
+        "brick",
+        "roof_slate",
+        "window",
+        "door",
+        "roof_flat",
+        "pub_green",
+        "concrete"
+      ],
+      "footprint_m": [
+        30.0,
+        14.4
+      ],
+      "height_m": 7.5
+    },
+    "warehouse": {
+      "file": "generic/warehouse.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=warehouse",
+        "building=retail + large footprint"
+      ],
+      "materials": [
+        "wall_blue",
+        "metal",
+        "door"
+      ],
+      "footprint_m": [
+        20.6,
+        30.6
+      ],
+      "height_m": 10.5
+    },
+    "factory": {
+      "file": "generic/factory.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=industrial",
+        "man_made=works"
+      ],
+      "materials": [
+        "wall_blue",
+        "metal",
+        "brick",
+        "black"
+      ],
+      "footprint_m": [
+        44.4,
+        20.1
+      ],
+      "height_m": 19.0
+    },
+    "barn": {
+      "file": "generic/barn.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "building=barn",
+        "building=farm_auxiliary"
+      ],
+      "materials": [
+        "barn_red",
+        "metal",
+        "white"
+      ],
+      "footprint_m": [
+        18.2,
+        15.0
+      ],
+      "height_m": 10.6
+    },
+    "parking_garage": {
+      "file": "generic/parking_garage.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "amenity=parking + parking=multi-storey"
+      ],
+      "materials": [
+        "concrete",
+        "garda_blue"
+      ],
+      "footprint_m": [
+        30.2,
+        20.1
+      ],
+      "height_m": 14.0
+    },
+    "round_tower": {
+      "file": "generic/round_tower.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "historic=castle",
+        "building=tower + historic=*"
+      ],
+      "materials": [
+        "stone",
+        "roof_slate",
+        "door",
+        "black"
+      ],
+      "footprint_m": [
+        14.2,
+        13.8
+      ],
+      "height_m": 21.6
+    },
+    "lighthouse": {
+      "file": "generic/lighthouse.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "man_made=lighthouse"
+      ],
+      "materials": [
+        "offwhite",
+        "red",
+        "black",
+        "gold",
+        "door"
+      ],
+      "footprint_m": [
+        6.0,
+        6.2
+      ],
+      "height_m": 24.6
+    },
+    "tree": {
+      "file": "generic/tree.glb",
+      "pack": "generic",
+      "osm_tags": [
+        "natural=tree"
+      ],
+      "materials": [
+        "trunk",
+        "leaf"
+      ],
+      "footprint_m": [
+        4.9,
+        4.4
+      ],
+      "height_m": 6.4
+    },
+    "landmark_metal_man": {
+      "file": "ireland/landmark_metal_man.glb",
+      "pack": "ireland",
+      "osm_tags": [
+        "landmark override by OSM id"
+      ],
+      "materials": [
+        "offwhite",
+        "white",
+        "garda_blue",
+        "skin"
+      ],
+      "footprint_m": [
+        17.6,
+        3.6
+      ],
+      "height_m": 22.7
+    }
+  }
+}

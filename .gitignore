@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+.cache/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+.vite/
+test-results/
+playwright-report/
+# Raw OSM extracts and Overpass responses are never committed
+*.osm
+*.osm.pbf
+*.pbf
+overpass-*.json
