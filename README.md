@@ -1,6 +1,6 @@
 # toytown-gl
 
-> **Status: early development (phase 4b: model kit as its own package).** Nothing is published yet.
+> **Status: early development (phase 5: performance and levels of detail).** Nothing is published yet.
 
 ![Waterford City as a toy town](docs/toon/waterford-z17.png)
 
@@ -55,6 +55,7 @@ python3 -m venv .venv && .venv/bin/pip install -r assets/generator/requirements.
 - [Building data (`toytown build-data`)](docs/build-data.md)
 - [Procedural buildings](docs/buildings.md)
 - [Rendering: toon shading, hero models and trees](docs/rendering.md)
+- [Performance and levels of detail](docs/performance.md)
 - [Adding models](docs/adding-models.md) and the kit package, [`@toytown/models`](packages/models/README.md)
 - [Tag mapping](docs/tag-mapping.md) and the [classification report](docs/classification-report.md)
 

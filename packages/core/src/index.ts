@@ -29,8 +29,23 @@ export {
   type PlannedBuilding,
   type PointFeature,
 } from './placement';
-export { ToyTown, splitData, type ToyTownOptions, type DataCollection } from './toytown';
-export { ToyTownLayer, instanceMatrix, shouldDraw3D } from './render/layer';
+export { ToyTown, splitData, toChunks, type ToyTownOptions, type DataCollection } from './toytown';
+export {
+  DEFAULT_LOD,
+  lodLevel,
+  chunkSphere,
+  chunksToDispose,
+  type LodOptions,
+  type LodLevel,
+} from './render/lod';
+export { DebugOverlay } from './render/overlay';
+export {
+  ToyTownLayer,
+  instanceMatrix,
+  shouldDraw3D,
+  type ChunkInput,
+  type ChunkLoader,
+} from './render/layer';
 export { SceneFrame } from './render/frame';
 
 export const VERSION = '0.0.0';

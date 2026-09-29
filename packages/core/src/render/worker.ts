@@ -8,7 +8,7 @@ self.onmessage = (e: MessageEvent<ChunkRequest>) => {
     const result = processChunk(request);
     (self as unknown as Worker).postMessage(
       { id, ...result } satisfies ChunkResponse,
-      transferables(result.mesh),
+      transferables(result),
     );
   } catch (err) {
     (self as unknown as Worker).postMessage({ id, error: String(err) } satisfies ChunkResponse);

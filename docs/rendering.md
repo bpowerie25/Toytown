@@ -99,11 +99,12 @@ Planning is pure and runs in the chunk workers, before meshing (`packages/core/s
 In Waterford, 9,561 of the 26,870 buildings fit a hero model (mostly houses), 296 buildings get
 awnings and 27 get spires, and there are 3,839 trees.
 
-## Instancing and lazy loading
+## Instancing, lazy loading and levels of detail
 
-There is one `InstancedMesh` per model or prop (plus its hull), holding every placement of that
-model. Models load lazily: on `moveend`, only models with a placement inside the current view are
-fetched. `ready` waits for the initial view, including loads another caller already started.
+There is one `InstancedMesh` per model, variant or prop (plus its hull), filled only with the
+instances in visible, loaded chunks. Models load lazily, the first time one of their instances is
+in view. Chunks are meshed lazily and freed when out of view; what's drawn depends on zoom. See
+[performance.md](performance.md) for the levels, culling and measurements.
 
-Chunk results and placements are added in a fixed order (chunk key, then model name and id), so
+Chunks are added and instances filled in a fixed order (chunk key, then model name and id), so
 overlapping geometry always draws the same way, whatever order the workers finish in.

@@ -33,7 +33,7 @@ export class ChunkPool {
     if (!p) return;
     this.pending.delete(r.id);
     if ('error' in r) p.reject(new Error(r.error));
-    else p.resolve({ mesh: r.mesh, placements: r.placements });
+    else p.resolve({ full: r.full, fitted: r.fitted, plain: r.plain, placements: r.placements });
   }
 
   process(request: Omit<ChunkRequest, 'id'>): Promise<ChunkResult> {

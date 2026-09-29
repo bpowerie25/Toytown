@@ -119,3 +119,41 @@ test('globe projection: 3D is off until globe has blended into mercator', async 
   expect(await at(17)).toEqual({ drawing: true, base: 'none' });
   expect(errors).toEqual([]);
 });
+
+test('levels of detail by zoom', async ({ page }) => {
+  type L = Window & {
+    map: import('maplibre-gl').Map;
+    toy: {
+      ready: Promise<void>;
+      stats(): {
+        level: number;
+        chunks: { visible: number; ready: number };
+        visibleInstances: number;
+        calls: number;
+      };
+    };
+  };
+  await page.goto('/waterford/?debug');
+  await page.waitForFunction(() => !!(window as unknown as L).toy);
+  const at = async (zoom: number) => {
+    await page.evaluate((z) => (window as unknown as L).map.jumpTo({ zoom: z, pitch: 55 }), zoom);
+    await page.evaluate(() => (window as unknown as L).toy.ready);
+    await page.waitForTimeout(300);
+    return page.evaluate(() => ({
+      stats: (window as unknown as L).toy.stats(),
+      base: (window as unknown as L).map.getLayoutProperty('toytown-base-buildings', 'visibility'),
+      overlay: document.querySelector('.toytown-debug')?.textContent ?? '',
+    }));
+  };
+  const z13 = await at(13.5);
+  expect([z13.stats.level, z13.base]).toEqual([0, 'visible']);
+  const z14 = await at(14.5);
+  expect([z14.stats.level, z14.base, z14.stats.visibleInstances]).toEqual([1, 'none', 0]);
+  expect(z14.stats.chunks.ready).toBeGreaterThanOrEqual(z14.stats.chunks.visible);
+  const z15 = await at(15.5);
+  expect([z15.stats.level, z15.stats.visibleInstances]).toEqual([2, 0]);
+  const z16 = await at(16.5);
+  expect(z16.stats.level).toBe(3);
+  expect(z16.stats.visibleInstances).toBeGreaterThan(50);
+  expect(z16.overlay).toContain('lod full + models');
+});

@@ -402,3 +402,53 @@ export function meshChunk(
   }
   return m.toMesh(origin, ids, roofs);
 }
+
+/**
+ * The low-detail version of a chunk (LOD for zoom 14–15): every footprint extruded to its full
+ * height with a flat top, with no windows, bevels, parapets or roof shapes. The top uses the
+ * building's roof colour when it would get a pitched roof, so the colours stay continuous as
+ * detail loads in.
+ */
+export function meshChunkPlain(
+  features: BuildingInputFeature[],
+  origin: LngLat,
+  theme: BuildingTheme,
+): ChunkMesh {
+  const proj = new LocalProjection(origin);
+  const m = new MeshBuilder();
+  const ids: string[] = [];
+  const roofs: RoofKind[] = [];
+  for (const f of features) {
+    const parts: Rings[] = [];
+    for (const part of f.parts) {
+      const outer = cleanRing(part[0]!.map((p) => proj.toXY(p)));
+      if (!outer) continue;
+      const holes = part
+        .slice(1)
+        .map((h) => cleanRing(h.map((p) => proj.toXY(p))))
+        .filter((h): h is XY[] => h !== null)
+        .map((h) => wind(h, false));
+      parts.push({ outer: wind(outer, true), holes });
+    }
+    if (!parts.length) continue;
+    m.building = ids.length;
+    ids.push(f.id);
+    const h = Math.max(MIN_HEIGHT, f.height);
+    const wall = hexToRgb(pick(wallPalette(theme, f.category), `${f.id}:wall`));
+    const choice = selectRoof(
+      f.id,
+      f.category,
+      parts.map((p) => [p.outer, ...p.holes]),
+      theme,
+    );
+    const pitched =
+      choice.kind !== 'flat' && !!choice.rect && roofRise(choice.rect.width, h, theme) > 0;
+    const top = hexToRgb(pitched ? pick(theme.roofs, `${f.id}:roofcolor`) : theme.flatRoof);
+    for (const { outer, holes } of parts) {
+      for (const r of [outer, ...holes]) walls(m, r, 0, h, wall, false, h);
+      m.cap(outer, holes, h, top);
+    }
+    roofs.push('flat');
+  }
+  return m.toMesh(origin, ids, roofs);
+}

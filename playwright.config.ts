@@ -20,9 +20,23 @@ export default defineConfig({
     baseURL: 'http://localhost:4310',
     viewport: { width: 1280, height: 800 },
     deviceScaleFactor: 1,
-    launchOptions: {
-      args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
-    },
+    // Screenshot tests use software WebGL (deterministic, same as CI). Perf runs (PERF=1) use the
+    // installed Chrome with the real GPU instead.
+    ...(process.env.PERF
+      ? // Uncapped frame rate, so results show headroom beyond the display's 60 Hz.
+        {
+          channel: 'chrome',
+          launchOptions: { args: ['--disable-gpu-vsync', '--disable-frame-rate-limit'] },
+        }
+      : {
+          launchOptions: {
+            args: [
+              '--use-angle=swiftshader',
+              '--enable-unsafe-swiftshader',
+              '--ignore-gpu-blocklist',
+            ],
+          },
+        }),
   },
   webServer: {
     command: 'node e2e/serve.mjs',

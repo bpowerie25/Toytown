@@ -11,16 +11,24 @@ export interface ChunkRequest {
   kit: PlanKit | null;
 }
 
+/** One chunk's geometry at each level of detail, plus its model and prop placements. */
 export interface ChunkResult {
-  mesh: ChunkMesh;
+  /** Detailed buildings that keep their procedural geometry at every zoom. */
+  full: ChunkMesh;
+  /** Detailed buildings that hero models replace; shown only below the model zoom. */
+  fitted: ChunkMesh;
+  /** Every building as a plain extrusion, for the lowest 3D level. */
+  plain: ChunkMesh;
   placements: Placement[];
 }
 
 export type ChunkResponse = ({ id: number } & ChunkResult) | { id: number; error: string };
 
-/** Typed arrays in a mesh, for zero-copy transfer from the worker. */
-export function transferables(m: ChunkMesh): ArrayBuffer[] {
-  return [m.positions, m.normals, m.colors, m.walls, m.buildings, m.edges, m.indices].map(
-    (a) => a.buffer as ArrayBuffer,
+/** Typed arrays in a chunk result, for zero-copy transfer from the worker. */
+export function transferables(r: ChunkResult): ArrayBuffer[] {
+  return [r.full, r.fitted, r.plain].flatMap((m) =>
+    [m.positions, m.normals, m.colors, m.walls, m.buildings, m.edges, m.indices].map(
+      (a) => a.buffer as ArrayBuffer,
+    ),
   );
 }

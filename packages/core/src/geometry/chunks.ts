@@ -44,3 +44,17 @@ export function groupByChunk<T>(
   }
   return [...chunks.values()];
 }
+
+/** [west, south, east, north] of a tile, in degrees. */
+export function tileBounds(x: number, y: number, z = CHUNK_ZOOM): [number, number, number, number] {
+  const n = 2 ** z;
+  const lng = (i: number) => (i / n) * 360 - 180;
+  const lat = (j: number) => (Math.atan(Math.sinh(Math.PI * (1 - (2 * j) / n))) * 180) / Math.PI;
+  return [lng(x), lat(y + 1), lng(x + 1), lat(y)];
+}
+
+/** Parse a chunk key ("15/x/y") back to its tile. */
+export function parseChunkKey(key: string): [number, number, number] {
+  const [z, x, y] = key.split('/').map(Number) as [number, number, number];
+  return [x, y, z];
+}

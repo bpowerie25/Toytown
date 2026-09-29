@@ -2,14 +2,66 @@
 
 Updated at the end of each phase.
 
-| Phase           | Status   | Notes                                                          |
-| --------------- | -------- | -------------------------------------------------------------- |
-| 0 Scaffold      | done     | Workspace, tooling, kit validation, CI, licences, examples.    |
-| 1 Style         | done     | toytown.json, Nunito labels, Playwright screenshot tests.      |
-| 2 Data          | done     | build-data CLI, tag-map.json, both datasets, report.           |
-| 2.5 Spike       | approved | deck.gl spike; model kit colour fix. See docs/spike/README.md. |
-| 3 Buildings     | done     | Procedural buildings, worker meshing, minimal render layer.    |
-| 4 Toon + models | done     | Toon/ink rendering, fit/decorate/point, props, instancing.     |
+| Phase           | Status   | Notes                                                                  |
+| --------------- | -------- | ---------------------------------------------------------------------- |
+| 0 Scaffold      | done     | Workspace, tooling, kit validation, CI, licences, examples.            |
+| 1 Style         | done     | toytown.json, Nunito labels, Playwright screenshot tests.              |
+| 2 Data          | done     | build-data CLI, tag-map.json, both datasets, report.                   |
+| 2.5 Spike       | approved | deck.gl spike; model kit colour fix. See docs/spike/README.md.         |
+| 3 Buildings     | done     | Procedural buildings, worker meshing, minimal render layer.            |
+| 4 Toon + models | done     | Toon/ink rendering, fit/decorate/point, props, instancing.             |
+| 4b Model kit    | done     | @toytown/models + zip, variants, kit CI, adding-models guide.          |
+| 5 Performance   | done     | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs. |
+
+## Phase 5: Performance and levels of detail (2026-09-29)
+
+### What was done
+
+- **LOD by zoom**, as in the plan: base style only below z14; plain extrusions at z14–15 (no
+  windows or roofs); full procedural buildings from z15; hero models, props and trees from z16.
+  Also model outline hulls from z17. The thresholds are configurable (`lod` option).
+- **Three meshes per chunk from the worker**: `full` (kept buildings), `fitted` (the detailed
+  version of buildings that models replace, shown at z15–16 so nothing disappears before the
+  models appear) and `plain` (every building, flat-topped in its roof colour).
+- **Lazy chunks**: a chunk is meshed when its bounding sphere enters the frustum, and its GPU
+  buffers are disposed after 20 s out of view.
+- **Per-chunk culling for models**: each model's `InstancedMesh` holds only the instances in
+  visible, loaded chunks, rebuilt from precomputed per-chunk matrices when the visible set changes.
+  Buffers grow as needed.
+- **Debug overlay** (`debug: true`, or `?debug` in the examples): FPS, zoom, LOD level, draw calls,
+  triangles, chunks, instances and the layer's CPU time.
+- **`ready` now means "the current view is drawn"**: it resolves after a frame where the visible
+  chunks and the models they need are loaded. Await it again after moving the map.
+- **Perf harness** (`e2e/perf.spec.ts`, `PERF=1`): installed Chrome, real GPU, vsync off,
+  continuous rotation at z16 / pitch 60 over Waterford, with laptop and CPU-throttled phone
+  profiles. Results are in `docs/performance.md`.
+- **Results on an Apple M5**: 274 → 513 fps (p95 4.9 → 3.2 ms) on the laptop profile. Draw calls
+  73 → 46, and instances in view 16.4k → 7.6k. The phone profile (4× CPU throttle) runs at
+  644 fps. The layer's CPU time is 0.35 ms per frame.
+- Tests: LOD levels, the plain mesher, chunk splitting, tile chunks for tree-only tiles, chunk
+  spheres and the disposal policy (473 unit tests). A new e2e test walks z13.5 → z16.5 checking
+  the level, base-building visibility, instance counts and the overlay. The examples now open at
+  z16.2, so models show.
+
+### Decisions
+
+- **Frame rate measured uncapped** (vsync off). With vsync the M5 sits at 60 fps even with the old
+  code and 4× CPU throttling, which says nothing about headroom.
+- **The M5 isn't a mid-range laptop**, so `docs/performance.md` gives estimates for mid-range
+  laptop and phone GPUs, labelled as estimates, and draw calls and triangles as the portable
+  numbers. The phone budget still needs a real-device check.
+- **Instances are culled per chunk on the CPU** rather than with one InstancedMesh per chunk per
+  model, which would mean hundreds of draw calls.
+- The PROGRESS table was missing the 4b row: the same silent text-match failure that dropped
+  rows before. Rows are now inserted by position.
+
+### Known issues
+
+- **Not measured on a real mid-range laptop or phone.** See `docs/performance.md`.
+- The JS heap is up about 34 MB, because chunks keep CPU-side vertex arrays. That's deliberate
+  until phase 6's picking decides between raycasting and GPU id picking.
+- No distance-based LOD within a level, and no DPR cap. Both are listed as next steps in
+  `docs/performance.md`.
 
 ## Phase 4b: Model kit as its own distributable (2026-09-29)
 

@@ -20,6 +20,20 @@ export {
 export { hash32, hashUnit, pick } from './hash';
 export { cleanRing, wind, edgeNormal, insetRing } from './ring';
 export { selectRoof, roofRise, type RoofKind, type RoofChoice } from './roof';
-export { meshChunk, hexToRgb, type ChunkMesh, type BuildingInputFeature } from './mesher';
-export { CHUNK_ZOOM, tileOf, tileCenter, groupByChunk, type Chunk } from './chunks';
+export {
+  meshChunk,
+  meshChunkPlain,
+  hexToRgb,
+  type ChunkMesh,
+  type BuildingInputFeature,
+} from './mesher';
+export {
+  CHUNK_ZOOM,
+  tileOf,
+  tileCenter,
+  tileBounds,
+  parseChunkKey,
+  groupByChunk,
+  type Chunk,
+} from './chunks';
 export { toMercator, mercatorPerMetre } from './mercator';
