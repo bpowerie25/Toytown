@@ -1,16 +1,16 @@
 /// <reference lib="webworker" />
-import { meshChunk } from '../geometry/mesher';
-import { transferables, type MeshRequest, type MeshResponse } from './protocol';
+import { processChunk } from './chunk';
+import { transferables, type ChunkRequest, type ChunkResponse } from './protocol';
 
-self.onmessage = (e: MessageEvent<MeshRequest>) => {
-  const { id, features, origin, theme } = e.data;
+self.onmessage = (e: MessageEvent<ChunkRequest>) => {
+  const { id, ...request } = e.data;
   try {
-    const mesh = meshChunk(features, origin, theme);
+    const result = processChunk(request);
     (self as unknown as Worker).postMessage(
-      { id, mesh } satisfies MeshResponse,
-      transferables(mesh),
+      { id, ...result } satisfies ChunkResponse,
+      transferables(result.mesh),
     );
   } catch (err) {
-    (self as unknown as Worker).postMessage({ id, error: String(err) } satisfies MeshResponse);
+    (self as unknown as Worker).postMessage({ id, error: String(err) } satisfies ChunkResponse);
   }
 };

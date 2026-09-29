@@ -62,7 +62,8 @@ describe('buildData', () => {
   it('writes standalone POIs that map to a model as points', () => {
     const pub = byId('node/' + nodes.find((n) => n.tags?.amenity === 'pub')!.id);
     expect(pub.geometry.type).toBe('Point');
-    expect(pub.properties).toMatchObject({ category: 'pub', name: 'Lonely Pub' });
+    // The pub is at (-30, 40); the nearest street (y = 20) is due south of it.
+    expect(pub.properties).toMatchObject({ category: 'pub', name: 'Lonely Pub', front: 180 });
     expect(stats.pois).toEqual({ inBuildings: 1, standalone: 1 });
   });
 

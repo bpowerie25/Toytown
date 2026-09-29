@@ -12,7 +12,10 @@ const map = new maplibregl.Map({
 });
 map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-const toy = new ToyTown({ data: './data/waterford.geojson' }).addTo(map);
+const toy = new ToyTown({
+  data: './data/waterford.geojson',
+  models: './models/manifest.json',
+}).addTo(map);
 
 // Exposed for the Playwright screenshot tests and for poking around in devtools.
 declare global {

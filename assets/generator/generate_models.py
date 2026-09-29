@@ -391,6 +391,49 @@ BUILDERS = [
     (metal_man, ["landmark override by OSM id"]),
 ]
 
+# Props: small parts attached to procedural buildings when a hero model doesn't fit ("decorate").
+# Same conventions as models (front is -Y here, +Z after export). Wall-mounted props have their
+# origin on the wall plane at the prop's base, and extend outwards (-Y).
+def prop_awning():
+    m = Model("awning", pack="props")
+    for i in range(6):  # striped, projecting out from the wall
+        x = -2 + (i + 0.5) * 4 / 6
+        m.box(4 / 6, 1.4, 0.12, x, -0.7, 0.45, "awning" if i % 2 == 0 else "white")
+    m.box(4, 0.08, 0.35, 0, -1.4, 0.2, "awning")  # front valance
+    m.box(4, 0.1, 0.12, 0, -0.05, 0.62, "black")  # wall rail
+    return m
+
+def prop_red_cross():
+    m = Model("red_cross", pack="props")
+    m.box(2.2, 0.15, 2.2, 0, -0.075, 0, "white")
+    m.box(0.6, 0.12, 1.8, 0, -0.2, 0.2, "red"); m.box(1.8, 0.12, 0.6, 0, -0.2, 0.8, "red")
+    return m
+
+def prop_spire():
+    m = Model("spire", pack="props")
+    m.box(5, 5, 14, color="stone")
+    m.box(5.4, 5.4, 0.5, z=14, color="stone")
+    m.cone(3.4, 10, z=14.5, color="roof_slate", sections=8)
+    m.box(1.2, 0.2, 2.4, 0, -2.55, 0, "door")
+    m.box(0.12, 0.12, 1.6, z=24.3, color="gold"); m.box(0.8, 0.12, 0.12, z=25.2, color="gold")
+    return m
+
+def prop_canopy():
+    m = Model("canopy", pack="props")
+    m.box(10, 7, 0.6, z=4.6, color="white"); m.box(10.2, 7.2, 0.3, z=4.9, color="red")
+    for x in (-3.5, 3.5):
+        m.box(0.4, 0.4, 4.6, x, 0, 0, "metal")
+        m.box(1.0, 0.6, 1.5, x, 1.2, 0, "red"); m.box(0.8, 0.62, 0.5, x, 1.2, 0.9, "white")  # pumps
+    return m
+
+PROPS = [
+    # (builder, categories it decorates, how it attaches)
+    (prop_awning, ["shop", "cafe"], {"at": "front-wall", "z": "ground-floor", "fit_frontage": 0.7}),
+    (prop_red_cross, ["hospital"], {"at": "front-wall", "z": "top"}),
+    (prop_spire, ["church"], {"at": "front-edge", "z": "ground"}),
+    (prop_canopy, ["petrol_station"], {"at": "front-ground", "z": "ground", "offset": 6}),
+]
+
 if __name__ == "__main__":
     for root, _, files in os.walk(OUT):
         for f in files:
@@ -405,9 +448,17 @@ if __name__ == "__main__":
                               "osm_tags": tags, "materials": list(mdl.parts.keys()),
                               "footprint_m": [round(float(bounds[1][0] - bounds[0][0]), 1), round(float(bounds[1][1] - bounds[0][1]), 1)],
                               "height_m": round(float(bounds[1][2]), 1)}
+    props = {}
+    for b, categories, attach in PROPS:
+        mdl = b(); path = mdl.export(); models.append(mdl)
+        bounds = trimesh.util.concatenate([x for ms in mdl.parts.values() for x in ms]).bounds
+        props[mdl.name] = {"file": f"{mdl.pack}/{os.path.basename(path)}", "categories": categories,
+                           "attach": attach, "materials": list(mdl.parts.keys()),
+                           "footprint_m": [round(float(bounds[1][0] - bounds[0][0]), 1), round(float(bounds[1][1] - bounds[0][1]), 1)],
+                           "height_m": round(float(bounds[1][2]), 1)}
     json.dump({"version": 1, "units": "metres", "up": "+Y", "front": "+Z",
-               "palette": PALETTE, "models": manifest}, open(os.path.join(OUT, "manifest.json"), "w"), indent=2)
-    print(len(manifest), "models")
+               "palette": PALETTE, "models": manifest, "props": props}, open(os.path.join(OUT, "manifest.json"), "w"), indent=2)
+    print(len(manifest), "models,", len(props), "props")
 
     import matplotlib; matplotlib.use("Agg")
     import matplotlib.pyplot as plt

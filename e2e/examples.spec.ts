@@ -42,10 +42,7 @@ for (const { name, title } of EXAMPLES) {
       expect(layers).toContain('toytown-base-buildings');
       // Custom layers aren't part of getStyle(), so look the 3D layer up directly.
       const hasBuildings = await page.evaluate(
-        () =>
-          !!(window as unknown as { map: import('maplibre-gl').Map }).map.getLayer(
-            'toytown-buildings',
-          ),
+        () => !!(window as unknown as { map: import('maplibre-gl').Map }).map.getLayer('toytown'),
       );
       expect(hasBuildings).toBe(true);
       const baseVisibility = await page.evaluate(() =>
@@ -55,6 +52,18 @@ for (const { name, title } of EXAMPLES) {
         ),
       );
       expect(baseVisibility).toBe('none'); // hidden while the 3D buildings are shown
+      // Hero models, props and trees in the initial view are loaded and instanced.
+      const stats = await page.evaluate(
+        () =>
+          (
+            window as unknown as {
+              toy: { stats(): { instances: Record<string, { state: string }> } };
+            }
+          ).toy.stats().instances,
+      );
+      const ready = Object.values(stats).filter((g) => g.state === 'ready').length;
+      expect(ready).toBeGreaterThan(5);
+      expect(Object.values(stats).filter((g) => g.state === 'failed')).toEqual([]);
       expect(errors).toEqual([]);
 
       await expect(page).toHaveScreenshot(`${name}.png`);
@@ -81,8 +90,32 @@ for (const { name, title } of EXAMPLES) {
           [zoom, bearing] as const,
         );
         await waitForMap(page);
-        await page.screenshot({ path: `docs/buildings/${name}-z${zoom}.png` });
+        await page.screenshot({ path: `docs/toon/${name}-z${zoom}.png` });
       }
     });
   });
 }
+
+test('globe projection: 3D is off until globe has blended into mercator', async ({ page }) => {
+  type G = Window & {
+    map: import('maplibre-gl').Map;
+    toy: { ready: Promise<void>; stats(): { drawing: boolean } };
+  };
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/waterford/');
+  await page.evaluate(() => (window as unknown as G).toy.ready);
+  const at = async (zoom: number) => {
+    await page.evaluate((z) => (window as unknown as G).map.jumpTo({ zoom: z, pitch: 0 }), zoom);
+    await page.waitForFunction(() => !(window as unknown as G).map.isMoving());
+    await page.waitForTimeout(500);
+    return page.evaluate(() => ({
+      drawing: (window as unknown as G).toy.stats().drawing,
+      base: (window as unknown as G).map.getLayoutProperty('toytown-base-buildings', 'visibility'),
+    }));
+  };
+  await page.evaluate(() => (window as unknown as G).map.setProjection({ type: 'globe' }));
+  expect(await at(4)).toEqual({ drawing: false, base: 'visible' });
+  expect(await at(17)).toEqual({ drawing: true, base: 'none' });
+  expect(errors).toEqual([]);
+});

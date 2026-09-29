@@ -1,12 +1,34 @@
 export { parseManifest, ManifestError } from './manifest';
-export type { Manifest, ModelEntry } from './manifest';
+export type { Manifest, ModelEntry, PropEntry, PropAttach } from './manifest';
 export { toytownStyle, setBaseBuildingsVisible, BASE_BUILDING_LAYER_ID } from './style';
 export type { StyleOptions, LayerHost } from './style';
 export * from './geometry';
 export * from './classify';
-export { DEFAULT_THEME, wallPalette, type Theme, type BuildingTheme } from './themes';
+export {
+  DEFAULT_THEME,
+  wallPalette,
+  type Theme,
+  type BuildingTheme,
+  type LightingTheme,
+  type OutlineTheme,
+  type ModelsTheme,
+  type FitRules,
+} from './themes';
 
-export { ToyTown, toBuildings, type ToyTownOptions } from './toytown';
-export { BuildingLayer } from './render/layer';
+export {
+  planKit,
+  fitModel,
+  decorate,
+  planBuildings,
+  planPoints,
+  planTrees,
+  type Placement,
+  type PlanKit,
+  type PlannedBuilding,
+  type PointFeature,
+} from './placement';
+export { ToyTown, splitData, type ToyTownOptions, type DataCollection } from './toytown';
+export { ToyTownLayer, instanceMatrix, shouldDraw3D } from './render/layer';
+export { SceneFrame } from './render/frame';
 
 export const VERSION = '0.0.0';

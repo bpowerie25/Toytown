@@ -31,6 +31,12 @@ export interface ChunkMesh {
   walls: Float32Array;
   /** Per vertex: index into `ids`. */
   buildings: Float32Array;
+  /**
+   * Per vertex: face-edge coordinates for the ink-line shader (0 or 255). xyz are barycentric
+   * corners; w = 255 means "triangle, outline all three edges", w = 0 means "quad, ignore y"
+   * (y is shared by both ends of the quad's diagonal). All 255 means no outline (roof decks).
+   */
+  edges: Uint8Array;
   indices: Uint32Array;
   ids: string[];
   /** Roof chosen per building, same order as `ids`. */
@@ -38,6 +44,11 @@ export interface ChunkMesh {
 }
 
 type V3 = [number, number, number];
+type Edge = [number, number, number, number];
+const NO_EDGE: Edge = [255, 255, 255, 255];
+// Triangles fan as (0,1,2)(0,2,3): the diagonal 0–2 always has y = 0, which quads ignore.
+const QUAD_EDGES: Edge[] = [[255, 0, 0, 0], [0, 255, 0, 0], [0, 0, 255, 0], [0, 255, 0, 0]]; // prettier-ignore
+const TRI_EDGES: Edge[] = [[255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255]]; // prettier-ignore
 type RGB = [number, number, number];
 
 const UP: V3 = [0, 0, 1];
@@ -65,11 +76,19 @@ class MeshBuilder {
   col: number[] = [];
   wall: number[] = [];
   bid: number[] = [];
+  edge: number[] = [];
   idx: number[] = [];
   building = 0;
 
-  private vert(p: V3, n: V3, c: RGB, w: [number, number, number, number]): number {
+  private vert(
+    p: V3,
+    n: V3,
+    c: RGB,
+    w: [number, number, number, number],
+    e: Edge = NO_EDGE,
+  ): number {
     const i = this.pos.length / 3;
+    this.edge.push(e[0], e[1], e[2], e[3]);
     this.pos.push(p[0], p[1], p[2]);
     this.nrm.push(Math.round(n[0] * 127), Math.round(n[1] * 127), Math.round(n[2] * 127));
     this.col.push(c[0], c[1], c[2]);
@@ -91,7 +110,10 @@ class MeshBuilder {
       w = walls && [...walls].reverse();
       n = [-n[0], -n[1], -n[2]];
     }
-    const ids = pts.map((p, i) => this.vert(p, n, color, w ? w[i]! : [0, p[2], 0, 0]));
+    const edges = pts.length === 3 ? TRI_EDGES : pts.length === 4 ? QUAD_EDGES : null;
+    const ids = pts.map((p, i) =>
+      this.vert(p, n, color, w ? w[i]! : [0, p[2], 0, 0], edges ? edges[i] : NO_EDGE),
+    );
     for (let i = 1; i + 1 < ids.length; i++) this.idx.push(ids[0]!, ids[i]!, ids[i + 1]!);
   }
 
@@ -122,6 +144,7 @@ class MeshBuilder {
       colors: Uint8Array.from(this.col),
       walls: Float32Array.from(this.wall),
       buildings: Float32Array.from(this.bid),
+      edges: Uint8Array.from(this.edge),
       indices: Uint32Array.from(this.idx),
       ids,
       roofs,

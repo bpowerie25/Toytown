@@ -24,6 +24,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm build
+      # The built packages must work in plain Node, not just through Vitest's module interop.
+      - name: Smoke-test built packages in Node
+        run: |
+          node -e "import('./packages/core/dist/index.js').then((m) => console.log('toytown-gl exports', Object.keys(m).length))"
+          node packages/cli/dist/index.js --version
       - run: pnpm test
       - run: pnpm typecheck
 

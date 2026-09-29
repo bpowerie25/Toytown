@@ -2,14 +2,96 @@
 
 Updated at the end of each phase.
 
-| Phase           | Status      | Notes                                                          |
-| --------------- | ----------- | -------------------------------------------------------------- |
-| 0 Scaffold      | done        | Workspace, tooling, kit validation, CI, licences, examples.    |
-| 1 Style         | done        | toytown.json, Nunito labels, Playwright screenshot tests.      |
-| 2 Data          | done        | build-data CLI, tag-map.json, both datasets, report.           |
-| 2.5 Spike       | approved    | deck.gl spike; model kit colour fix. See docs/spike/README.md. |
-| 3 Buildings     | done        | Procedural buildings, worker meshing, minimal render layer.    |
-| 4 Toon + models | in progress |                                                                |
+| Phase           | Status   | Notes                                                          |
+| --------------- | -------- | -------------------------------------------------------------- |
+| 0 Scaffold      | done     | Workspace, tooling, kit validation, CI, licences, examples.    |
+| 1 Style         | done     | toytown.json, Nunito labels, Playwright screenshot tests.      |
+| 2 Data          | done     | build-data CLI, tag-map.json, both datasets, report.           |
+| 2.5 Spike       | approved | deck.gl spike; model kit colour fix. See docs/spike/README.md. |
+| 3 Buildings     | done     | Procedural buildings, worker meshing, minimal render layer.    |
+| 4 Toon + models | done     | Toon/ink rendering, fit/decorate/point, props, instancing.     |
+
+## Phase 4: Toon rendering and hero models (2026-09-29)
+
+### What was done
+
+- **Renderer rebuilt on a single scene frame** (`SceneFrame`): metres from the data's centre, with
+  MapLibre's `mainMatrix` × frame computed in float64 into the three.js camera's projection. This
+  lets standard `MeshToonMaterial`, lights, `InstancedMesh` and per-chunk frustum culling work.
+  Pitch and bearing come for free from MapLibre's matrix. Details in `docs/rendering.md`.
+- **Toon shading**: `MeshToonMaterial` with a 3-step gradient, one sun plus ambient (intensities
+  scaled by π for three's Lambert term), and faces towards the sun showing exact palette hex.
+- **Ink outlines** in `#2B2D42`: an edge shader on procedural buildings (barycentric edge
+  coordinates, quad diagonals skipped, constant pixel width) and inverted hulls on hero models
+  (a second `InstancedMesh` sharing instance matrices, with smooth welded normals). Ink and
+  windows fade with ground resolution, which fixes phase 3's z16 moiré.
+- **Hero models**: GLBs loaded lazily, only for models with a placement in view. Materials are
+  resolved by palette key through the theme into vertex colours. One `InstancedMesh` per model.
+- **Placement** (`placement.ts`, pure and unit-tested, run in the chunk workers before meshing):
+  - `fit`: rectangularity, aspect checked against the frontage, scale tolerance, and the model
+    placed at the centroid facing `front`. Fitted buildings are left out of the mesh.
+  - `decorate`: props attached by manifest rules.
+  - `point`: POI models placed only on free spots.
+  - Trees are instanced with hash-based scale and rotation.
+
+  Tolerances are in the theme (`models.fit`).
+
+- **Prop set in the generator**: `awning`, `red_cross`, `spire` and `canopy` in
+  `assets/models/props/`, all within 300 triangles. Each records in the manifest which
+  categories it decorates and how it attaches. `parseManifest` validates `props`, and the kit
+  tests cover them (validator, budget, materials).
+- **Globe projection**: 3D draws only once MapLibre's globe-to-mercator transition is complete;
+  until then the flat base buildings show. There's an e2e test for this.
+- **Examples** load the kit through a small inline Vite plugin (`examples/kit-models.ts`) that
+  serves `assets/models` in dev and copies it into the build.
+- **build-data**: standalone POIs now carry a street-facing `front`. Datasets were rebuilt.
+- **Numbers**: in Waterford, 9,561 of 26,870 buildings fit a hero model. There are 296 awnings,
+  27 spires, 12 red crosses, 6 canopies and 3,839 trees.
+- Tests: 324 unit tests (placement, scene frame, instance orientation, globe gate, mercator, edge
+  flags, props) plus 3 e2e tests (both towns with model-load assertions, and globe). The first
+  phase 4 screenshots and docs are in `docs/toon/`.
+
+### Decisions
+
+- **One scene frame instead of per-chunk matrices.** Phase 3's per-chunk custom shader couldn't use
+  `MeshToonMaterial`, lights or instancing. Float32 relative to a city-centre origin is precise
+  enough, and the frame projection is still combined in float64.
+- **Model colours as vertex colours** from the theme, rather than one material per palette key.
+  One draw call per model type, and themes still recolour the kit by palette key.
+- **Fit aspect is measured against the frontage** (across the front), following the spike's
+  finding that models rotated to face the street otherwise got the wrong proportions.
+- **Landmarks (`landmark_*`) always fit**, with the scale clamped.
+- **Placement and chunk order are fixed** (chunk key, then model name and id). Without this,
+  overlapping models drew in whatever order the workers finished, and screenshots differed by 5%
+  between runs.
+- **Playwright expect timeout raised to 30 s**: software WebGL in the container takes seconds per
+  frame for a whole town of instanced models.
+
+### Bugs found and fixed along the way
+
+- **The core imported `maplibre-gl` at runtime** (for `MercatorCoordinate`), which broke plain
+  Node, including the CLI. Vitest's interop hid it. The core now computes mercator itself
+  (`toMercator`, `mercatorPerMetre`) and imports MapLibre for types only. CI now smoke-tests the
+  built core and CLI in Node.
+- **`LocalProjection` used 110,574 m per degree of latitude** (the ellipsoid's equatorial value),
+  while MapLibre's mercator is spherical (111,319.5 m/°). Meshes would have been squashed 0.67%
+  north–south against the base map (up to about 3 m at a chunk edge). It now uses MapLibre's
+  sphere, which is also closer to the real meridian degree at 52°N.
+- **The kit GLBs have no normals**, so the loader now computes flat ones.
+- **GLSL `smoothstep` with equal edges** produced NaNs in the ink shader, turning walls black. The
+  edge width is now clamped above 0.
+- **Lazy-loading race**: `ready` could resolve before models whose load a `moveend` had already
+  started. Each model group now keeps its load promise.
+
+### Known issues
+
+- **Model height isn't checked by fit.** The office hero (24.8 m) can tower over 3-storey
+  neighbours. A height tolerance would need better default heights first.
+- **Streets of identical hero houses.** Phase 4b adds 2–3 variants per common category.
+- **Performance is unmeasured on real hardware.** A single `house` instanced mesh holds 9.5k
+  instances (about 2.3M triangles, plus hulls), always drawn. Phase 5 adds LOD, per-chunk
+  instancing and the FPS overlay.
+- **Picking and click popups** are phase 6.
 
 ## Phase 3: Procedural toy buildings (2026-09-29)
 

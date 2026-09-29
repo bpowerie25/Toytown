@@ -645,5 +645,90 @@
       ],
       "height_m": 22.7
     }
+  },
+  "props": {
+    "awning": {
+      "file": "props/awning.glb",
+      "categories": [
+        "shop",
+        "cafe"
+      ],
+      "attach": {
+        "at": "front-wall",
+        "z": "ground-floor",
+        "fit_frontage": 0.7
+      },
+      "materials": [
+        "awning",
+        "white",
+        "black"
+      ],
+      "footprint_m": [
+        4.0,
+        1.4
+      ],
+      "height_m": 0.7
+    },
+    "red_cross": {
+      "file": "props/red_cross.glb",
+      "categories": [
+        "hospital"
+      ],
+      "attach": {
+        "at": "front-wall",
+        "z": "top"
+      },
+      "materials": [
+        "white",
+        "red"
+      ],
+      "footprint_m": [
+        2.2,
+        0.3
+      ],
+      "height_m": 2.2
+    },
+    "spire": {
+      "file": "props/spire.glb",
+      "categories": [
+        "church"
+      ],
+      "attach": {
+        "at": "front-edge",
+        "z": "ground"
+      },
+      "materials": [
+        "stone",
+        "roof_slate",
+        "door",
+        "gold"
+      ],
+      "footprint_m": [
+        6.8,
+        6.8
+      ],
+      "height_m": 25.9
+    },
+    "canopy": {
+      "file": "props/canopy.glb",
+      "categories": [
+        "petrol_station"
+      ],
+      "attach": {
+        "at": "front-ground",
+        "z": "ground",
+        "offset": 6
+      },
+      "materials": [
+        "white",
+        "red",
+        "metal"
+      ],
+      "footprint_m": [
+        10.2,
+        7.2
+      ],
+      "height_m": 5.2
+    }
   }
 }

@@ -35,8 +35,11 @@ describe('LocalProjection', () => {
   it('round-trips and measures roughly a metre per metre', () => {
     const p = new LocalProjection([-7.11, 52.26]);
     const [x, y] = p.toXY([-7.1, 52.27]);
-    expect(x).toBeCloseTo(0.01 * 111_320 * Math.cos((52.26 * Math.PI) / 180), 3);
-    expect(y).toBeCloseTo(1105.74, 2);
+    expect(x).toBeCloseTo(
+      0.01 * ((2 * Math.PI * 6378137) / 360) * Math.cos((52.26 * Math.PI) / 180),
+      3,
+    );
+    expect(y).toBeCloseTo(1113.19, 2);
     const back = p.toLngLat([x, y]);
     expect(back[0]).toBeCloseTo(-7.1, 10);
     expect(back[1]).toBeCloseTo(52.27, 10);

@@ -15,19 +15,19 @@ Buildings are classified with `assets/models/tag-map.json` (see `docs/tag-mappin
 | … classified by landmark             |                  0 (0.0%) |                   1 (0.0%) |
 | … classified by tags                 |             17417 (64.8%) |               5172 (82.5%) |
 | … classified by poi                  |                472 (1.8%) |                  44 (0.7%) |
-| … classified by heuristic            |              6277 (23.4%) |                 254 (4.0%) |
-| … classified by fallback             |              2704 (10.1%) |                801 (12.8%) |
+| … classified by heuristic            |              6300 (23.4%) |                 256 (4.1%) |
+| … classified by fallback             |              2681 (10.0%) |                799 (12.7%) |
 | Buildings with a street-facing front |             26843 (99.9%) |              6269 (100.0%) |
 | POIs inside buildings                |                      1071 |                         96 |
 | Standalone POI points                |                        34 |                          9 |
-| Trees (mapped + scattered)           |               2085 + 1742 |                 3028 + 575 |
+| Trees (mapped + scattered)           |               2085 + 1754 |                 3028 + 578 |
 
 ## Buildings per category
 
 | Category             |     Waterford |      Tramore |
 | -------------------- | ------------: | -----------: |
-| `house`              | 22278 (82.9%) | 4426 (70.6%) |
-| `generic`            |  3057 (11.4%) | 1055 (16.8%) |
+| `house`              | 22300 (83.0%) | 4428 (70.6%) |
+| `generic`            |  3034 (11.3%) | 1053 (16.8%) |
 | `semi_detached`      |    229 (0.9%) |   230 (3.7%) |
 | `terraced_house`     |     61 (0.2%) |   353 (5.6%) |
 | `shop`               |    318 (1.2%) |    33 (0.5%) |
@@ -39,7 +39,7 @@ Buildings are classified with `assets/models/tag-map.json` (see `docs/tag-mappin
 | `barn`               |     77 (0.3%) |    13 (0.2%) |
 | `bungalow`           |     35 (0.1%) |    42 (0.7%) |
 | `pub`                |     48 (0.2%) |     9 (0.1%) |
-| `warehouse`          |     44 (0.2%) |            – |
+| `warehouse`          |     45 (0.2%) |            – |
 | `church`             |     29 (0.1%) |     2 (0.0%) |
 | `supermarket`        |     19 (0.1%) |     4 (0.1%) |
 | `pharmacy`           |     16 (0.1%) |     4 (0.1%) |
@@ -60,7 +60,7 @@ Buildings are classified with `assets/models/tag-map.json` (see `docs/tag-mappin
 
 |   # | Tags                                                              | Buildings |
 | --: | ----------------------------------------------------------------- | --------: |
-|   1 | `building=yes`                                                    |      2572 |
+|   1 | `building=yes`                                                    |      2548 |
 |   2 | `building=yes + man_made=silo`                                    |        26 |
 |   3 | `building=yes + man_made=storage_tank`                            |        23 |
 |   4 | `building=yes + poi:leisure=fitness_centre`                       |         8 |
@@ -96,7 +96,7 @@ Buildings are classified with `assets/models/tag-map.json` (see `docs/tag-mappin
 |   # | Tags                                                                                 | Buildings |
 | --: | ------------------------------------------------------------------------------------ | --------: |
 |   1 | `building=static_caravan`                                                            |       453 |
-|   2 | `building=yes`                                                                       |       259 |
+|   2 | `building=yes`                                                                       |       257 |
 |   3 | `building=mobile_home`                                                               |        65 |
 |   4 | `building=storage_tank + man_made=storage_tank`                                      |         4 |
 |   5 | `amenity=community_centre + building=yes`                                            |         2 |

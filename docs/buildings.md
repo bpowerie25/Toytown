@@ -79,16 +79,7 @@ thread.
 Meshing all 26,870 Waterford buildings takes about 230 ms of CPU and produces 1.41M vertices and
 0.69M triangles (about 62 MB) in 110 draw calls. Phase 5 adds LOD and culling.
 
-## Rendering (minimal; phase 4 replaces the material)
+## Rendering
 
-`BuildingLayer` is a MapLibre custom layer (`renderingMode: '3d'`) that renders a three.js scene
-into MapLibre's WebGL context, sharing its depth buffer. It sits below the first symbol layer, so
-labels stay on top, and while it's active it hides the style's flat `toytown-base-buildings` layer.
-
-- **Precision**: for each chunk, MapLibre's `defaultProjectionData.mainMatrix` (mercator [0, 1] to
-  clip space) is multiplied on the CPU in float64 with the chunk's local-metres-to-mercator
-  transform. Only that combined matrix goes to the GPU, so there's no float32 jitter at city scale.
-- **Faces**: the chunk transform flips y (mercator y points south) and `mainMatrix` flips it back,
-  so outward faces stay counter-clockwise and default back-face culling is right.
-- **Lighting** is ambient plus one sun, with colours used as sRGB. Lit faces show the exact palette
-  hex.
+Rendering (toon shading, ink edges, the scene frame and globe handling) is described in
+[rendering.md](rendering.md). The window strips described above are drawn by that material.

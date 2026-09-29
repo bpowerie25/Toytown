@@ -70,11 +70,33 @@
     "windowsOff": ["warehouse", "barn", "parking_garage"],
     "minWindowHeight": 3.5,
     "floorHeight": 3,
-    "windowSpacing": 2.6,
-    "lighting": {
-      "ambient": 0.72,
-      "sun": 0.42,
-      "sunDirection": [-0.45, -0.6, 0.66]
+    "windowSpacing": 2.6
+  },
+  "lighting": {
+    "ambient": 0.7,
+    "sun": 0.3,
+    "sunDirection": [-0.45, -0.6, 0.66],
+    "toonSteps": [0, 0.5, 1]
+  },
+  "outline": {
+    "color": "#2B2D42",
+    "hullWidth": 0.12,
+    "edgeWidth": 1.1,
+    "fadeStart": 0.35,
+    "fadeEnd": 0.9
+  },
+  "models": {
+    "palette": {},
+    "exclude": ["generic", "tree"],
+    "fit": {
+      "minScale": 0.6,
+      "maxScale": 1.6,
+      "aspectTolerance": 0.4,
+      "minRectangularity": 0.75
+    },
+    "trees": {
+      "minScale": 0.8,
+      "maxScale": 1.25
     }
   }
 }

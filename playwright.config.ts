@@ -11,6 +11,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   expect: {
+    // Software WebGL (SwiftShader) takes seconds per frame for a whole town of instanced models.
+    timeout: 30_000,
     // Tiles come live from OpenFreeMap, whose data updates weekly: allow small drift.
     toHaveScreenshot: { maxDiffPixelRatio: 0.03, animations: 'disabled' },
   },

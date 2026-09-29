@@ -101,6 +101,7 @@ describe('meshChunk', () => {
     const { vertices } = inspect(m);
     for (const arr of [m.normals, m.colors]) expect(arr.length).toBe(vertices * 3);
     expect(m.walls.length).toBe(vertices * 4);
+    expect(m.edges.length).toBe(vertices * 4);
     expect(Math.max(...m.indices)).toBe(vertices - 1);
   });
 
@@ -156,6 +157,21 @@ describe('meshChunk', () => {
       [...t.walls.terraced_house!, ...t.roofs].map((h) => hexToRgb(h).join(',')),
     );
     for (const c of colors) expect(allowed.has(c), c).toBe(true);
+  });
+
+  it('marks quad faces so the ink shader skips their diagonals', () => {
+    const m = meshChunk([building('way/1', 'office', 12, [rect(0, 0, 20, 15)])], ORIGIN, t);
+    // Every triangle of a quad: one corner has y = 255 and the other two have y = 0 on the diagonal
+    // (quads, w = 0), or it's a triangle / roof deck (w = 255).
+    for (let i = 0; i < m.indices.length; i += 3) {
+      const tri = [m.indices[i]!, m.indices[i + 1]!, m.indices[i + 2]!];
+      const w = tri.map((v) => m.edges[v * 4 + 3]!);
+      expect(new Set(w).size).toBe(1);
+      if (w[0] === 0) {
+        const ys = tri.map((v) => m.edges[v * 4 + 1]!).sort();
+        expect(ys).toEqual([0, 0, 255]);
+      }
+    }
   });
 
   it('is deterministic per building id', () => {

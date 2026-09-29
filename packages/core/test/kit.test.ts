@@ -12,6 +12,7 @@ import { parseManifest } from '../src/manifest';
 const MODELS = join(dirname(fileURLToPath(import.meta.url)), '../../../assets/models');
 const manifest = parseManifest(JSON.parse(readFileSync(join(MODELS, 'manifest.json'), 'utf8')));
 const entries = Object.entries(manifest.models);
+const props = Object.entries(manifest.props ?? {});
 
 function glbFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {
@@ -21,10 +22,18 @@ function glbFiles(dir: string): string[] {
   });
 }
 
+function triangles(gltf: Gltf): number {
+  return gltf.meshes.reduce(
+    (n, m) =>
+      n + m.primitives.reduce((k, p) => k + (gltf.accessors[p.indices!]!.count ?? 0) / 3, 0),
+    0,
+  );
+}
+
 interface Gltf {
   materials?: { name?: string; pbrMetallicRoughness?: { baseColorFactor?: number[] } }[];
-  meshes: { primitives: { attributes: { POSITION: number } }[] }[];
-  accessors: { min?: number[]; max?: number[] }[];
+  meshes: { primitives: { attributes: { POSITION: number }; indices?: number }[] }[];
+  accessors: { min?: number[]; max?: number[]; count?: number }[];
 }
 
 function readGlbJson(bytes: Uint8Array): Gltf {
@@ -38,9 +47,34 @@ describe('model kit', () => {
     expect(entries).toHaveLength(31);
   });
 
+  it('has the four decorate props, each for categories that have models', () => {
+    expect(props.map(([n]) => n).sort()).toEqual(['awning', 'canopy', 'red_cross', 'spire']);
+    for (const [, p] of props)
+      for (const c of p.categories) expect(manifest.models).toHaveProperty(c);
+  });
+
   it('lists every GLB on disk, and nothing else', () => {
-    const listed = entries.map(([, m]) => m.file).sort();
+    const listed = [...entries, ...props].map(([, m]) => m.file).sort();
     expect(glbFiles(MODELS).sort()).toEqual(listed);
+  });
+
+  describe.each(props)('prop %s', (_name, prop) => {
+    const bytes = new Uint8Array(readFileSync(join(MODELS, prop.file)));
+    const gltf = readGlbJson(bytes);
+
+    it('passes the glTF validator with no errors', async () => {
+      const report = await validateBytes(bytes, { uri: prop.file, maxIssues: 50 });
+      expect(report.issues.messages.filter((m) => m.severity === 0)).toEqual([]);
+    });
+
+    it('stays within the 300-triangle prop budget', () => {
+      expect(triangles(gltf)).toBeLessThanOrEqual(300);
+    });
+
+    it('has one material per palette key, matching the manifest', () => {
+      const names = (gltf.materials ?? []).map((m) => m.name ?? '');
+      expect(names.sort()).toEqual([...prop.materials].sort());
+    });
   });
 
   describe.each(entries)('%s', (_name, model) => {

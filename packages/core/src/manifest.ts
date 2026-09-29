@@ -18,6 +18,29 @@ export interface ModelEntry {
   height_m: number;
 }
 
+/** How a prop attaches to a procedural building's front. */
+export interface PropAttach {
+  /** `front-wall`: on the front wall; `front-edge`: centred on the front wall line, from the ground; `front-ground`: in front of the building. */
+  at: 'front-wall' | 'front-edge' | 'front-ground';
+  /** Mounting height: `ground`, `ground-floor` (2.4 m) or `top` (just under the eaves). */
+  z: 'ground' | 'ground-floor' | 'top';
+  /** Metres out from the front wall (front-ground). */
+  offset?: number;
+  /** Scale the prop so its width is this fraction of the frontage. */
+  fit_frontage?: number;
+}
+
+/** A prop: a small part attached to a procedural building when no hero model fits. */
+export interface PropEntry {
+  file: string;
+  /** Building categories this prop decorates. */
+  categories: string[];
+  attach: PropAttach;
+  materials: string[];
+  footprint_m: [number, number];
+  height_m: number;
+}
+
 export interface Manifest {
   version: number;
   units: 'metres';
@@ -26,6 +49,7 @@ export interface Manifest {
   /** Palette key to exact hex colour, e.g. `"roof_red": "#D9644A"`. */
   palette: Record<string, string>;
   models: Record<string, ModelEntry>;
+  props?: Record<string, PropEntry>;
 }
 
 export class ManifestError extends Error {
@@ -87,6 +111,35 @@ export function parseManifest(input: unknown): Manifest {
       fail(`${at}.footprint_m must be [width, depth] in metres`);
     }
     if (!isPositive(m.height_m)) fail(`${at}.height_m must be a positive number`);
+  }
+
+  if (input.props !== undefined) {
+    if (!isRecord(input.props)) fail('props must be an object');
+    for (const [name, p] of Object.entries(input.props)) {
+      const at = `props.${name}`;
+      if (!isRecord(p)) fail(`${at} must be an object`);
+      if (typeof p.file !== 'string' || !p.file.endsWith('.glb'))
+        fail(`${at}.file must be a .glb path`);
+      if (!Array.isArray(p.categories) || !p.categories.every((c) => typeof c === 'string')) {
+        fail(`${at}.categories must be an array of strings`);
+      }
+      const a = p.attach;
+      if (!isRecord(a) || !['front-wall', 'front-edge', 'front-ground'].includes(a.at as string)) {
+        fail(`${at}.attach.at must be front-wall, front-edge or front-ground`);
+      }
+      if (!['ground', 'ground-floor', 'top'].includes(a.z as string))
+        fail(`${at}.attach.z must be ground, ground-floor or top`);
+      if (
+        !Array.isArray(p.materials) ||
+        !p.materials.every((m) => typeof m === 'string' && m in palette)
+      ) {
+        fail(`${at}.materials must be palette keys`);
+      }
+      const fp = p.footprint_m;
+      if (!Array.isArray(fp) || fp.length !== 2 || !fp.every(isPositive))
+        fail(`${at}.footprint_m must be [width, depth]`);
+      if (!isPositive(p.height_m)) fail(`${at}.height_m must be a positive number`);
+    }
   }
 
   return input as unknown as Manifest;

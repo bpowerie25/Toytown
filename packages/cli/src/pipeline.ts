@@ -72,6 +72,8 @@ export interface PointProps {
   id: string;
   category: string;
   height?: number;
+  /** Standalone POIs: compass bearing towards the nearest street, degrees in [0, 360). */
+  front?: number | null;
   name?: string;
 }
 
@@ -287,7 +289,16 @@ export function buildData(
   for (const [id, p, tags] of standalonePois.sort((a, b) => a[0] - b[0])) {
     const c = classify({ id: `node/${id}`, tags, area: 0, pois: [] });
     if ((c.via !== 'tags' && c.via !== 'landmark') || c.category === fallback) continue;
-    const props: PointProps = { id: `node/${id}`, category: c.category, height: c.height };
+    const xy = toXY(p);
+    const street = nearestStreet(xy, frontRadius, false) ?? nearestStreet(xy, frontRadius, true);
+    const front = street
+      ? round(
+          ((Math.atan2(street.point[0] - xy[0], street.point[1] - xy[1]) * 180) / Math.PI + 360) %
+            360,
+          1,
+        ) % 360
+      : null;
+    const props: PointProps = { id: `node/${id}`, category: c.category, height: c.height, front };
     if (tags.name) props.name = tags.name;
     features.push({
       type: 'Feature',
