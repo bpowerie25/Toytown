@@ -1,5 +1,7 @@
 import type { XY } from 'toytown-gl';
 
+export { hash32 } from 'toytown-gl';
+
 /** Uniform grid spatial index over axis-aligned boxes in local metres. */
 export class Grid<T> {
   private cells = new Map<string, T[]>();
@@ -43,16 +45,6 @@ export function bounds(points: XY[]): [number, number, number, number] {
     if (y > maxY) maxY = y;
   }
   return [minX, minY, maxX, maxY];
-}
-
-/** Deterministic 32-bit string hash (FNV-1a). */
-export function hash32(s: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return h >>> 0;
 }
 
 /** Small seeded PRNG (mulberry32) returning floats in [0, 1). */

@@ -8,6 +8,62 @@ Updated at the end of each phase.
 | 1 Style    | done (CI not yet run) | toytown.json, Nunito labels, Playwright screenshot tests.   |
 | 2 Data     | done (CI not yet run) | build-data CLI, tag-map.json, both datasets, report.        |
 
+## Phase 3: Procedural toy buildings (2026-09-29)
+
+### What was done
+
+- `packages/core/src/geometry/mesher.ts`: every footprint becomes a toy building. Walls are
+  extruded to the eaves. Flat roofs get a bevelled top edge and a parapet around a triangulated
+  deck, with holes. Gable or hip roofs, with overhang and soffit, go on rectangular-enough
+  residential, pub, church and school footprints; there are no straight-skeleton roofs. Window
+  strips are drawn by the shader, not built as geometry. Details are in `docs/buildings.md`.
+- Wall colours are a deterministic per-building hash into category palettes, including the Irish
+  terrace colours. Roofs are `#D9644A` or `#5B6C8F`, and windows `#7EC8E3`. Everything is driven
+  by the new `packages/core/src/themes/default.json`: palettes, roof rules, bevel, parapet, window
+  spacing and lighting.
+- **Chunking** by z15 tile, with meshing in a Web Worker pool (`MeshPool`). Each chunk becomes one
+  merged set of typed arrays and one draw call; there is never one mesh per building. Waterford is
+  110 chunks, 1.41M vertices, 0.69M triangles, about 230 ms of meshing CPU.
+- **Minimal three.js MapLibre custom layer (`BuildingLayer`)**, pulled forward from phase 4 so the
+  buildings can be seen. It shares the GL context and depth buffer, uses per-chunk float64 matrix
+  composition for precision, sits under the labels, and hides the base 2D buildings.
+- **Minimal `ToyTown` class**: `ToyTown.style()`, `new ToyTown({ data }).addTo(map)`, `ready` and
+  `remove()`. This is the start of the phase 6 API. Both examples now use it.
+- Tests (283 unit tests): roof selection (categories, rectangularity threshold, holes and
+  multipolygons, gable/hip share and determinism), roof rise caps, ring cleaning and insets, mesher
+  output (merged buffers, gable/hip/flat heights, normals agree with winding, parapet and deck
+  heights, box fallback, palette colours, window flags, degenerate input), chunk tiles, and
+  `toBuildings`. The screenshot tests now wait for meshing, check the 3D layer exists and the base
+  layer is hidden, and have refreshed baselines.
+- Screenshots at z15, z16, z17 and z18.3 for both towns are in `docs/buildings/`.
+
+### Decisions
+
+- **Render layer pulled forward.** Phase 4 still owns the toon material, outlines, globe handling
+  and hero models; the matrix maths and layer plumbing written now will be reused.
+- **`three` is now a dependency of `toytown-gl`** (^0.186; on the approved stack), not a peer, so
+  `npm i toytown-gl` stays enough. `@types/three` is a dev dependency. The mesher uses three's
+  earcut triangulator (`ShapeUtils`) for roof decks.
+- **The library is ESM-only for now.** The CJS build was dropped: the worker is loaded with
+  `new URL('./worker.js', import.meta.url)`, which bundlers (Vite, webpack 5) resolve, but which
+  has no CJS equivalent. The plan's phase 7 asks for ESM and UMD; UMD will need an inlined worker.
+- **`hash32` moved into the core** (the CLI re-exports it), plus `hashUnit` and `pick` for stable
+  per-building choices.
+- **MapLibre v5 matrix**: `args.defaultProjectionData.mainMatrix` is the mercator [0, 1] to clip
+  matrix. `modelViewProjectionMatrix` works in pixel-sized world units, and using it put
+  everything past the far plane. Back-face culling stays at the default `FrontSide`.
+
+### Known issues
+
+- Windows shimmer (moiré) at z16 and below. Phase 5's LOD turns windows off below z15; a
+  distance-based fade could help too.
+- Big flat roofs, such as the city-centre shopping centre, are large plain grey areas. A theme
+  could add roof detail later.
+- Pitched roofs are fitted to the minimum rectangle, so on footprints that are 85–95% rectangular
+  the roof overhangs the cut-away corners a little.
+- About 62 MB of vertex data for all of Waterford. Fine on desktop; phase 5 needs LOD for phones.
+- Globe projection isn't handled yet (phase 4).
+
 ## Phase 2.5: Visual spike (2026-09-29), approved
 
 The screenshots were reviewed and approved on 2026-09-29. Zoom exaggeration and the manifest

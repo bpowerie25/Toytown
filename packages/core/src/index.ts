@@ -4,5 +4,9 @@ export { toytownStyle, setBaseBuildingsVisible, BASE_BUILDING_LAYER_ID } from '.
 export type { StyleOptions, LayerHost } from './style';
 export * from './geometry';
 export * from './classify';
+export { DEFAULT_THEME, wallPalette, type Theme, type BuildingTheme } from './themes';
+
+export { ToyTown, toBuildings, type ToyTownOptions } from './toytown';
+export { BuildingLayer } from './render/layer';
 
 export const VERSION = '0.0.0';

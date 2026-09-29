@@ -7,6 +7,8 @@ const EXAMPLES = [
 
 /** Wait until MapLibre has loaded the style, all visible tiles and glyphs, and stopped moving. */
 async function waitForMap(page: Page) {
+  // Buildings are meshed in workers; wait for all chunks before judging "idle".
+  await page.evaluate(() => (window as unknown as { toy: { ready: Promise<void> } }).toy.ready);
   await page.waitForFunction(
     () => {
       const map = (window as unknown as { map?: import('maplibre-gl').Map }).map;
@@ -38,6 +40,21 @@ for (const { name, title } of EXAMPLES) {
           .layers.map((l) => l.id),
       );
       expect(layers).toContain('toytown-base-buildings');
+      // Custom layers aren't part of getStyle(), so look the 3D layer up directly.
+      const hasBuildings = await page.evaluate(
+        () =>
+          !!(window as unknown as { map: import('maplibre-gl').Map }).map.getLayer(
+            'toytown-buildings',
+          ),
+      );
+      expect(hasBuildings).toBe(true);
+      const baseVisibility = await page.evaluate(() =>
+        (window as unknown as { map: import('maplibre-gl').Map }).map.getLayoutProperty(
+          'toytown-base-buildings',
+          'visibility',
+        ),
+      );
+      expect(baseVisibility).toBe('none'); // hidden while the 3D buildings are shown
       expect(errors).toEqual([]);
 
       await expect(page).toHaveScreenshot(`${name}.png`);
@@ -48,13 +65,23 @@ for (const { name, title } of EXAMPLES) {
       test.skip(!process.env.DOCS_SCREENSHOTS, 'set DOCS_SCREENSHOTS=1 to regenerate docs/ images');
       await page.goto(`/${name}/`);
       await waitForMap(page);
-      for (const zoom of [13, 15, 17]) {
+      for (const [zoom, bearing] of [
+        [15, 0],
+        [16, 0],
+        [17, -20],
+        [18.3, 30],
+      ] as const) {
         await page.evaluate(
-          (z) => (window as unknown as { map: import('maplibre-gl').Map }).map.jumpTo({ zoom: z }),
-          zoom,
+          ([z, b]) =>
+            (window as unknown as { map: import('maplibre-gl').Map }).map.jumpTo({
+              zoom: z,
+              bearing: b,
+              pitch: 58,
+            }),
+          [zoom, bearing] as const,
         );
         await waitForMap(page);
-        await page.screenshot({ path: `docs/style/${name}-z${zoom}.png` });
+        await page.screenshot({ path: `docs/buildings/${name}-z${zoom}.png` });
       }
     });
   });

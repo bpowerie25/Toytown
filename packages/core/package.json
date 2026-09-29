@@ -4,15 +4,15 @@
   "description": "Drop-in MapLibre plugin that renders OpenStreetMap as a cartoony toy town.",
   "license": "MIT",
   "type": "module",
-  "sideEffects": false,
-  "main": "./dist/index.cjs",
+  "sideEffects": [
+    "./dist/worker.js"
+  ],
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     }
   },
   "files": [
@@ -31,10 +31,14 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@types/three": "~0.186.0",
     "gltf-validator": "2.0.0-dev.3.10",
     "maplibre-gl": "^5.24.0"
   },
   "peerDependencies": {
     "maplibre-gl": "^5.0.0"
+  },
+  "dependencies": {
+    "three": "^0.186.1"
   }
 }

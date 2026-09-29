@@ -1,8 +1,8 @@
 # toytown-gl
 
-> **Status: early development (phase 2: building data pipeline).** Nothing is published yet.
+> **Status: early development (phase 3: procedural buildings).** Nothing is published yet.
 
-![Waterford City in the toy-town base style](docs/style/waterford-z15.png)
+![Waterford City as a toy town](docs/buildings/waterford-z17.png)
 
 A drop-in [MapLibre GL JS](https://maplibre.org/) plugin that renders OpenStreetMap anywhere in the
 world as a cartoony toy town. It has three parts:
@@ -52,6 +52,7 @@ python3 -m venv .venv && .venv/bin/pip install -r assets/generator/requirements.
 
 - [Base style](docs/style.md)
 - [Building data (`toytown build-data`)](docs/build-data.md)
+- [Procedural buildings](docs/buildings.md)
 - [Tag mapping](docs/tag-mapping.md) and the [classification report](docs/classification-report.md)
 
 ## Licensing and attribution

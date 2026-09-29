@@ -1,0 +1,80 @@
+{
+  "name": "default",
+  "buildings": {
+    "windows": "#7EC8E3",
+    "roofs": ["#D9644A", "#5B6C8F"],
+    "flatRoof": "#B8B2A7",
+    "walls": {
+      "default": ["#F4E9D8", "#EFE3CF", "#E8DCC8"],
+      "house": ["#F4E9D8", "#F2B5A7", "#F6D57A", "#A9CBE8", "#BFE3C9", "#F7F7F2"],
+      "bungalow": ["#F7F7F2", "#F4E9D8", "#F6D57A"],
+      "semi_detached": ["#F4E9D8", "#F2B5A7", "#A9CBE8", "#F7F7F2"],
+      "terraced_house": ["#F2B5A7", "#F6D57A", "#A9CBE8", "#BFE3C9", "#F4E9D8"],
+      "apartment": ["#F4E9D8", "#F7F7F2", "#E8DCC8"],
+      "tower_block": ["#D8D4CC", "#E8DCC8"],
+      "shop": ["#BFE3C9", "#F2B5A7", "#F6D57A", "#A9CBE8"],
+      "supermarket": ["#F4E9D8", "#D8D4CC"],
+      "cafe": ["#F2B5A7", "#F6D57A", "#BFE3C9"],
+      "pub": ["#2A6F4E", "#F4E9D8", "#E07A5F"],
+      "pharmacy": ["#F7F7F2"],
+      "bank": ["#CFC6B8"],
+      "office": ["#9AD1D4", "#D8D4CC"],
+      "hotel": ["#F4E9D8", "#F7F7F2"],
+      "petrol_station": ["#F7F7F2"],
+      "hospital": ["#FFFFFF", "#F7F7F2"],
+      "school": ["#E07A5F", "#F4E9D8"],
+      "library": ["#E07A5F", "#CFC6B8"],
+      "town_hall": ["#CFC6B8"],
+      "police_station": ["#F7F7F2"],
+      "fire_station": ["#E07A5F"],
+      "church": ["#CFC6B8"],
+      "train_station": ["#E07A5F"],
+      "warehouse": ["#A9CBE8", "#D8D4CC", "#8D99AE"],
+      "factory": ["#A9CBE8", "#D8D4CC"],
+      "barn": ["#B23A48"],
+      "parking_garage": ["#D8D4CC"],
+      "round_tower": ["#CFC6B8"],
+      "lighthouse": ["#F7F7F2"],
+      "generic": ["#E8DCC8", "#D8D4CC", "#F4E9D8"]
+    },
+    "pitchedRoofs": {
+      "categories": [
+        "house",
+        "bungalow",
+        "semi_detached",
+        "terraced_house",
+        "apartment",
+        "pub",
+        "church",
+        "school"
+      ],
+      "minRectangularity": 0.85,
+      "pitchDeg": 35,
+      "maxRoofHeightRatio": 0.45,
+      "maxRoofHeight": 8,
+      "overhang": 0.3,
+      "hipShare": {
+        "default": 0.4,
+        "church": 0,
+        "pub": 0,
+        "terraced_house": 0,
+        "school": 1,
+        "apartment": 0.7
+      }
+    },
+    "flat": {
+      "bevel": 0.3,
+      "parapetHeight": 0.6,
+      "parapetWidth": 0.3
+    },
+    "windowsOff": ["warehouse", "barn", "parking_garage"],
+    "minWindowHeight": 3.5,
+    "floorHeight": 3,
+    "windowSpacing": 2.6,
+    "lighting": {
+      "ambient": 0.72,
+      "sun": 0.42,
+      "sunDirection": [-0.45, -0.6, 0.66]
+    }
+  }
+}
