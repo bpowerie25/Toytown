@@ -2,11 +2,14 @@
 
 Updated at the end of each phase.
 
-| Phase      | Status                | Notes                                                       |
-| ---------- | --------------------- | ----------------------------------------------------------- |
-| 0 Scaffold | done (CI not yet run) | Workspace, tooling, kit validation, CI, licences, examples. |
-| 1 Style    | done (CI not yet run) | toytown.json, Nunito labels, Playwright screenshot tests.   |
-| 2 Data     | done (CI not yet run) | build-data CLI, tag-map.json, both datasets, report.        |
+| Phase           | Status      | Notes                                                          |
+| --------------- | ----------- | -------------------------------------------------------------- |
+| 0 Scaffold      | done        | Workspace, tooling, kit validation, CI, licences, examples.    |
+| 1 Style         | done        | toytown.json, Nunito labels, Playwright screenshot tests.      |
+| 2 Data          | done        | build-data CLI, tag-map.json, both datasets, report.           |
+| 2.5 Spike       | approved    | deck.gl spike; model kit colour fix. See docs/spike/README.md. |
+| 3 Buildings     | done        | Procedural buildings, worker meshing, minimal render layer.    |
+| 4 Toon + models | in progress |                                                                |
 
 ## Phase 3: Procedural toy buildings (2026-09-29)
 
@@ -190,7 +193,6 @@ report` for the markdown report. Details in `docs/build-data.md`.
 - Scattered trees avoid buildings and roads, but not water or car parks inside a `landuse=grass`
   polygon.
 - The PBF reader supports zlib and raw blobs only (standard for Geofabrik), not LZ4, zstd or LZMA.
-- CI still hasn't run (no remote yet).
 
 ## Phase 1: Cartoon base style (2026-09-29)
 
@@ -245,7 +247,6 @@ report` for the markdown report. Details in `docs/build-data.md`.
 - Chrome driven through the extension doesn't run `requestAnimationFrame` in a hidden tab, so the
   map never loads there. This explains the blank first captures in phase 0. Playwright runs
   headless and doesn't have this problem.
-- CI still hasn't run (no remote yet).
 
 ## Phase 0: Scaffold (2026-09-29)
 
@@ -299,11 +300,9 @@ report` for the markdown report. Details in `docs/build-data.md`.
 
 ### Known issues
 
-- **CI has not run yet**: nothing has been pushed and there is no GitHub remote. `pnpm lint`,
-  `pnpm build`, `pnpm test` (106 tests) and `pnpm typecheck` all pass locally. The phase's
-  acceptance criterion ("passes in CI") is only confirmed after the first push.
-- The Python CI job assumes Linux numpy produces the same float output as macOS for the
-  reproducibility check. Unverified until CI runs.
+- CI first ran on 2026-09-29 after the push to github.com/bpowerie25/Toytown, and all three jobs
+  passed (lint/test/build, Playwright screenshots, generator reproducibility), which meets this
+  phase's acceptance criterion.
 - Headless Chrome (`--screenshot`) doesn't wait for MapLibre tiles, so phase 0 screenshots were
   taken in a real browser. Playwright screenshot tests (with a wait for `map.idle`) come in phase 1.
 - OpenFreeMap's liberty style logs missing-sprite warnings (e.g. `gaelic_games`). These are harmless
