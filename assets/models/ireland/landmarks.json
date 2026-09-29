@@ -1,0 +1,11 @@
+{
+  "pack": "ireland",
+  "landmarks": [
+    {
+      "osm": "way/46694890",
+      "category": "landmark_metal_man",
+      "name": "The Metal Man",
+      "verified": "Nominatim search 'Metal Man Tramore' and OSM API, 2026-09-29: building=tower, historic=monument, wikidata Q32824163"
+    }
+  ]
+}

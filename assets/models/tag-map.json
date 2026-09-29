@@ -1,0 +1,343 @@
+{
+  "version": 1,
+  "fallback": "generic",
+  "level_height_m": 3,
+  "default_height_m": {
+    "generic": 6,
+    "house": 7,
+    "bungalow": 4.5,
+    "semi_detached": 7,
+    "terraced_house": 7,
+    "apartment": 12,
+    "tower_block": 30,
+    "shop": 6,
+    "supermarket": 7,
+    "cafe": 5,
+    "pub": 7,
+    "pharmacy": 6,
+    "bank": 9,
+    "office": 12,
+    "hotel": 13,
+    "petrol_station": 5,
+    "hospital": 15,
+    "school": 8,
+    "library": 9,
+    "town_hall": 12,
+    "police_station": 8,
+    "fire_station": 8,
+    "church": 12,
+    "train_station": 7,
+    "warehouse": 9,
+    "factory": 10,
+    "barn": 7,
+    "parking_garage": 12,
+    "round_tower": 18,
+    "lighthouse": 20,
+    "landmark_metal_man": 15
+  },
+  "rules": [
+    {
+      "category": "lighthouse",
+      "priority": 95,
+      "when": ["man_made=lighthouse"]
+    },
+    {
+      "category": "round_tower",
+      "priority": 90,
+      "when": ["historic=castle"]
+    },
+    {
+      "category": "round_tower",
+      "priority": 90,
+      "when": ["building=tower", "historic=*"]
+    },
+    {
+      "category": "pharmacy",
+      "priority": 85,
+      "when": ["amenity=pharmacy"]
+    },
+    {
+      "category": "pharmacy",
+      "priority": 85,
+      "when": ["shop=chemist"]
+    },
+    {
+      "category": "pharmacy",
+      "priority": 85,
+      "when": ["healthcare=pharmacy"]
+    },
+    {
+      "category": "supermarket",
+      "priority": 85,
+      "when": ["shop=supermarket|wholesale|department_store"]
+    },
+    {
+      "category": "tower_block",
+      "priority": 85,
+      "when": ["building=apartments|flats|residential", "@levels>=8"]
+    },
+    {
+      "category": "hospital",
+      "priority": 80,
+      "when": ["amenity=hospital"]
+    },
+    {
+      "category": "hospital",
+      "priority": 80,
+      "when": ["healthcare=hospital"]
+    },
+    {
+      "category": "school",
+      "priority": 80,
+      "when": ["amenity=school|college|university|kindergarten"]
+    },
+    {
+      "category": "library",
+      "priority": 80,
+      "when": ["amenity=library"]
+    },
+    {
+      "category": "town_hall",
+      "priority": 80,
+      "when": ["amenity=townhall|courthouse"]
+    },
+    {
+      "category": "police_station",
+      "priority": 80,
+      "when": ["amenity=police"]
+    },
+    {
+      "category": "fire_station",
+      "priority": 80,
+      "when": ["amenity=fire_station"]
+    },
+    {
+      "category": "church",
+      "priority": 80,
+      "when": ["amenity=place_of_worship"]
+    },
+    {
+      "category": "petrol_station",
+      "priority": 80,
+      "when": ["amenity=fuel"]
+    },
+    {
+      "category": "bank",
+      "priority": 80,
+      "when": ["amenity=bank|bureau_de_change"]
+    },
+    {
+      "category": "pub",
+      "priority": 80,
+      "when": ["amenity=pub|bar|biergarten"]
+    },
+    {
+      "category": "hotel",
+      "priority": 80,
+      "when": ["tourism=hotel|guest_house|hostel|motel"]
+    },
+    {
+      "category": "parking_garage",
+      "priority": 80,
+      "when": ["amenity=parking", "parking=multi-storey"]
+    },
+    {
+      "category": "cafe",
+      "priority": 78,
+      "when": ["amenity=cafe|restaurant|fast_food|ice_cream"]
+    },
+    {
+      "category": "train_station",
+      "priority": 75,
+      "when": ["building=train_station"]
+    },
+    {
+      "category": "train_station",
+      "priority": 70,
+      "when": ["railway=station|halt"]
+    },
+    {
+      "category": "church",
+      "priority": 75,
+      "when": ["building=church|cathedral|chapel|basilica|mosque|synagogue|temple"]
+    },
+    {
+      "category": "hospital",
+      "priority": 75,
+      "when": ["building=hospital"]
+    },
+    {
+      "category": "school",
+      "priority": 75,
+      "when": ["building=school|college|university|kindergarten"]
+    },
+    {
+      "category": "fire_station",
+      "priority": 75,
+      "when": ["building=fire_station"]
+    },
+    {
+      "category": "police_station",
+      "priority": 75,
+      "when": ["building=police"]
+    },
+    {
+      "category": "hotel",
+      "priority": 75,
+      "when": ["building=hotel"]
+    },
+    {
+      "category": "supermarket",
+      "priority": 75,
+      "when": ["building=supermarket"]
+    },
+    {
+      "category": "bungalow",
+      "priority": 75,
+      "when": ["building=bungalow"]
+    },
+    {
+      "category": "bungalow",
+      "priority": 72,
+      "when": ["building=house|detached", "building:levels<=1"]
+    },
+    {
+      "category": "apartment",
+      "priority": 70,
+      "when": ["building=apartments|flats"]
+    },
+    {
+      "category": "semi_detached",
+      "priority": 70,
+      "when": ["building=semidetached_house|semi|semi-detached"]
+    },
+    {
+      "category": "terraced_house",
+      "priority": 70,
+      "when": ["building=terrace|terraced_house"]
+    },
+    {
+      "category": "warehouse",
+      "priority": 70,
+      "when": ["building=warehouse"]
+    },
+    {
+      "category": "parking_garage",
+      "priority": 70,
+      "when": ["building=parking"]
+    },
+    {
+      "category": "factory",
+      "priority": 70,
+      "when": ["man_made=works"]
+    },
+    {
+      "category": "barn",
+      "priority": 70,
+      "when": ["building=barn|farm_auxiliary|cowshed|stable"]
+    },
+    {
+      "category": "office",
+      "priority": 70,
+      "when": ["building=office"]
+    },
+    {
+      "category": "house",
+      "priority": 65,
+      "when": ["building=house|detached|farm"]
+    },
+    {
+      "category": "office",
+      "priority": 60,
+      "when": ["office=*"]
+    },
+    {
+      "category": "shop",
+      "priority": 60,
+      "when": ["shop=*"]
+    },
+    {
+      "category": "shop",
+      "priority": 50,
+      "when": ["building=kiosk"]
+    },
+    {
+      "category": "warehouse",
+      "priority": 45,
+      "when": ["building=retail|commercial", "@area>=2500"],
+      "weak": true,
+      "note": "large retail sheds"
+    },
+    {
+      "category": "apartment",
+      "priority": 45,
+      "when": ["building=residential", "@levels>=3"],
+      "weak": true
+    },
+    {
+      "category": "shop",
+      "priority": 40,
+      "when": ["building=retail"],
+      "weak": true
+    },
+    {
+      "category": "office",
+      "priority": 40,
+      "when": ["building=commercial"],
+      "weak": true
+    },
+    {
+      "category": "factory",
+      "priority": 40,
+      "when": ["building=industrial|manufacture"],
+      "weak": true
+    },
+    {
+      "category": "town_hall",
+      "priority": 40,
+      "when": ["building=civic|government|public"],
+      "weak": true
+    },
+    {
+      "category": "house",
+      "priority": 35,
+      "when": ["building=residential"],
+      "weak": true
+    },
+    {
+      "category": "generic",
+      "priority": 30,
+      "when": [
+        "building=garage|garages|shed|roof|carport|construction|ruins|hut|container|service|transformer_tower|toilets|greenhouse"
+      ],
+      "weak": true,
+      "note": "keep small structures out of the heuristics"
+    }
+  ],
+  "heuristics": [
+    {
+      "category": "office",
+      "priority": 30,
+      "when": ["@levels>=8"],
+      "note": "tall untagged buildings"
+    },
+    {
+      "category": "warehouse",
+      "priority": 25,
+      "when": ["@area>=2500", "@levels<=2"],
+      "note": "big low sheds"
+    },
+    {
+      "category": "warehouse",
+      "priority": 25,
+      "when": ["@area>=2500", "!building:levels", "!height"],
+      "note": "big sheds with no height info"
+    },
+    {
+      "category": "house",
+      "priority": 10,
+      "when": ["building=yes", "@area>=50", "@area<=250"],
+      "note": "small untagged buildings are usually homes"
+    }
+  ]
+}

@@ -12,7 +12,7 @@ from trimesh.visual import TextureVisuals
 
 OUT = os.environ.get("TOYTOWN_MODELS_OUT", os.path.join(os.path.dirname(__file__), "..", "models"))
 os.makedirs(OUT, exist_ok=True)
-KEEP = {"LICENSES.md", "README.md"}  # hand-written files in OUT that must survive regeneration
+GENERATED = {"manifest.json", "preview.png"}  # plus every *.glb; everything else in OUT is hand-written and kept
 
 PALETTE = {
     "wall_cream": "#F4E9D8", "wall_pink": "#F2B5A7", "wall_mint": "#BFE3C9",
@@ -367,11 +367,10 @@ BUILDERS = [
 ]
 
 if __name__ == "__main__":
-    import shutil
-    for d in os.listdir(OUT):
-        if d in KEEP or d.startswith("."): continue
-        p = os.path.join(OUT, d)
-        shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
+    for root, _, files in os.walk(OUT):
+        for f in files:
+            if f.endswith(".glb") or (root == OUT and f in GENERATED):
+                os.remove(os.path.join(root, f))
     manifest = {}
     models = []
     for b, tags in BUILDERS:

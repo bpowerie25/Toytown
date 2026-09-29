@@ -6,6 +6,97 @@ Updated at the end of each phase.
 | ---------- | --------------------- | ----------------------------------------------------------- |
 | 0 Scaffold | done (CI not yet run) | Workspace, tooling, kit validation, CI, licences, examples. |
 | 1 Style    | done (CI not yet run) | toytown.json, Nunito labels, Playwright screenshot tests.   |
+| 2 Data     | done (CI not yet run) | build-data CLI, tag-map.json, both datasets, report.        |
+
+## Phase 2: Building data pipeline (2026-09-29)
+
+### What was done
+
+- `toytown build-data --bbox <w,s,e,n> --out <file>` in `packages/cli`. Sources: Overpass
+  (default), or `--source pbf <file>`. Options: `--fgb` (FlatGeobuf), `--stats` and `toytown
+report` for the markdown report. Details in `docs/build-data.md`.
+- **Overpass client**: one query per bbox. It waits for a free slot via `/api/status`, retries
+  429/503/504 with backoff, and caches raw responses in `.cache/overpass/` (git-ignored).
+- **PBF reader** with no dependencies (node:zlib and a small protobuf decoder). The whole Ireland
+  extract (414 MB) scans in about 11 s with about 250 MB of memory. Tramore from the PBF and from
+  Overpass gives identical features and classification; coordinates differ by at most 1e-6°.
+- **Polygons**, including multipolygon relations with holes (split member ways are joined).
+  Buildings are assigned to a bbox by centroid, so adjacent bboxes never share one.
+- **Classification** is in the core (`createClassifier`, `parseTagMap`), driven by
+  `assets/models/tag-map.json`: 53 rules and 4 heuristics, whose categories must exist in the
+  manifest. The order is landmark override, strong tags, POIs inside (point-in-polygon), weak
+  tags, heuristics, then `generic`. Rules have priority, tag conditions (`building:levels>=8`)
+  and measure conditions (`@area`, `@levels`, `@height`). See `docs/tag-mapping.md`.
+- **Landmark pack**: `assets/models/ireland/landmarks.json` maps `way/46694890` to
+  `landmark_metal_man`. The id was verified with Nominatim ("Metal Man Tramore") and the OSM API:
+  `building=tower`, `historic=monument`, wikidata Q32824163.
+- **Geometry** in the core (`packages/core/src/geometry/`): local projection, area, centroid,
+  point-in-polygon with holes, convex hull, minimum rotated rectangle (rotating calipers),
+  rectangularity, orientation, and front snapping.
+- **Height** comes from `height`, else `building:levels` × 3 m, else a per-category default.
+  **Orientation** is the bearing of the minimum-rectangle long side, in [0, 180). **Front** is
+  the bearing to the nearest street within 100 m, snapped to a rectangle side. Footpaths and
+  service roads are only used when no street is in range.
+- **Trees**: 2,085 + 1,742 in Waterford and 3,028 + 575 in Tramore (mapped + scattered). The
+  scatter in parks and grass is seeded by `--seed` and each area's OSM id, and trees are kept off
+  buildings and roads.
+- **Standalone POIs** (nodes outside any footprint that map to a model) are written as points for
+  phase 4's `point` placement.
+- **Datasets**: `examples/waterford/public/data/waterford.geojson` (8.80 MB, 26,870 buildings) and
+  `examples/tramore/public/data/tramore.geojson` (2.45 MB, 6,272 buildings). Both are committed,
+  since each is under 10 MB. Rebuild with `pnpm data:build`.
+- `docs/classification-report.md`: counts per category for each town and the 30 most common
+  unmapped tag combinations.
+- 228 unit tests (up from 122): geometry, rectangle fitting, orientation, conditions, the tag map
+  against the manifest, classifier stages, heights, PBF decoding (against an in-test PBF
+  encoder), ring assembly, the Overpass client (slot waits, retry, cache), the pipeline on a
+  synthetic town, args, FlatGeobuf round-trip, and the report.
+
+### Decisions
+
+- **Final bboxes** (checked against Nominatim; reasoning in the example READMEs):
+  - Waterford `-7.17,52.22,-7.05,52.28`. The plan's rough box was `-7.16,52.23,-7.05,52.28`; I
+    extended it west and south to cover the built-up area measured from land use.
+  - Tramore `-7.18,52.135,-7.12,52.18`. The plan's rough box was `-7.17,52.15,-7.12,52.18`; I
+    extended it south to include the Metal Man, which sits at 52.1376.
+- **Weak rules** (not in the plan): vague building types such as `retail`, `commercial`,
+  `industrial`, `civic` and `residential` give way to a POI inside. Otherwise a `building=retail`
+  with a pharmacy inside would stay a generic `shop`.
+- **Heuristics** in `tag-map.json` beyond levels and height, which the plan mentions:
+  - Untagged buildings of 50–250 m² become `house`. This is 23% of Waterford.
+  - Buildings of 2,500 m² or more with 2 levels or fewer become `warehouse`.
+  - Buildings with 8 or more levels become `office`.
+
+  Small structures (`garage`, `shed`, `roof`...) are pinned to `generic` so they don't turn into
+  houses.
+
+- **Queried POIs beyond the plan's list**: `healthcare=*` and `railway=station|halt` nodes are
+  also fetched, because the tag map uses them.
+- **Output format**: a single GeoJSON file holding buildings, trees (`category: "tree"`) and
+  standalone POIs, so the plugin needs just one `data:` URL. Ids are `way/…`, `relation/…`,
+  `node/…` and `scatter/…`.
+- **`flatgeobuf` added to the CLI** (approved). Its licence is **BSD-3-Clause**, not MIT as I said
+  when asking. FlatGeobuf needs a fixed column schema, so unknown numbers are `-1` and a missing
+  name is `""`.
+- **Overpass query uses `[maxsize:256MB]`, not 1 GB.** With 1 GB the server returned 504 five times
+  in a row; the smaller reservation is served immediately.
+- **Generator cleanup narrowed again**: it now deletes only `*.glb`, `manifest.json` and
+  `preview.png`, so hand-written files in pack folders (`ireland/landmarks.json`, `tag-map.json`)
+  survive regeneration.
+- **Obvious fixes found via the first report**: `building=police` → `police_station`,
+  `building=farm` → `house`, and `building=stable` → `barn`.
+
+### Known issues
+
+- About 10% of Waterford and 13% of Tramore buildings are still `generic`. Mostly these are
+  `building=yes` outside the 50–250 m² house heuristic (2,572 in Waterford) and Tramore's caravan
+  parks (`static_caravan` and `mobile_home`, 518 buildings), which have no model. See the report.
+- `front` points at the nearest street segment from the centroid. For corner buildings and deep
+  plots this can pick a side street; phase 4 can refine it with address or entrance tags.
+- Scattered trees avoid buildings and roads, but not water or car parks inside a `landuse=grass`
+  polygon.
+- The PBF reader supports zlib and raw blobs only (standard for Geofabrik), not LZ4, zstd or LZMA.
+- CI still hasn't run (no remote yet).
 
 ## Phase 1: Cartoon base style (2026-09-29)
 
