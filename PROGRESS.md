@@ -2,16 +2,90 @@
 
 Updated at the end of each phase.
 
-| Phase           | Status   | Notes                                                                  |
-| --------------- | -------- | ---------------------------------------------------------------------- |
-| 0 Scaffold      | done     | Workspace, tooling, kit validation, CI, licences, examples.            |
-| 1 Style         | done     | toytown.json, Nunito labels, Playwright screenshot tests.              |
-| 2 Data          | done     | build-data CLI, tag-map.json, both datasets, report.                   |
-| 2.5 Spike       | approved | deck.gl spike; model kit colour fix. See docs/spike/README.md.         |
-| 3 Buildings     | done     | Procedural buildings, worker meshing, minimal render layer.            |
-| 4 Toon + models | done     | Toon/ink rendering, fit/decorate/point, props, instancing.             |
-| 4b Model kit    | done     | @toytown/models + zip, variants, kit CI, adding-models guide.          |
-| 5 Performance   | done     | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs. |
+| Phase           | Status   | Notes                                                                      |
+| --------------- | -------- | -------------------------------------------------------------------------- |
+| 0 Scaffold      | done     | Workspace, tooling, kit validation, CI, licences, examples.                |
+| 1 Style         | done     | toytown.json, Nunito labels, Playwright screenshot tests.                  |
+| 2 Data          | done     | build-data CLI, tag-map.json, both datasets, report.                       |
+| 2.5 Spike       | approved | deck.gl spike; model kit colour fix. See docs/spike/README.md.             |
+| 3 Buildings     | done     | Procedural buildings, worker meshing, minimal render layer.                |
+| 4 Toon + models | done     | Toon/ink rendering, fit/decorate/point, props, instancing.                 |
+| 4b Model kit    | done     | @toytown/models + zip, variants, kit CI, adding-models guide.              |
+| 5 Performance   | done     | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs.     |
+| 6 API + demos   | done     | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages. |
+
+## Phase 6: Public API, examples, docs (2026-09-29)
+
+### What was done
+
+- **The API as in the plan**: `ToyTown.style({ theme })`,
+  `new ToyTown({ data, models, theme, lod, debug })`, `addTo`, `ready`,
+  `setCategoryModel(category, url)`, `addPack(url)`, `on/off('click')`, `pick({x, y})`, `stats()`
+  and `remove()`. See `docs/api.md`.
+- **Themes as JSON**: `default` and `night` (background `#1B2238`, windows `#FFD166` that glow at
+  full colour). Each covers the base-map palette, building palettes, lighting, outlines, model
+  palette overrides and glow keys. The base style recolours through an explicit paint-property →
+  palette-key map (`toytown:colors`), because road casing and building outlines share a default
+  hex.
+- **Click and pick**: raycasting through the last frame's camera into the visible chunk meshes (the
+  `aBuilding` attribute maps a hit to its OSM id) and model instances (each instance buffer keeps
+  its placements). Returns category, name, height, kind and an openstreetmap.org link.
+- **`setCategoryModel`**: loads the user's GLB, measures its footprint for fitting, replaces the
+  category's model and variants, and re-plans the town. Materials named by palette keys follow
+  the theme; others keep their own colours. Before, they would have turned magenta.
+- **`addPack`**: loads a pack `manifest.json` (models relative to the pack and landmark overrides
+  by OSM id), merges the models and re-categorises landmark buildings. The generator now writes
+  `assets/models/<pack>/manifest.json` (the Ireland one lists the Metal Man), and
+  `check_reproducible.py` checks pack manifests too.
+- **Demos**: full-screen Waterford and Tramore with a panel of landmark fly-to buttons
+  (Waterford: Reginald's Tower, Christ Church Cathedral, House of Waterford Crystal, Bishop's
+  Palace and People's Park; Tramore: the Metal Man, the Promenade, Holy Cross Church and the
+  Racecourse), all ids and positions verified with Nominatim. There's also a day/night toggle, a
+  link to the other town, click popups (category, height, "View on OpenStreetMap"), a pointer
+  cursor over clickable things, and `?debug`. The shared UI is a private workspace package,
+  `@toytown/example-shared`.
+- **README rewrite**: a demo GIF (`docs/demo.gif`, 60 frames, 4.1 MB: a day orbit to Reginald's
+  Tower, then night), what you get, a quick start, adding models, improving the tag mapping,
+  documentation links, attribution and ODbL, and a roadmap. Plus `docs/api.md`,
+  `CONTRIBUTING.md`, and issue templates (bug, wrong building type, model or pack request).
+- **GitHub Pages**: `.github/workflows/pages.yml` builds a site (landing page with the GIF, plus
+  both demos). The deploy job only runs when the repo variable `PAGES_ENABLED` is `true`.
+- **Tests**: themes (hex only, key parity, night colours), the themed style (every colour from the
+  night palette, casing and outline themed separately), pack manifests, and 4 new e2e tests
+  (click popup with OSM link, landmark fly-to, a night screenshot, `setCategoryModel` +
+  `addPack`). 483 unit tests and 8 e2e tests in total.
+
+### Decisions
+
+- **Only `window` glows at night.** Letting `glass` glow turned the glass office and apartment
+  models into solid yellow blocks.
+- **Custom-model colours**: GLB materials that aren't palette keys keep their own base colour
+  (sRGB), so user models look as authored.
+- **The README quick start uses the repo CLI** (`node packages/cli/dist/index.js build-data`),
+  because the CLI isn't a published package; phase 7 publishes only `toytown-gl` and
+  `@toytown/models`.
+
+### Bugs found and fixed along the way
+
+- **The model glow shader didn't compile under ANGLE**: I assumed `vColor` was a `vec3` at the end
+  of three's toon fragment shader, and it isn't. It now mixes with `diffuseColor.rgb`. The
+  screenshot tests' console-error check caught it.
+- **The 3% screenshot tolerance had hidden real changes**: `--update-snapshots` only rewrites
+  failing baselines, so phase 4b/5 look changes (e.g. variants) weren't reflected. All baselines
+  were rewritten with `--update-snapshots=all`. Refresh deliberately with that flag after visual
+  changes.
+- **pnpm workspace issues**: the shared demo code first lived in a plain folder, which pnpm's
+  strict layout can't resolve dependencies from, so it's now a package. And zsh expanded
+  `workspace:*` as a glob.
+
+### Known issues
+
+- **GitHub Pages isn't enabled yet** (a repo setting). Pages on a private repo needs a paid GitHub
+  plan. The workflow builds the site on every push, and deploys once enabled.
+- Hover picking raycasts the visible chunks (a few ms); it's throttled to once per frame and
+  skipped while the map moves.
+- `addPack` landmark overrides only re-categorise buildings present in the data; they don't
+  re-run classification.
 
 ## Phase 5: Performance and levels of detail (2026-09-29)
 

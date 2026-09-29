@@ -1,11 +1,21 @@
-export { parseManifest, ManifestError, kitFiles } from './manifest';
-export type { Manifest, ModelEntry, ModelVariant, PropEntry, PropAttach } from './manifest';
+export { parseManifest, parsePackManifest, ManifestError, kitFiles } from './manifest';
+export type {
+  Manifest,
+  PackManifest,
+  ModelEntry,
+  ModelVariant,
+  PropEntry,
+  PropAttach,
+} from './manifest';
 export { toytownStyle, setBaseBuildingsVisible, BASE_BUILDING_LAYER_ID } from './style';
 export type { StyleOptions, LayerHost } from './style';
 export * from './geometry';
 export * from './classify';
 export {
   DEFAULT_THEME,
+  NIGHT_THEME,
+  THEMES,
+  resolveTheme,
   wallPalette,
   type Theme,
   type BuildingTheme,
@@ -29,7 +39,15 @@ export {
   type PlannedBuilding,
   type PointFeature,
 } from './placement';
-export { ToyTown, splitData, toChunks, type ToyTownOptions, type DataCollection } from './toytown';
+export {
+  ToyTown,
+  splitData,
+  toChunks,
+  type ToyTownOptions,
+  type DataCollection,
+  type BuildingInfo,
+  type ToyTownClickEvent,
+} from './toytown';
 export {
   DEFAULT_LOD,
   lodLevel,
@@ -45,6 +63,7 @@ export {
   shouldDraw3D,
   type ChunkInput,
   type ChunkLoader,
+  type PickHit,
 } from './render/layer';
 export { SceneFrame } from './render/frame';
 

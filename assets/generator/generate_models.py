@@ -553,6 +553,25 @@ if __name__ == "__main__":
                "palette": PALETTE, "models": manifest, "props": props}, open(os.path.join(OUT, "manifest.json"), "w"), indent=2)
     print(len(manifest), "models,", sum(len(m.get("variants", [])) for m in manifest.values()), "variants,", len(props), "props")
 
+    # A manifest per regional pack, loadable on its own (ToyTown.addPack): the pack's models with
+    # paths relative to the pack folder, the palette keys they use, and its landmark overrides.
+    for pack in sorted({m["pack"] for m in manifest.values()} - {"generic"}):
+        pack_models = {}
+        for name, m in manifest.items():
+            if m["pack"] != pack: continue
+            e = {k: v for k, v in m.items() if k not in ("pack",)}
+            e["file"] = os.path.relpath(m["file"], pack)
+            if "variants" in e:
+                e["variants"] = [{**v, "file": os.path.relpath(v["file"], pack)} for v in e["variants"]]
+            pack_models[name] = e
+        used = sorted({k for m in pack_models.values() for k in m["materials"]})
+        lm_path = os.path.join(SRC, pack, "landmarks.json")
+        landmarks = json.load(open(lm_path))["landmarks"] if os.path.exists(lm_path) else []
+        json.dump({"version": 1, "pack": pack, "units": "metres", "up": "+Y", "front": "+Z",
+                   "palette": {k: PALETTE[k] for k in used if k in PALETTE}, "models": pack_models,
+                   "landmarks": [{"osm": l["osm"], "category": l["category"]} for l in landmarks]},
+                  open(os.path.join(OUT, pack, "manifest.json"), "w"), indent=2)
+
     import matplotlib; matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection

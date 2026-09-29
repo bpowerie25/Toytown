@@ -1,0 +1,75 @@
+html,
+body,
+#map {
+  margin: 0;
+  height: 100%;
+  background: #f4ebd0;
+}
+body.night,
+body.night #map {
+  background: #1b2238;
+}
+.panel {
+  position: absolute;
+  left: 12px;
+  bottom: 40px;
+  z-index: 2;
+  width: 250px;
+  max-width: calc(100% - 24px);
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #2b2d42;
+  font:
+    14px/1.4 'Nunito',
+    system-ui,
+    sans-serif;
+  box-shadow: 0 4px 16px rgba(43, 45, 66, 0.18);
+}
+body.night .panel {
+  background: #262e4a;
+  color: #e8e6f0;
+}
+.panel h1 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.panel button {
+  display: block;
+  width: 100%;
+  margin: 4px 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #ffe8a3;
+  color: #2b2d42;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.panel button:hover {
+  background: #e0b85c;
+}
+.panel .links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+}
+.panel a,
+.maplibregl-popup-content a {
+  color: #3b6ea5;
+}
+body.night .panel a {
+  color: #ffd166;
+}
+.maplibregl-popup-content {
+  font:
+    13px/1.4 'Nunito',
+    system-ui,
+    sans-serif;
+  color: #2b2d42;
+}
+.maplibregl-popup-content strong {
+  font-size: 15px;
+}

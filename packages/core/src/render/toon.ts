@@ -54,12 +54,31 @@ export function createLights(theme: Theme): [AmbientLight, DirectionalLight] {
   return [a, d];
 }
 
-/** Toon material for hero models and props: vertex colours (baked from the theme palette). */
+/**
+ * Toon material for hero models and props: vertex colours (baked from the theme palette). Parts
+ * whose palette key is in `theme.models.glow` (e.g. windows at night) carry `aGlow = 1` and show
+ * their colour unlit.
+ */
 export function createModelMaterial(theme: Theme): MeshToonMaterial {
-  return new MeshToonMaterial({
+  const m = new MeshToonMaterial({
     vertexColors: true,
     gradientMap: gradientMap(theme.lighting.toonSteps),
   });
+  m.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nattribute float aGlow;\nvarying float vGlow;',
+      )
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlow = aGlow;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying float vGlow;')
+      .replace(
+        '#include <dithering_fragment>',
+        '#include <dithering_fragment>\ngl_FragColor.rgb = mix(gl_FragColor.rgb, diffuseColor.rgb, vGlow);',
+      );
+  };
+  return m;
 }
 
 /** Inverted-hull outline: back faces pushed out along smooth normals, in the ink colour. */
@@ -98,6 +117,7 @@ export function createBuildingMaterial(theme: Theme): MeshToonMaterial {
       uSpacing: { value: b.windowSpacing },
       uEdgeWidth: { value: o.edgeWidth },
       uFade: { value: [o.fadeStart, o.fadeEnd] },
+      uWindowGlow: { value: b.windowGlow },
     });
     shader.vertexShader = shader.vertexShader
       .replace(
@@ -126,6 +146,7 @@ uniform float uFloor;
 uniform float uSpacing;
 uniform float uEdgeWidth;
 uniform vec2 uFade;
+uniform float uWindowGlow;
 varying vec4 vWall; // u along edge, height, edge length (0 = no windows), eave height
 varying vec4 vEdge;
 varying vec3 vLocal;`,
@@ -135,6 +156,7 @@ varying vec3 vLocal;`,
         `#include <color_fragment>
 float mpp = length(fwidth(vLocal)); // metres per pixel, roughly
 float detail = 1.0 - smoothstep(uFade.x, uFade.y, mpp);
+float winAmount = 0.0;
 if (vWall.z > 1.8) {
   float n = max(1.0, floor(vWall.z / uSpacing));
   float fu = fract(vWall.x / (vWall.z / n));
@@ -144,11 +166,14 @@ if (vWall.z > 1.8) {
   // Far away, blend towards the windows' average coverage instead of aliasing.
   float amount = mix(storey ? 0.18 : 0.0, win, detail);
   diffuseColor.rgb = mix(diffuseColor.rgb, uWindow, amount);
+  winAmount = amount;
 }`,
       )
       .replace(
         '#include <dithering_fragment>',
         `#include <dithering_fragment>
+// Night: windows glow at full colour, whatever the light.
+gl_FragColor.rgb = mix(gl_FragColor.rgb, uWindow, winAmount * uWindowGlow);
 vec3 bc = vEdge.xyz;
 if (vEdge.w < 0.5) bc.y = 1.0; // quad: skip the diagonal
 // smoothstep is undefined when both edges are equal: constant channels (decks, the quad's

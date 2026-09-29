@@ -1,4 +1,12 @@
-import { BufferAttribute, BufferGeometry, Matrix4, type Mesh } from 'three';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Matrix4,
+  SRGBColorSpace,
+  type Material,
+  type Mesh,
+  type MeshStandardMaterial,
+} from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { hexToRgb } from '../geometry';
@@ -31,8 +39,11 @@ export async function loadModel(
   gltf.scene.traverse((o) => {
     const mesh = o as Mesh;
     if (!mesh.isMesh) return;
-    const name = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material)?.name ?? '';
-    const hex = theme.models.palette[name] ?? manifest.palette[name] ?? '#FF00FF';
+    const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+    const name = material?.name ?? '';
+    // Kit materials are palette keys, coloured through the theme. Other GLBs (e.g. a model set
+    // with setCategoryModel) keep their own material colour.
+    const hex = theme.models.palette[name] ?? manifest.palette[name] ?? ownColour(material);
     // Kit GLBs carry no normals. De-index so every face gets its own flat normal (crisp toy
     // faces), rather than normals smoothed across shared corners.
     const src = new BufferGeometry();
@@ -46,6 +57,8 @@ export async function loadModel(
     const [r, gg, b] = hexToRgb(hex);
     for (let i = 0; i < count; i++) colors.set([r, gg, b], i * 3);
     g.setAttribute('color', new BufferAttribute(colors, 3, true));
+    const glow = new Uint8Array(count).fill(theme.models.glow.includes(name) ? 255 : 0);
+    g.setAttribute('aGlow', new BufferAttribute(glow, 1, true));
     parts.push(g);
   });
   const geometry = mergeGeometries(parts, false);
@@ -61,4 +74,10 @@ export async function loadModel(
   hull.computeVertexNormals();
   for (const p of parts) p.dispose();
   return { geometry, hull };
+}
+
+/** A glTF material's base colour as sRGB hex, or magenta if it has none. */
+function ownColour(material: Material | undefined): string {
+  const c = (material as MeshStandardMaterial | undefined)?.color;
+  return c ? `#${c.getHexString(SRGBColorSpace).toUpperCase()}` : '#FF00FF';
 }

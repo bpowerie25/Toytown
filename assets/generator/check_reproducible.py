@@ -68,6 +68,12 @@ def main():
         failures = []
         if json.load(open(os.path.join(MODELS, "manifest.json"))) != json.load(open(os.path.join(tmp, "manifest.json"))):
             failures.append("manifest.json differs")
+        for d in sorted(os.listdir(MODELS)):
+            pm = os.path.join(MODELS, d, "manifest.json")
+            if os.path.isfile(pm):
+                other = os.path.join(tmp, d, "manifest.json")
+                if not os.path.isfile(other) or json.load(open(pm)) != json.load(open(other)):
+                    failures.append(f"{d}/manifest.json differs")
         committed, regenerated = set(files(MODELS)), set(files(tmp))
         for f in sorted(committed ^ regenerated):
             failures.append(f"{f}: only in {'committed kit' if f in committed else 'regenerated kit'}")

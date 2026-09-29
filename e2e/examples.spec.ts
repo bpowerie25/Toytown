@@ -157,3 +157,89 @@ test('levels of detail by zoom', async ({ page }) => {
   expect(z16.stats.visibleInstances).toBeGreaterThan(50);
   expect(z16.overlay).toContain('lod full + models');
 });
+
+test.describe('demo', () => {
+  type D = Window & {
+    map: import('maplibre-gl').Map;
+    toy: {
+      ready: Promise<void>;
+      pick(p: {
+        x: number;
+        y: number;
+      }): { id: string; category: string; osm: string | null } | null;
+      setCategoryModel(category: string, url: string): Promise<void>;
+      addPack(url: string): Promise<void>;
+      stats(): { instances: Record<string, { state: string; visible: number }> };
+    };
+  };
+  const ready = (page: Page) => page.evaluate(() => (window as unknown as D).toy.ready);
+
+  test('clicking a building opens a popup with its category and an OSM link', async ({ page }) => {
+    await page.goto('/waterford/');
+    await page.waitForFunction(() => !!(window as unknown as D).toy);
+    await ready(page);
+    // Find a clickable spot near the centre of the view.
+    const spot = await page.evaluate(() => {
+      const { map, toy } = window as unknown as D;
+      const c = map.getCanvas();
+      for (let dy = 0; dy < 200; dy += 10) {
+        for (let dx = -200; dx <= 200; dx += 10) {
+          const p = { x: c.clientWidth / 2 + dx, y: c.clientHeight / 2 + dy };
+          const hit = toy.pick(p);
+          if (hit?.osm) return { ...p, hit };
+        }
+      }
+      return null;
+    });
+    expect(spot).not.toBeNull();
+    expect(spot!.hit.osm).toMatch(/^https:\/\/www\.openstreetmap\.org\/(node|way|relation)\/\d+$/);
+    await page.mouse.click(spot!.x, spot!.y);
+    const popup = page.locator('.maplibregl-popup-content');
+    await expect(popup).toContainText('View on OpenStreetMap');
+    await expect(popup.locator('a')).toHaveAttribute('href', spot!.hit.osm!);
+  });
+
+  test('landmark buttons fly to verified landmarks', async ({ page }) => {
+    await page.goto('/tramore/');
+    await page.waitForFunction(() => !!(window as unknown as D).toy);
+    await page.getByRole('button', { name: 'The Metal Man' }).click();
+    await page.waitForFunction(() => {
+      const m = (window as unknown as D).map;
+      return !m.isMoving() && Math.abs(m.getCenter().lat - 52.13759) < 1e-4;
+    });
+    await ready(page);
+    const c = await page.evaluate(() => (window as unknown as D).map.getCenter().toArray());
+    expect(c[0]).toBeCloseTo(-7.17186, 4);
+  });
+
+  test('night theme', async ({ page }) => {
+    await page.goto('/waterford/?theme=night');
+    await page.waitForFunction(() => !!(window as unknown as D).toy);
+    await ready(page);
+    await page.waitForTimeout(1_000);
+    const bg = await page.evaluate(() =>
+      (window as unknown as D).map.getPaintProperty('background', 'background-color'),
+    );
+    expect(bg).toBe('#1B2238');
+    await expect(page).toHaveScreenshot('waterford-night.png');
+  });
+
+  test('setCategoryModel and addPack re-plan the town', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.goto('/waterford/');
+    await page.waitForFunction(() => !!(window as unknown as D).toy);
+    await ready(page);
+    await page.evaluate(async () => {
+      const { toy } = window as unknown as D;
+      await toy.setCategoryModel('house', './models/generic/barn.glb');
+      await toy.addPack('./models/ireland/manifest.json');
+      await toy.ready;
+    });
+    const stats = await page.evaluate(() => (window as unknown as D).toy.stats().instances);
+    // Houses now use the override (variants are dropped), and loaded without errors.
+    expect(stats.house?.state).toBe('ready');
+    expect(stats.house_2).toBeUndefined();
+    expect(errors).toEqual([]);
+  });
+});

@@ -108,3 +108,33 @@ in view. Chunks are meshed lazily and freed when out of view; what's drawn depen
 
 Chunks are added and instances filled in a fixed order (chunk key, then model name and id), so
 overlapping geometry always draws the same way, whatever order the workers finish in.
+
+## Themes
+
+A theme is JSON (`packages/core/src/themes/default.json`, `night.json`):
+
+- `style`: the base-map palette. `ToyTown.style({ theme })` recolours the style through an explicit
+  map of layer paint properties to palette keys in the style's metadata (`toytown:colors`), so keys
+  that share a default colour, like road casing and building outlines, still theme separately.
+- `buildings`: wall palettes per category, roofs, flat roofs, windows and `windowGlow` (1 = windows
+  shown at full colour whatever the light, for night).
+- `lighting`: ambient, sun and toon steps.
+- `outline`: ink colour, hull width, edge width and fade.
+- `models`: palette overrides for the kit, `glow` palette keys (shown unlit, e.g. `window` at
+  night), fit rules and tree sizes.
+
+The night theme uses background `#1B2238` and windows `#FFD166`. Walls and roofs are the day
+colours blended 35–45% towards the background, and the moon is lower and cooler than the sun.
+
+## Picking
+
+`toy.pick({ x, y })` and `toy.on('click', …)` cast a ray through the last frame's camera (the
+inverse projection) into the visible chunk meshes and model instances; outline hulls are skipped.
+
+- **Procedural buildings**: a hit maps back to its OSM id through the `aBuilding` vertex attribute
+  and the chunk's id list.
+- **Models, props and trees**: an instance hit maps back to its placement, because each instance
+  buffer keeps its placements in order.
+
+The result includes the category, name and height from the data, and a link to
+openstreetmap.org.

@@ -1,4 +1,5 @@
 import type { StyleSpecification } from 'maplibre-gl';
+import { resolveTheme, type Theme } from '../themes';
 import toytown from './toytown.json';
 
 /** Id of the flat 2D building layer in the toy-town style. Hidden while the 3D layer is active. */
@@ -18,6 +19,8 @@ export interface StyleOptions {
    * Source attribution HTML. Must keep "© OpenStreetMap contributors" (ODbL); this is enforced.
    */
   attribution?: string;
+  /** Recolour the base map with a theme's `style` palette: a built-in name (`night`) or a theme. */
+  theme?: string | Theme;
 }
 
 const OSM_ATTRIBUTION = '&copy; OpenStreetMap contributors';
@@ -40,6 +43,19 @@ export function toytownStyle(options: StyleOptions = {}): StyleSpecification {
     source.maxzoom = options.maxzoom ?? 14;
   }
   if (options.glyphs) style.glyphs = options.glyphs;
+  if (options.theme !== undefined) {
+    const palette = resolveTheme(options.theme).style;
+    const colors = (style.metadata as Record<string, Record<string, string>>)['toytown:colors']!;
+    for (const layer of style.layers) {
+      const paint = (layer as { paint?: Record<string, unknown> }).paint;
+      if (!paint) continue;
+      for (const prop of Object.keys(paint)) {
+        const key = colors[`${layer.id}/${prop}`];
+        if (key && palette[key]) paint[prop] = palette[key];
+      }
+    }
+    (style.metadata as Record<string, unknown>)['toytown:palette'] = { ...palette };
+  }
   if (options.attribution !== undefined) {
     const a = options.attribution;
     source.attribution = /(©|&copy;)\s*OpenStreetMap contributors/.test(a)

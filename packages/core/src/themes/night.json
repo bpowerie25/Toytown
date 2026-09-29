@@ -1,0 +1,151 @@
+{
+  "name": "night",
+  "buildings": {
+    "windows": "#FFD166",
+    "roofs": ["#844642", "#3E4B68"],
+    "flatRoof": "#717175",
+    "walls": {
+      "default": ["#A8A3A0", "#A59F9A", "#A09B96"],
+      "house": ["#A8A3A0", "#A78280", "#A99663", "#7790AA", "#869F96", "#AAACB1"],
+      "bungalow": ["#AAACB1", "#A8A3A0", "#A99663"],
+      "semi_detached": ["#A8A3A0", "#A78280", "#7790AA", "#AAACB1"],
+      "terraced_house": ["#A78280", "#A99663", "#7790AA", "#869F96", "#A8A3A0"],
+      "apartment": ["#A8A3A0", "#AAACB1", "#A09B96"],
+      "tower_block": ["#969698", "#A09B96"],
+      "shop": ["#869F96", "#A78280", "#A99663", "#7790AA"],
+      "supermarket": ["#A8A3A0", "#969698"],
+      "cafe": ["#A78280", "#A99663", "#869F96"],
+      "pub": ["#255446", "#A8A3A0", "#9B5B51"],
+      "pharmacy": ["#AAACB1"],
+      "bank": ["#908D8B"],
+      "office": ["#6E949D", "#969698"],
+      "hotel": ["#A8A3A0", "#AAACB1"],
+      "petrol_station": ["#AAACB1"],
+      "hospital": ["#AFB2B9", "#AAACB1"],
+      "school": ["#9B5B51", "#A8A3A0"],
+      "library": ["#9B5B51", "#908D8B"],
+      "town_hall": ["#908D8B"],
+      "police_station": ["#AAACB1"],
+      "fire_station": ["#9B5B51"],
+      "church": ["#908D8B"],
+      "train_station": ["#9B5B51"],
+      "warehouse": ["#7790AA", "#969698", "#656F85"],
+      "factory": ["#7790AA", "#969698"],
+      "barn": ["#7D3242"],
+      "parking_garage": ["#969698"],
+      "round_tower": ["#908D8B"],
+      "lighthouse": ["#AAACB1"],
+      "generic": ["#A09B96", "#969698", "#A8A3A0"]
+    },
+    "pitchedRoofs": {
+      "categories": [
+        "house",
+        "bungalow",
+        "semi_detached",
+        "terraced_house",
+        "apartment",
+        "pub",
+        "church",
+        "school"
+      ],
+      "minRectangularity": 0.85,
+      "pitchDeg": 35,
+      "maxRoofHeightRatio": 0.45,
+      "maxRoofHeight": 8,
+      "overhang": 0.3,
+      "hipShare": {
+        "default": 0.4,
+        "church": 0,
+        "pub": 0,
+        "terraced_house": 0,
+        "school": 1,
+        "apartment": 0.7
+      }
+    },
+    "flat": {
+      "bevel": 0.3,
+      "parapetHeight": 0.6,
+      "parapetWidth": 0.3
+    },
+    "windowsOff": ["warehouse", "barn", "parking_garage"],
+    "minWindowHeight": 3.5,
+    "floorHeight": 3,
+    "windowSpacing": 2.6,
+    "windowGlow": 1
+  },
+  "lighting": {
+    "ambient": 0.62,
+    "sun": 0.3,
+    "sunDirection": [0.4, 0.5, 0.77],
+    "toonSteps": [0, 0.5, 1]
+  },
+  "outline": {
+    "color": "#0D1120",
+    "hullWidth": 0.12,
+    "edgeWidth": 1.1,
+    "fadeStart": 0.35,
+    "fadeEnd": 0.9
+  },
+  "models": {
+    "palette": {
+      "wall_cream": "#A8A3A0",
+      "wall_pink": "#A78280",
+      "wall_mint": "#869F96",
+      "wall_yellow": "#A99663",
+      "wall_blue": "#7790AA",
+      "stone": "#908D8B",
+      "brick": "#9B5B51",
+      "white": "#AFB2B9",
+      "offwhite": "#AAACB1",
+      "roof_red": "#964D44",
+      "roof_slate": "#455271",
+      "roof_flat": "#818080",
+      "window": "#FFD166",
+      "glass": "#6E949D",
+      "glass_band": "#3A5C6F",
+      "door": "#64463B",
+      "red": "#9F3141",
+      "garda_blue": "#1C3F6D",
+      "fire_red": "#95262E",
+      "pub_green": "#255446",
+      "gold": "#A18B58",
+      "awning": "#A7773E",
+      "leaf": "#4F7A51",
+      "trunk": "#64463B",
+      "skin": "#A78F7C",
+      "metal": "#656F85",
+      "black": "#25293E",
+      "concrete": "#969698",
+      "barn_red": "#7D3242",
+      "green_cross": "#257944"
+    },
+    "exclude": ["generic", "tree"],
+    "fit": {
+      "minScale": 0.6,
+      "maxScale": 1.6,
+      "aspectTolerance": 0.4,
+      "minRectangularity": 0.75
+    },
+    "trees": {
+      "minScale": 0.8,
+      "maxScale": 1.25
+    },
+    "glow": ["window"]
+  },
+  "style": {
+    "land": "#1B2238",
+    "water": "#2E4A7D",
+    "grass": "#24453A",
+    "wood": "#1E3B30",
+    "sand": "#3E3A4F",
+    "road": "#3A4265",
+    "road_casing": "#111728",
+    "major_road": "#6A5A3C",
+    "major_road_casing": "#2B2233",
+    "rail": "#4A4F66",
+    "label": "#E8E6F0",
+    "label_halo": "#1B2238",
+    "building": "#2A3252",
+    "building_outline": "#111728"
+  }
+}

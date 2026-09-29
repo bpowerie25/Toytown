@@ -14,6 +14,7 @@ import {
   Matrix4,
   Mesh,
   Quaternion,
+  Raycaster,
   Scene,
   Vector3,
   WebGLRenderer,
@@ -79,6 +80,8 @@ interface ChunkSlot extends ChunkInput {
   meshes: { full?: Mesh; fitted?: Mesh; plain?: Mesh };
   /** Instance matrices per model name, 16 floats each, precomputed at load. */
   matrices: Map<string, Float32Array>;
+  /** The placements behind those matrices, in the same order (for picking). */
+  placed: Map<string, Placement[]>;
   lastSeen: number;
 }
 
@@ -90,6 +93,18 @@ interface ModelGroup {
   hull?: InstancedMesh;
   capacity: number;
   count: number;
+  /** Placements of the instances currently in the buffer, by instance index (for picking). */
+  placed: Placement[];
+}
+
+/** What's under a point on the map. */
+export interface PickHit {
+  /** OSM id of the building or node (`way/123`), or a `scatter/…` id for scattered trees. */
+  id: string;
+  /** A procedural building, a hero model, a prop on a building, or a tree. */
+  kind: 'building' | 'model' | 'prop' | 'tree';
+  /** For models, props and trees: the model or prop name. */
+  model?: string;
 }
 
 export type ChunkLoader = (chunk: ChunkInput) => Promise<ChunkResult>;
@@ -193,6 +208,7 @@ export class ToyTownLayer implements CustomLayerInterface {
         state: 'idle',
         meshes: {},
         matrices: new Map(),
+        placed: new Map(),
         lastSeen: 0,
       });
     }
@@ -226,6 +242,58 @@ export class ToyTownLayer implements CustomLayerInterface {
     return true;
   }
 
+  private readonly raycaster = new Raycaster();
+
+  /**
+   * What's drawn under a point, in CSS pixels from the map canvas's top-left corner. Uses the
+   * camera of the last frame. Null if nothing (or only the base map) is there.
+   */
+  pick(x: number, y: number): PickHit | null {
+    if (!this.map || !this.drawing || this.level === 0) return null;
+    const canvas = this.map.getCanvas();
+    const nx = (x / canvas.clientWidth) * 2 - 1;
+    const ny = 1 - (y / canvas.clientHeight) * 2;
+    const inv = this.camera.projectionMatrixInverse;
+    const near = new Vector3(nx, ny, -1).applyMatrix4(inv);
+    const far = new Vector3(nx, ny, 1).applyMatrix4(inv);
+    this.raycaster.ray.set(near, far.sub(near).normalize());
+    const targets: (Mesh | InstancedMesh)[] = [];
+    for (const k of this.visible) {
+      for (const m of Object.values(this.chunks.get(k)!.meshes)) if (m?.visible) targets.push(m);
+    }
+    for (const g of this.groups.values()) if (g.mesh?.visible && g.count) targets.push(g.mesh);
+    for (const hit of this.raycaster.intersectObjects(targets, false)) {
+      const obj = hit.object as Mesh;
+      if ((obj as InstancedMesh).isInstancedMesh) {
+        const g = [...this.groups.values()].find((x) => x.mesh === obj);
+        const p = g?.placed[hit.instanceId ?? -1];
+        if (p) return { id: p.id, kind: p.kind === 'model' ? 'model' : p.kind, model: p.name };
+      } else if (hit.face) {
+        const index = (obj.geometry.getAttribute('aBuilding') as BufferAttribute).getX(hit.face.a);
+        const id = (obj.userData.ids as string[])[index];
+        if (id) return { id, kind: 'building' };
+      }
+    }
+    return null;
+  }
+
+  /** Forget every chunk and model (e.g. after the kit or theme changes); they reload lazily. */
+  clear(): void {
+    for (const c of this.chunks.values()) this.disposeChunk(c);
+    this.chunks.clear();
+    for (const g of this.groups.values()) {
+      if (g.mesh) this.scene.remove(g.mesh, g.hull!);
+      g.mesh?.dispose();
+      g.hull?.dispose();
+      g.model?.geometry.dispose();
+      g.model?.hull.dispose();
+    }
+    this.groups.clear();
+    this.visible = new Set();
+    this.visibleKey = '';
+    this.instancesDirty = true;
+  }
+
   private meshFrom(m: ChunkMesh, name: string): Mesh | undefined {
     if (!m.indices.length || !this.frame) return undefined;
     const g = new BufferGeometry();
@@ -241,6 +309,7 @@ export class ToyTownLayer implements CustomLayerInterface {
     this.frame.toScene(m.origin, 0, mesh.position);
     mesh.scale.setScalar(this.frame.localScale(m.origin[1]));
     mesh.name = name;
+    mesh.userData.ids = m.ids;
     mesh.visible = false;
     this.scene.add(mesh);
     return mesh;
@@ -268,6 +337,7 @@ export class ToyTownLayer implements CustomLayerInterface {
           const arr = new Float32Array(list.length * 16);
           list.forEach((p, i) => instanceMatrix(this.frame!, p, m).toArray(arr, i * 16));
           c.matrices.set(name, arr);
+          c.placed.set(name, list);
         }
         c.state = 'ready';
         this.instancesDirty = true;
@@ -288,6 +358,7 @@ export class ToyTownLayer implements CustomLayerInterface {
     }
     c.meshes = {};
     c.matrices.clear();
+    c.placed.clear();
     c.state = 'idle';
   }
 
@@ -345,7 +416,8 @@ export class ToyTownLayer implements CustomLayerInterface {
         counts.set(name, (counts.get(name) ?? 0) + arr.length / 16);
     }
     for (const name of counts.keys()) {
-      if (!this.groups.has(name)) this.groups.set(name, { state: 'idle', capacity: 0, count: 0 });
+      if (!this.groups.has(name))
+        this.groups.set(name, { state: 'idle', capacity: 0, count: 0, placed: [] });
     }
     for (const [name, g] of this.groups) {
       const count = counts.get(name) ?? 0;
@@ -356,12 +428,14 @@ export class ToyTownLayer implements CustomLayerInterface {
       const mesh = g.mesh!;
       const dst = mesh.instanceMatrix.array as Float32Array;
       let offset = 0;
+      g.placed = [];
       for (const k of this.visible) {
         const c = this.chunks.get(k)!;
         const arr = c.state === 'ready' ? c.matrices.get(name) : undefined;
         if (!arr) continue;
         dst.set(arr, offset);
         offset += arr.length;
+        g.placed.push(...c.placed.get(name)!);
       }
       mesh.count = g.hull!.count = count;
       (mesh.instanceMatrix as InstancedBufferAttribute).needsUpdate = true;

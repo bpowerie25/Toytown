@@ -1,4 +1,5 @@
 import defaultTheme from './default.json';
+import nightTheme from './night.json';
 
 /** Building look: colours, roof rules and window settings. All colours are exact hex. */
 export interface BuildingTheme {
@@ -31,6 +32,8 @@ export interface BuildingTheme {
   minWindowHeight: number;
   floorHeight: number;
   windowSpacing: number;
+  /** 0: windows are lit like walls (day). 1: windows glow at full colour whatever the light (night). */
+  windowGlow: number;
 }
 
 /**
@@ -74,10 +77,14 @@ export interface ModelsTheme {
   exclude: string[];
   fit: FitRules;
   trees: { minScale: number; maxScale: number };
+  /** Palette keys that glow on models (e.g. windows at night): shown at full colour, unlit. */
+  glow: string[];
 }
 
 export interface Theme {
   name: string;
+  /** Base map colours by style palette key (land, water, grass, roads, labels…). */
+  style: Record<string, string>;
   buildings: BuildingTheme;
   lighting: LightingTheme;
   outline: OutlineTheme;
@@ -85,6 +92,22 @@ export interface Theme {
 }
 
 export const DEFAULT_THEME = defaultTheme as unknown as Theme;
+export const NIGHT_THEME = nightTheme as unknown as Theme;
+
+/** Built-in themes by name. */
+export const THEMES: Record<string, Theme> = { default: DEFAULT_THEME, night: NIGHT_THEME };
+
+/** A theme by name (`default`, `night`) or as an object; undefined means the default theme. */
+export function resolveTheme(theme?: string | Theme): Theme {
+  if (theme === undefined) return DEFAULT_THEME;
+  if (typeof theme !== 'string') return theme;
+  const t = THEMES[theme];
+  if (!t)
+    throw new Error(
+      `unknown theme "${theme}" (built-in themes: ${Object.keys(THEMES).join(', ')})`,
+    );
+  return t;
+}
 
 export function wallPalette(theme: BuildingTheme, category: string): string[] {
   return theme.walls[category] ?? theme.walls.default!;

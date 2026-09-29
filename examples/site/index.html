@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>toytown-gl demos</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 32px 16px;
+        background: #f4ebd0;
+        color: #2b2d42;
+        font:
+          17px/1.5 'Nunito',
+          system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 34px;
+        margin: 0 0 4px;
+      }
+      img {
+        width: 100%;
+        border-radius: 12px;
+      }
+      .demos {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 20px 0;
+      }
+      .demos a {
+        flex: 1 1 200px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: #ffe8a3;
+        color: #2b2d42;
+        font-weight: 800;
+        text-decoration: none;
+      }
+      .demos a:hover {
+        background: #e0b85c;
+      }
+      small {
+        color: #5b6c8f;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>toytown-gl</h1>
+      <p>OpenStreetMap as a cartoony toy town, anywhere in the world: a MapLibre plugin.</p>
+      <img src="demo.gif" alt="Waterford City as a toy town, by day and by night" />
+      <div class="demos">
+        <a href="waterford/">Waterford City →</a>
+        <a href="tramore/">Tramore →</a>
+        <a href="waterford/?theme=night">Waterford by night →</a>
+      </div>
+      <p>
+        <small
+          >Map data © OpenStreetMap contributors (ODbL). Tiles: OpenFreeMap. Models: CC0.</small
+        >
+      </p>
+    </main>
+  </body>
+</html>

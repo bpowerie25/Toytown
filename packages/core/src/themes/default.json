@@ -70,7 +70,8 @@
     "windowsOff": ["warehouse", "barn", "parking_garage"],
     "minWindowHeight": 3.5,
     "floorHeight": 3,
-    "windowSpacing": 2.6
+    "windowSpacing": 2.6,
+    "windowGlow": 0
   },
   "lighting": {
     "ambient": 0.7,
@@ -97,6 +98,23 @@
     "trees": {
       "minScale": 0.8,
       "maxScale": 1.25
-    }
+    },
+    "glow": []
+  },
+  "style": {
+    "land": "#F4EBD0",
+    "water": "#7EC8E3",
+    "grass": "#A8D5A2",
+    "wood": "#6BAA5E",
+    "sand": "#F6E3B4",
+    "road": "#FFFFFF",
+    "road_casing": "#D9C9A3",
+    "major_road": "#FFE8A3",
+    "major_road_casing": "#E0B85C",
+    "rail": "#B8B2A7",
+    "label": "#2B2D42",
+    "label_halo": "#FFFFFF",
+    "building": "#E8DCBE",
+    "building_outline": "#D9C9A3"
   }
 }

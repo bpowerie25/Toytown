@@ -1,0 +1,25 @@
+name: Bug report
+description: Something renders wrong, crashes or is slow
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you expected, and what happened instead. Screenshots help a lot.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: Example or URL, zoom, and approximate location (or the bbox you built data for).
+  - type: input
+    id: env
+    attributes:
+      label: Browser, OS and GPU
+      description: 'Open the example with ?debug: the overlay shows FPS and draw calls.'
+  - type: input
+    id: version
+    attributes:
+      label: toytown-gl version or commit

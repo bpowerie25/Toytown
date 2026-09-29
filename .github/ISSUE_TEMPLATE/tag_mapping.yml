@@ -1,0 +1,24 @@
+name: Wrong building type
+description: A building gets the wrong category or model
+labels: [tag-mapping]
+body:
+  - type: input
+    id: osm
+    attributes:
+      label: OSM element
+      description: e.g. https://www.openstreetmap.org/way/42744158 (click the building in the demo for the link)
+    validations:
+      required: true
+  - type: input
+    id: got
+    attributes:
+      label: Category it gets
+  - type: input
+    id: want
+    attributes:
+      label: Category it should get
+  - type: textarea
+    id: why
+    attributes:
+      label: Tags and reasoning
+      description: The element's relevant tags, and any POIs inside it. If the OSM data itself is wrong, fix it on openstreetmap.org instead.

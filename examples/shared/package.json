@@ -1,0 +1,21 @@
+{
+  "name": "@toytown/example-shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Demo UI shared by the Waterford and Tramore examples: landmark fly-to, day/night toggle, click popups.",
+  "type": "module",
+  "exports": {
+    "./demo": "./demo.ts",
+    "./landmarks": "./landmarks.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "maplibre-gl": "^5.24.0",
+    "toytown-gl": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^8.3.1"
+  }
+}

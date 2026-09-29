@@ -191,3 +191,40 @@ export function kitFiles(
   for (const [name, p] of Object.entries(manifest.props ?? {})) out.set(name, p);
   return out;
 }
+
+/** A regional pack's own manifest (`<pack>/manifest.json`), for `ToyTown.addPack`. */
+export interface PackManifest {
+  version: 1;
+  pack: string;
+  palette: Record<string, string>;
+  /** Models with file paths relative to the pack manifest. */
+  models: Record<string, ModelEntry>;
+  /** Landmark overrides: this OSM element uses this model, whatever its tags. */
+  landmarks: { osm: string; category: string }[];
+}
+
+/** Validate a pack manifest. Its models use the same checks as the main manifest. */
+export function parsePackManifest(input: unknown): PackManifest {
+  if (!isRecord(input)) fail('pack manifest must be an object');
+  if (typeof input.pack !== 'string' || !input.pack) fail('pack manifest needs a "pack" name');
+  // Reuse the model checks by validating it as a main manifest. Pack models don't repeat the
+  // pack name, so fill it in.
+  const models = isRecord(input.models)
+    ? Object.fromEntries(
+        Object.entries(input.models).map(([k, m]) => [k, { ...(m as object), pack: input.pack }]),
+      )
+    : input.models;
+  parseManifest({ ...input, models, units: 'metres', up: '+Y', front: '+Z', props: undefined });
+  const landmarks = input.landmarks ?? [];
+  if (!Array.isArray(landmarks)) fail('landmarks must be an array');
+  for (const l of landmarks) {
+    if (!isRecord(l) || typeof l.osm !== 'string' || !/^(node|way|relation)\/\d+$/.test(l.osm)) {
+      fail(`landmark ${JSON.stringify(l)}: "osm" must look like "way/123"`);
+    }
+    if (typeof l.category !== 'string') fail(`landmark ${l.osm}: "category" must be a string`);
+  }
+  return {
+    ...(input as unknown as PackManifest),
+    landmarks: landmarks as PackManifest['landmarks'],
+  };
+}

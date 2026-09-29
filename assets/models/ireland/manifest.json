@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "pack": "ireland",
+  "units": "metres",
+  "up": "+Y",
+  "front": "+Z",
+  "palette": {
+    "garda_blue": "#1D4E89",
+    "offwhite": "#F7F7F2",
+    "skin": "#F2C9A0",
+    "white": "#FFFFFF"
+  },
+  "models": {
+    "landmark_metal_man": {
+      "file": "landmark_metal_man.glb",
+      "materials": ["offwhite", "white", "garda_blue", "skin"],
+      "footprint_m": [17.6, 3.6],
+      "height_m": 22.7,
+      "osm_tags": ["landmark override by OSM id"]
+    }
+  },
+  "landmarks": [
+    {
+      "osm": "way/46694890",
+      "category": "landmark_metal_man"
+    }
+  ]
+}
