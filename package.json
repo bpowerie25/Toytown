@@ -14,10 +14,13 @@
     "format": "prettier --write .",
     "typecheck": "pnpm -r run typecheck",
     "models:generate": "python3 assets/generator/generate_models.py",
-    "models:check": "python3 assets/generator/check_reproducible.py"
+    "models:check": "python3 assets/generator/check_reproducible.py",
+    "test:e2e": "docker run --rm --ipc=host -e CI -e DOCS_SCREENSHOTS -v \"$PWD\":/work -w /work mcr.microsoft.com/playwright:v1.63.0-noble npx playwright test",
+    "test:e2e:update": "docker run --rm --ipc=host -v \"$PWD\":/work -w /work mcr.microsoft.com/playwright:v1.63.0-noble npx playwright test --update-snapshots"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.63.0",
     "@types/node": "^24.19.0",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",

@@ -1,6 +1,8 @@
 # toytown-gl
 
-> **Status: early development (phase 0 scaffold).** Nothing is published yet.
+> **Status: early development (phase 1: base style).** Nothing is published yet.
+
+![Waterford City in the toy-town base style](docs/style/waterford-z15.png)
 
 A drop-in [MapLibre GL JS](https://maplibre.org/) plugin that renders OpenStreetMap anywhere in the
 world as a cartoony toy town. It has three parts:
@@ -34,6 +36,7 @@ pnpm build          # build the packages and examples
 pnpm test           # unit tests, including glTF validation of the model kit
 pnpm lint
 pnpm --filter @toytown/example-waterford dev
+pnpm test:e2e       # Playwright screenshot tests, in Docker (matches CI)
 ```
 
 To regenerate the model kit:
@@ -53,4 +56,5 @@ python3 -m venv .venv && .venv/bin/pip install -r assets/generator/requirements.
   toytown-gl must show "© OpenStreetMap contributors" attribution. Building datasets you derive
   from OSM (for example, the output of `toytown build-data`) are ODbL derivative databases and
   must be shared under the ODbL.
-- Base map tiles come from [OpenFreeMap](https://openfreemap.org/) by default.
+- Base map tiles come from [OpenFreeMap](https://openfreemap.org/) by default, and label glyphs
+  (Nunito, SIL OFL) from [VersaTiles](https://versatiles.org/). See [docs/style.md](docs/style.md).

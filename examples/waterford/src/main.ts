@@ -1,16 +1,23 @@
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { VERSION } from 'toytown-gl';
+import { toytownStyle, VERSION } from 'toytown-gl';
 
-// Phase 0: plain OpenFreeMap base map. The toy-town style and 3D layer arrive in later phases.
 const map = new maplibregl.Map({
   container: 'map',
-  style: 'https://tiles.openfreemap.org/styles/liberty',
+  style: toytownStyle(),
   center: [-7.1085, 52.2615],
   zoom: 15,
   pitch: 55,
-  attributionControl: { compact: false, customAttribution: '© OpenStreetMap contributors' },
+  attributionControl: { compact: false },
 });
 map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+// Exposed for the Playwright screenshot tests and for poking around in devtools.
+declare global {
+  interface Window {
+    map: maplibregl.Map;
+  }
+}
+window.map = map;
 
 console.info(`toytown-gl ${VERSION}: Waterford City example`);

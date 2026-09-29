@@ -5,7 +5,62 @@ Updated at the end of each phase.
 | Phase      | Status                | Notes                                                       |
 | ---------- | --------------------- | ----------------------------------------------------------- |
 | 0 Scaffold | done (CI not yet run) | Workspace, tooling, kit validation, CI, licences, examples. |
-| 1 Style    | not started           |                                                             |
+| 1 Style    | done (CI not yet run) | toytown.json, Nunito labels, Playwright screenshot tests.   |
+
+## Phase 1: Cartoon base style (2026-09-29)
+
+### What was done
+
+- `packages/core/src/style/toytown.json`: a 25-layer MapLibre style over OpenMapTiles-schema tiles
+  (OpenFreeMap by default), using the exact plan palette. Round caps and joins, exaggerated road
+  widths, and labels only for towns and villages, major roads, and water bodies. Full details in
+  `docs/style.md`.
+- `toytownStyle(options)`: returns a fresh copy of the style. Options: `tiles` (a TileJSON URL or
+  XYZ templates), `maxzoom`, `glyphs`, `attribution`. OSM attribution is always kept.
+- `setBaseBuildingsVisible(map, visible)` and `BASE_BUILDING_LAYER_ID`: the flat 2D building
+  layer, ready for the 3D layer to hide in phase 4.
+- Both examples now use `toytownStyle()`, and expose `window.map` for tests.
+- Unit tests (`packages/core/test/style.test.ts`) check the exact palette, that every colour is a
+  palette hex, round caps, casings wider than fills, the label set and font, attribution, the
+  options, and the building toggle. 122 unit tests in total.
+- Playwright screenshot tests (`e2e/`) for both examples. They wait for the style, tiles and
+  glyphs to load, then check there are no console errors, the OSM attribution is shown and the
+  base building layer exists, and compare against baselines. A CI job runs them in the same
+  Docker image.
+- Screenshots at z13, z15 and z17 for both towns are in `docs/style/`.
+
+### Decisions
+
+- **Font: Nunito, served by the VersaTiles glyph server.** Nothing on the OpenFreeMap glyph server
+  is rounded. fonts.openmaptiles.org looks like it hosts Nunito, Varela Round and Fredoka, but it
+  returns the same HTML redirect page for every font name, so it's effectively dead. The
+  reasoning, and the self-hosting fallback, are in `docs/style.md`.
+- **2D building colours** `#E8DCBE` (fill) and `#D9C9A3` (outline) are extra palette keys; the plan
+  didn't specify building colours.
+- **Line labels face the viewer** (`text-pitch-alignment: viewport`). At pitch 55 and z17, the
+  map-aligned river labels were tiny and flattened.
+- **Screenshot baselines are Linux-only** and generated in `mcr.microsoft.com/playwright:v1.63.0-noble`
+  via Docker (`pnpm test:e2e`, `pnpm test:e2e:update`). The CI job uses the same image as a
+  container, so local and CI rendering match. The examples are served from their `dist/` folders
+  by a dependency-free static server (`e2e/serve.mjs`), so the host's macOS `node_modules` work
+  inside the container.
+- **`maplibre-gl` is now a peer dependency (`^5`)** of `toytown-gl`, and a dev dependency for
+  types. `@playwright/test` was added at the root (it's on the approved stack).
+- **Style validation.** I didn't add `@maplibre/maplibre-gl-style-spec` because it isn't on the
+  approved list. The style is checked at runtime instead: the e2e tests fail on any MapLibre
+  console error. Adding it as a dev dependency would allow a proper unit-level `validate()`.
+
+### Known issues
+
+- Screenshot baselines use live OpenFreeMap tiles, which update weekly. The tests allow a 3% pixel
+  difference, but a big OSM edit in view could fail them; if so, run `pnpm test:e2e:update` and
+  review the diff.
+- VersaTiles' Nunito doesn't cover scripts such as Arabic or Devanagari, so those labels won't
+  render (see `docs/style.md`).
+- Chrome driven through the extension doesn't run `requestAnimationFrame` in a hidden tab, so the
+  map never loads there. This explains the blank first captures in phase 0. Playwright runs
+  headless and doesn't have this problem.
+- CI still hasn't run (no remote yet).
 
 ## Phase 0: Scaffold (2026-09-29)
 

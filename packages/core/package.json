@@ -31,6 +31,10 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "gltf-validator": "2.0.0-dev.3.10"
+    "gltf-validator": "2.0.0-dev.3.10",
+    "maplibre-gl": "^5.24.0"
+  },
+  "peerDependencies": {
+    "maplibre-gl": "^5.0.0"
   }
 }
