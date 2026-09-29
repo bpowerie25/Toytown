@@ -22,7 +22,7 @@ function glbFiles(dir: string): string[] {
 }
 
 interface Gltf {
-  materials?: { name?: string }[];
+  materials?: { name?: string; pbrMetallicRoughness?: { baseColorFactor?: number[] } }[];
   meshes: { primitives: { attributes: { POSITION: number } }[] }[];
   accessors: { min?: number[]; max?: number[] }[];
 }
@@ -56,6 +56,18 @@ describe('model kit', () => {
       const names = (readGlbJson(bytes).materials ?? []).map((m) => m.name ?? '');
       expect(names.sort()).toEqual([...model.materials].sort());
       for (const n of names) expect(manifest.palette).toHaveProperty(n);
+    });
+
+    it('stores palette colours as linear baseColorFactor (glTF spec)', () => {
+      const srgbToLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+      for (const m of readGlbJson(bytes).materials ?? []) {
+        const hex = manifest.palette[m.name ?? '']!;
+        const expected = [1, 3, 5].map((i) =>
+          srgbToLinear(parseInt(hex.slice(i, i + 2), 16) / 255),
+        );
+        const factor = m.pbrMetallicRoughness?.baseColorFactor ?? [];
+        expected.forEach((e, i) => expect(factor[i], `${m.name} channel ${i}`).toBeCloseTo(e, 4));
+      }
     });
 
     it('sits on the ground (min Y = 0) with its origin at the base centre', () => {

@@ -8,6 +8,40 @@ Updated at the end of each phase.
 | 1 Style    | done (CI not yet run) | toytown.json, Nunito labels, Playwright screenshot tests.   |
 | 2 Data     | done (CI not yet run) | build-data CLI, tag-map.json, both datasets, report.        |
 
+## Phase 2.5: Visual spike (2026-09-29), awaiting review
+
+### What was done
+
+- `examples/spike`: deck.gl `ScenegraphLayer` via `MapboxOverlay` (interleaved) over the phase 1
+  style. It places 28 kit models on classified Waterford buildings around the Quay and city
+  centre, plus 15 mapped trees. Each model sits at the footprint centroid, scaled to the minimum
+  rotated rectangle (clamped 0.6–1.6×) and rotated to face `front`.
+- Screenshots at z15, z16 and z17 (pitch 55), a close-up, and two calibration shots are in
+  `docs/spike/`. Findings are in `docs/spike/README.md`.
+- deck.gl 9.4 and loaders.gl 4.5 were added to `examples/spike` only (approved); nothing new in the
+  core.
+
+### Decisions
+
+- **Colour fix in `generate_models.py`.** glTF `baseColorFactor` is linear, but the generator wrote
+  sRGB hex/255, so every spec-compliant renderer showed the palette washed out. It now writes
+  exact linear floats. Because trimesh quantises factors to 8 bits, they're patched into the GLB
+  JSON after export. A kit test enforces the conversion. Rendered colours were verified within
+  5–11/255 of the palette. All 31 GLBs were regenerated; `check_reproducible.py` passes.
+- **Orientation convention confirmed** with a four-direction calibration render: roll 90° (Y-up to
+  deck's Z-up) and yaw `180 − front`. No generator change was needed.
+- **Manifest version stays 1.** The documented conventions are unchanged; this was a spec bug.
+  This is flagged for review.
+
+### Known issues (for phase 4, not model fixes)
+
+- Hero models overflow small city-centre plots even at the 0.6× clamp. This needs phase 4's
+  `fit`/`decorate` rule.
+- Models and trees are specks at z15 next to the exaggerated roads. Consider per-zoom
+  exaggeration.
+- Some terraced town-centre buildings are tagged `building=house` and get the detached-house
+  model.
+
 ## Phase 2: Building data pipeline (2026-09-29)
 
 ### What was done

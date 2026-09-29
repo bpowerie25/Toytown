@@ -28,8 +28,17 @@ PALETTE = {
 }
 
 def rgba(hexc):
+    """sRGB components in 0..1, for the matplotlib preview."""
     h = hexc.lstrip("#")
     return [int(h[i:i+2], 16) / 255 for i in (0, 2, 4)] + [1.0]
+
+def linear_rgba(hexc):
+    """glTF baseColorFactor is linear, so decode the sRGB palette hex; spec-compliant renderers
+    (three.js, Blender, deck.gl) then show exactly the palette colour under neutral light."""
+    def dec(c):
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+    r, g, b, a = rgba(hexc)
+    return [round(dec(r), 6), round(dec(g), 6), round(dec(b), 6), a]
 
 class Model:
     def __init__(self, name, pack="generic"):
@@ -78,12 +87,28 @@ class Model:
         to_yup = trimesh.transformations.rotation_matrix(-np.pi / 2, [1, 0, 0])
         for color, meshes in self.parts.items():
             m = trimesh.util.concatenate(meshes); m.apply_transform(to_yup)
-            m.visual = TextureVisuals(material=PBRMaterial(name=color, baseColorFactor=rgba(PALETTE[color]),
+            m.visual = TextureVisuals(material=PBRMaterial(name=color, baseColorFactor=linear_rgba(PALETTE[color]),
                                                             metallicFactor=0.0, roughnessFactor=1.0))
             scene.add_geometry(m, node_name=f"{self.name}_{color}", geom_name=f"{self.name}_{color}")
         d = os.path.join(OUT, self.pack); os.makedirs(d, exist_ok=True)
         path = os.path.join(d, f"{self.name}.glb"); scene.export(path)
+        exact_colors(path)
         return path
+
+def exact_colors(path):
+    """trimesh stores baseColorFactor as 8-bit, which loses precision in linear space (dark
+    colours worst). Rewrite each material's factor with exact linear floats from the palette."""
+    import struct
+    b = open(path, "rb").read()
+    n = struct.unpack_from("<I", b, 12)[0]
+    doc = json.loads(b[20:20 + n])
+    for m in doc.get("materials", []):
+        m.setdefault("pbrMetallicRoughness", {})["baseColorFactor"] = linear_rgba(PALETTE[m["name"]])
+    j = json.dumps(doc, separators=(",", ":")).encode()
+    j += b" " * (-len(j) % 4)  # JSON chunk must be 4-byte aligned, padded with spaces
+    rest = b[20 + n:]
+    out = struct.pack("<4sII", b"glTF", 2, 12 + 8 + len(j) + len(rest)) + struct.pack("<I4s", len(j), b"JSON") + j + rest
+    open(path, "wb").write(out)
 
 # Front of each building is the -Y face here (becomes +Z after Y-up conversion).
 def house():
