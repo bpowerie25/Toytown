@@ -13,6 +13,11 @@ const MODELS = join(dirname(fileURLToPath(import.meta.url)), '../../../assets/mo
 const manifest = parseManifest(JSON.parse(readFileSync(join(MODELS, 'manifest.json'), 'utf8')));
 const entries = Object.entries(manifest.models);
 const props = Object.entries(manifest.props ?? {});
+const variants = entries.flatMap(([base, m]) =>
+  (m.variants ?? []).map((v) => [v.name, { ...v, base }] as const),
+);
+/** Every model and variant, with its manifest data. */
+const looks = [...entries.map(([n, m]) => [n, m] as const), ...variants];
 
 function glbFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {
@@ -28,6 +33,39 @@ function triangles(gltf: Gltf): number {
       n + m.primitives.reduce((k, p) => k + (gltf.accessors[p.indices!]!.count ?? 0) / 3, 0),
     0,
   );
+}
+
+/** Mean Z of the vertices of the mesh whose material is "door", or null if there's none. */
+function doorCentreZ(gltf: Gltf, bytes: Uint8Array): number | null {
+  const doc = gltf as Gltf & {
+    nodes?: { mesh?: number }[];
+    bufferViews: { byteOffset?: number; byteLength: number }[];
+    meshes: { primitives: { attributes: { POSITION: number }; material?: number }[] }[];
+  };
+  const doorIndex = (doc.materials ?? []).findIndex((m) => m.name === 'door');
+  if (doorIndex < 0) return null;
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const jsonLen = view.getUint32(12, true);
+  const binStart = 20 + jsonLen + 8;
+  let sum = 0;
+  let n = 0;
+  for (const mesh of doc.meshes) {
+    for (const prim of mesh.primitives) {
+      if (prim.material !== doorIndex) continue;
+      const acc = doc.accessors[prim.attributes.POSITION]! as {
+        bufferView?: number;
+        byteOffset?: number;
+        count?: number;
+      };
+      const bv = doc.bufferViews[acc.bufferView!]!;
+      const base = binStart + (bv.byteOffset ?? 0) + (acc.byteOffset ?? 0);
+      for (let i = 0; i < acc.count!; i++) {
+        sum += view.getFloat32(base + i * 12 + 8, true);
+        n++;
+      }
+    }
+  }
+  return n ? sum / n : null;
 }
 
 interface Gltf {
@@ -54,7 +92,7 @@ describe('model kit', () => {
   });
 
   it('lists every GLB on disk, and nothing else', () => {
-    const listed = [...entries, ...props].map(([, m]) => m.file).sort();
+    const listed = [...looks, ...props].map(([, m]) => m.file).sort();
     expect(glbFiles(MODELS).sort()).toEqual(listed);
   });
 
@@ -77,7 +115,23 @@ describe('model kit', () => {
     });
   });
 
-  describe.each(entries)('%s', (_name, model) => {
+  it('records the provenance and licence of every GLB in LICENSES.md', () => {
+    const licences = readFileSync(join(MODELS, 'LICENSES.md'), 'utf8');
+    const rows = new Map(
+      [...licences.matchAll(/^\|\s*`([^`]+)`\s*\|.*\|\s*([\w.-]+)\s*\|\s*$/gm)].map((m) => [
+        m[1]!,
+        m[2]!,
+      ]),
+    );
+    for (const f of glbFiles(MODELS)) expect(['CC0-1.0', 'CC-BY-4.0'], f).toContain(rows.get(f));
+  });
+
+  it('has 2 extra variants for house, shop and apartment', () => {
+    for (const c of ['house', 'shop', 'apartment'])
+      expect(manifest.models[c]!.variants, c).toHaveLength(2);
+  });
+
+  describe.each(looks)('%s', (_name, model) => {
     const bytes = new Uint8Array(readFileSync(join(MODELS, model.file)));
 
     it('passes the glTF validator with no errors', async () => {
@@ -102,6 +156,25 @@ describe('model kit', () => {
         const factor = m.pbrMetallicRoughness?.baseColorFactor ?? [];
         expected.forEach((e, i) => expect(factor[i], `${m.name} channel ${i}`).toBeCloseTo(e, 4));
       }
+    });
+
+    it('stays within the 2,000-triangle model budget', () => {
+      expect(triangles(readGlbJson(bytes))).toBeLessThanOrEqual(2000);
+    });
+
+    it('is in metres: a plausible building size', () => {
+      const [w, d] = model.footprint_m;
+      expect(model.height_m).toBeGreaterThan(2);
+      expect(model.height_m).toBeLessThan(60);
+      for (const v of [w, d]) {
+        expect(v).toBeGreaterThan(1);
+        expect(v).toBeLessThan(60);
+      }
+    });
+
+    it('faces +Z: any door is on the front half', () => {
+      const z = doorCentreZ(readGlbJson(bytes), bytes);
+      if (z !== null) expect(z).toBeGreaterThan(0);
     });
 
     it('sits on the ground (min Y = 0) with its origin at the base centre', () => {

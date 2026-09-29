@@ -16,3 +16,5 @@ playwright-report/
 *.pbf
 overpass-*.json
 blob-report/
+packages/models/models/
+packages/models/dist/

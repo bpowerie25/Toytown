@@ -18,7 +18,7 @@ import {
   type Material,
 } from 'three';
 import type { ChunkMesh } from '../geometry';
-import type { Manifest } from '../manifest';
+import { kitFiles, type Manifest } from '../manifest';
 import type { Placement } from '../placement';
 import { setBaseBuildingsVisible } from '../style';
 import type { Theme } from '../themes';
@@ -172,7 +172,7 @@ export class ToyTownLayer implements CustomLayerInterface {
 
   private async loadGroup(name: string, g: Group): Promise<void> {
     const manifest = this.manifest!;
-    const entry = manifest.models[name] ?? manifest.props?.[name];
+    const entry = kitFiles(manifest).get(name);
     if (!entry || !this.frame) return;
     g.state = 'loading';
     try {

@@ -1,5 +1,5 @@
-export { parseManifest, ManifestError } from './manifest';
-export type { Manifest, ModelEntry, PropEntry, PropAttach } from './manifest';
+export { parseManifest, ManifestError, kitFiles } from './manifest';
+export type { Manifest, ModelEntry, ModelVariant, PropEntry, PropAttach } from './manifest';
 export { toytownStyle, setBaseBuildingsVisible, BASE_BUILDING_LAYER_ID } from './style';
 export type { StyleOptions, LayerHost } from './style';
 export * from './geometry';
@@ -22,6 +22,8 @@ export {
   planBuildings,
   planPoints,
   planTrees,
+  chooseVariant,
+  type KitModel,
   type Placement,
   type PlanKit,
   type PlannedBuilding,

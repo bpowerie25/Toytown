@@ -75,7 +75,9 @@ Planning is pure and runs in the chunk workers, before meshing (`packages/core/s
     (0.6–1.6).
 
   The model sits at the footprint centroid, scaled uniformly and turned so its +Z front faces the
-  building's `front` bearing. Categories named `landmark_*` always fit, with the scale clamped.
+  building's `front` bearing. For categories with variants (house, shop and apartment), a stable
+  hash of the OSM id picks the base model or one of its variants first, and fit uses that look's
+  footprint, so neighbouring houses differ. Categories named `landmark_*` always fit, with the scale clamped.
 
 - **decorate**: otherwise the procedural building stays and gets its category's props from the
   manifest's `props`:

@@ -45,15 +45,30 @@ export interface Placement {
 }
 
 /** The parts of the manifest planning needs; small enough to send to workers. */
+export interface KitModel {
+  footprint_m: [number, number];
+  height_m: number;
+  /** Other looks for this category: name and size. The base model is always an option too. */
+  variants?: { name: string; footprint_m: [number, number]; height_m: number }[];
+}
+
 export interface PlanKit {
-  models: Record<string, { footprint_m: [number, number]; height_m: number }>;
+  models: Record<string, KitModel>;
   props: Record<string, Pick<PropEntry, 'categories' | 'attach' | 'footprint_m' | 'height_m'>>;
 }
 
 export function planKit(manifest: Manifest): PlanKit {
   const models: PlanKit['models'] = {};
-  for (const [k, m] of Object.entries(manifest.models))
+  for (const [k, m] of Object.entries(manifest.models)) {
     models[k] = { footprint_m: m.footprint_m, height_m: m.height_m };
+    if (m.variants?.length) {
+      models[k].variants = m.variants.map((v) => ({
+        name: v.name,
+        footprint_m: v.footprint_m,
+        height_m: v.height_m,
+      }));
+    }
+  }
   const props: PlanKit['props'] = {};
   for (const [k, p] of Object.entries(manifest.props ?? {})) {
     props[k] = {
@@ -67,6 +82,22 @@ export function planKit(manifest: Manifest): PlanKit {
 }
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
+
+/**
+ * The look for one building or POI: the base model or one of its variants, by a stable hash of
+ * the OSM id, so neighbouring houses differ but a building always gets the same one.
+ */
+export function chooseVariant(
+  category: string,
+  model: KitModel,
+  id: string,
+): { name: string; footprint_m: [number, number]; height_m: number } {
+  const options = [
+    { name: category, footprint_m: model.footprint_m, height_m: model.height_m },
+    ...(model.variants ?? []),
+  ];
+  return options[Math.floor(hashUnit(`${id}:variant`) * options.length)]!;
+}
 const LANDMARK_PREFIX = 'landmark_';
 
 interface Frame {
@@ -111,7 +142,8 @@ export function fitModel(b: PlannedBuilding, kit: PlanKit, theme: Theme): Placem
   const fr = frame(b);
   if (!fr) return null;
   const rules = theme.models.fit;
-  const [fw, fd] = model.footprint_m;
+  const look = chooseVariant(b.category, model, b.id);
+  const [fw, fd] = look.footprint_m;
   const scale = Math.sqrt((fr.frontage * fr.depth) / (fw * fd));
   const landmark = b.category.startsWith(LANDMARK_PREFIX);
   if (!landmark) {
@@ -122,7 +154,7 @@ export function fitModel(b: PlannedBuilding, kit: PlanKit, theme: Theme): Placem
   return {
     id: b.id,
     kind: 'model',
-    name: b.category,
+    name: look.name,
     position: fr.proj.toLngLat(fr.center),
     z: 0,
     front: b.front!,
@@ -253,7 +285,8 @@ export function planPoints(
   const placed: { p: XY; r: number }[] = [];
   const out: Placement[] = [];
   for (const pt of candidates) {
-    const [fw, fd] = kit.models[pt.category]!.footprint_m;
+    const look = chooseVariant(pt.category, kit.models[pt.category]!, pt.id);
+    const [fw, fd] = look.footprint_m;
     const r = Math.max(fw, fd) / 2;
     const c = proj.toXY(pt.position);
     const probes: XY[] = [
@@ -270,7 +303,7 @@ export function planPoints(
     out.push({
       id: pt.id,
       kind: 'model',
-      name: pt.category,
+      name: look.name,
       position: pt.position,
       z: 0,
       front: pt.front ?? 180,

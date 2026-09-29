@@ -11,6 +11,67 @@ Updated at the end of each phase.
 | 3 Buildings     | done     | Procedural buildings, worker meshing, minimal render layer.    |
 | 4 Toon + models | done     | Toon/ink rendering, fit/decorate/point, props, instancing.     |
 
+## Phase 4b: Model kit as its own distributable (2026-09-29)
+
+### What was done
+
+- **`packages/models` (`@toytown/models`, CC0-1.0)**: an npm package of the kit, with GLBs,
+  manifest, preview and licences, plus a README covering the conventions and use from three.js,
+  Babylon.js, Unity (glTFast) and Godot. `pnpm --filter @toytown/models zip` builds
+  `toytown-models-<version>.zip` for GitHub releases (51 files, 1.1 MB). The package copies from
+  `assets/models`, which stays the single source of truth. It is not published yet (phase 7).
+- **Variants**: 2 extra looks each for `house`, `shop` and `apartment`, in the generator:
+  - houses: a hipped pink house with a porch, and a front-gabled yellow house with a bay window;
+  - shops: a blue shop with a fascia sign, and a 3-storey shop with a striped awning;
+  - apartments: a 5-storey block with balconies and a hipped roof, and a brick block with a long
+    gable.
+
+  They're listed in the manifest under `models.<category>.variants`. A stable hash of the OSM id
+  picks the base model or a variant (`chooseVariant`), and fit uses that look's footprint. The
+  renderer loads each variant as its own instanced mesh.
+
+- **Hand-made models**: a pack can declare its own GLBs (Blender, Kenney, Quaternius…) in
+  `assets/models/<pack>/pack.json`, as models or as `variant_of` a category. The generator
+  measures them (materials, footprint, height) into the manifest with `"source": "hand"`, and
+  regenerating never deletes them. Before this, it deleted every GLB. `test_generator.py` covers
+  this.
+- **Kit validation (`pnpm test`, in CI)**: every model, variant and prop is checked for:
+  - the glTF validator;
+  - the triangle budget (≤ 2,000 per model, ≤ 300 per prop);
+  - materials matching the manifest and palette;
+  - ground and centred origin;
+  - plausible metric size;
+  - **orientation** (any `door` material must be on the +Z half; 20 of 37 models have doors, all
+    pass);
+  - a `LICENSES.md` provenance row with CC0 or CC-BY.
+
+  The CI models job also runs the generator tests, regenerates the kit (including `preview.png`),
+  fails if the manifest and files disagree, and uploads the regenerated kit and the zip as
+  artifacts.
+
+- **`docs/adding-models.md`**: conventions, generating a model, making one in Blender (front on
+  -Y, apply transforms, palette-key materials, glTF export), converting Kenney/Quaternius packs,
+  the manifest fields, tag rules, regional packs and landmarks, and a checklist.
+
+### Decisions
+
+- **`tower_block` was over budget** (2,628 triangles). Its per-window boxes became one glass band
+  per floor per side, bringing it to about 600.
+- **Variants are nested in their category's manifest entry**, so the category list (used by
+  `tag-map.json` validation) is unchanged. Manifest `version` stays 1: `variants`, `props` and
+  `source` are optional additions and the conventions are unchanged.
+- **The Vitest projects are listed explicitly** (`packages/core`, `packages/cli`), so the models
+  package, which has no tests of its own, isn't picked up.
+- **Caught by the new tests:** an edit that should have passed variants into the planning kit had
+  silently not applied, so production would never have used variants. The variant tests found
+  it.
+
+### Known issues
+
+- The `@toytown` npm scope still needs claiming before phase 7's publish.
+- The Unity and Godot notes in the package README are from the engines' documented glTF
+  conventions, not tested in those engines.
+
 ## Phase 4: Toon rendering and hero models (2026-09-29)
 
 ### What was done

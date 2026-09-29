@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { LocalProjection, type LngLat, type XY } from '../src/geometry';
 import { parseManifest } from '../src/manifest';
 import {
+  chooseVariant,
   decorate,
   fitModel,
   planBuildings,
@@ -35,11 +36,15 @@ function building(
   return { id, category, height, parts: [[ring]], front };
 }
 const xy = (p: LngLat) => proj.toXY(p);
+/** An id that hashes to the base house model (not a variant), for tests about fitting rules. */
+const BASE_HOUSE = Array.from({ length: 50 }, (_, i) => `way/${i}`).find(
+  (i) => chooseVariant('house', kit.models.house!, i).name === 'house',
+)!;
 
 describe('fitModel', () => {
   // The house model is 8.6 m wide (frontage) by 7.8 m deep.
   it('fits a house-shaped footprint, at its centroid, facing its front', () => {
-    const p = fitModel(building('way/1', 'house', 9, 8, 180), kit, theme)!;
+    const p = fitModel(building(BASE_HOUSE, 'house', 9, 8, 180), kit, theme)!;
     expect(p).toMatchObject({ kind: 'model', name: 'house', front: 180, z: 0 });
     expect(p.scale).toBeCloseTo(Math.sqrt((9 * 8) / (8.6 * 7.8)), 3);
     const [x, y] = xy(p.position);
@@ -80,6 +85,35 @@ describe('fitModel', () => {
   });
 });
 
+describe('variants', () => {
+  it('picks the base model or a variant, stably per id and spread evenly', () => {
+    const counts: Record<string, number> = {};
+    for (let i = 0; i < 900; i++) {
+      const name = chooseVariant('house', kit.models.house!, `way/${i}`).name;
+      counts[name] = (counts[name] ?? 0) + 1;
+      expect(chooseVariant('house', kit.models.house!, `way/${i}`).name).toBe(name);
+    }
+    expect(Object.keys(counts).sort()).toEqual(['house', 'house_2', 'house_3']);
+    for (const n of Object.values(counts)) expect(n).toBeGreaterThan(240);
+  });
+
+  it('fits using the chosen variant’s footprint and places that variant', () => {
+    // Find an id that gets house_3 (7.6 wide × 10.2 deep): a footprint shaped like it fits…
+    const id = Array.from({ length: 50 }, (_, i) => `way/${i}`).find(
+      (i) => chooseVariant('house', kit.models.house!, i).name === 'house_3',
+    )!;
+    const p = fitModel({ ...building(id, 'house', 7.6, 10.2, 180) }, kit, theme)!;
+    expect(p.name).toBe('house_3');
+    expect(p.scale).toBeCloseTo(1, 2);
+    // …while the same shape rotated a quarter turn (wide frontage) doesn't.
+    expect(fitModel({ ...building(id, 'house', 10.2, 7.6, 180) }, kit, theme)).toBeNull();
+  });
+
+  it('categories without variants always get their base model', () => {
+    expect(chooseVariant('church', kit.models.church!, 'way/1').name).toBe('church');
+  });
+});
+
 describe('decorate', () => {
   it('puts an awning on a shop’s front wall at ground-floor height, sized to the frontage', () => {
     // 30×12 shop facing south: too big for the shop model, so it's decorated.
@@ -117,14 +151,14 @@ describe('decorate', () => {
 
 describe('planBuildings', () => {
   it('leaves fitted buildings out of the mesh and decorates the rest', () => {
-    const fits = building('way/1', 'house', 9, 8, 180);
-    const big = building('way/2', 'cafe', 30, 12, 180, 50);
-    const plain = building('way/3', 'generic', 10, 10, 180, 100);
+    const fits = building(BASE_HOUSE, 'house', 9, 8, 180);
+    const big = building('way/9002', 'cafe', 30, 12, 180, 50);
+    const plain = building('way/9003', 'generic', 10, 10, 180, 100);
     const plan = planBuildings([fits, big, plain], kit, theme);
-    expect(plan.meshed.map((b) => b.id)).toEqual(['way/2', 'way/3']);
+    expect(plan.meshed.map((b) => b.id)).toEqual(['way/9002', 'way/9003']);
     expect(plan.placements.map((p) => [p.id, p.kind, p.name])).toEqual([
-      ['way/1', 'model', 'house'],
-      ['way/2', 'prop', 'awning'],
+      [BASE_HOUSE, 'model', 'house'],
+      ['way/9002', 'prop', 'awning'],
     ]);
   });
 

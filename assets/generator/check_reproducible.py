@@ -7,9 +7,10 @@ not the model. We require identical manifest, materials, meshes, accessors,
 buffer views and binary buffers, and the same named mesh nodes with no
 transforms.
 
-Usage: python assets/generator/check_reproducible.py
+Usage: python assets/generator/check_reproducible.py [--keep DIR]
+  --keep DIR  also copy the regenerated kit (including preview.png) to DIR, e.g. for CI artifacts
 """
-import json, os, struct, subprocess, sys, tempfile
+import json, os, shutil, struct, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODELS = os.path.normpath(os.path.join(HERE, "..", "models"))
@@ -71,9 +72,15 @@ def main():
         for f in sorted(committed ^ regenerated):
             failures.append(f"{f}: only in {'committed kit' if f in committed else 'regenerated kit'}")
         for f in sorted(committed & regenerated):
-            errs = compare(os.path.join(MODELS, f), os.path.join(tmp, f))
+            a, b = os.path.join(MODELS, f), os.path.join(tmp, f)
+            if open(a, "rb").read() == open(b, "rb").read():
+                continue  # identical, e.g. hand-made files copied as they are
+            errs = compare(a, b)
             if errs:
                 failures.append(f"{f}: differs in {', '.join(errs)}")
+        if "--keep" in sys.argv:
+            keep = sys.argv[sys.argv.index("--keep") + 1]
+            shutil.copytree(tmp, keep, dirs_exist_ok=True)
 
     if failures:
         print("Generator does NOT reproduce the committed kit:")

@@ -1,0 +1,30 @@
+{
+  "name": "@toytown/models",
+  "version": "0.0.0",
+  "description": "CC0 low-poly toy-town building models (GLB) with a manifest: houses, shops, schools, churches, props and more.",
+  "license": "CC0-1.0",
+  "type": "module",
+  "files": [
+    "models",
+    "README.md"
+  ],
+  "exports": {
+    "./manifest.json": "./models/manifest.json",
+    "./*": "./models/*"
+  },
+  "keywords": [
+    "gltf",
+    "glb",
+    "low-poly",
+    "buildings",
+    "cc0",
+    "three",
+    "babylonjs",
+    "godot",
+    "unity"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "zip": "node scripts/build.mjs && node scripts/zip.mjs"
+  }
+}

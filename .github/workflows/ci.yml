@@ -31,6 +31,12 @@ jobs:
           node packages/cli/dist/index.js --version
       - run: pnpm test
       - run: pnpm typecheck
+      - name: Build the model kit zip
+        run: pnpm --filter @toytown/models zip
+      - uses: actions/upload-artifact@v7
+        with:
+          name: toytown-models-zip
+          path: packages/models/dist/*.zip
 
   models:
     name: Model generator reproduces the kit
@@ -43,7 +49,15 @@ jobs:
           cache: pip
           cache-dependency-path: assets/generator/requirements.txt
       - run: pip install -r assets/generator/requirements.txt
-      - run: python assets/generator/check_reproducible.py
+      - run: python assets/generator/test_generator.py
+      # Regenerates the whole kit (GLBs, manifest, preview.png) and fails if the committed kit
+      # or manifest disagree with it.
+      - run: python assets/generator/check_reproducible.py --keep regenerated-kit
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: regenerated-kit
+          path: regenerated-kit/
 
   e2e:
     name: Example screenshots (Playwright)

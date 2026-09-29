@@ -4,6 +4,17 @@
  * Conventions are fixed: Y-up, metres, front faces +Z, origin at base centre,
  * one material per palette key.
  */
+/** Another look for the same category; picked per building by a hash of its OSM id. */
+export interface ModelVariant {
+  name: string;
+  file: string;
+  materials: string[];
+  footprint_m: [number, number];
+  height_m: number;
+  /** "hand" for hand-made GLBs declared in a pack's pack.json; absent for generated ones. */
+  source?: 'hand';
+}
+
 export interface ModelEntry {
   /** Path to the GLB, relative to the manifest. */
   file: string;
@@ -16,6 +27,8 @@ export interface ModelEntry {
   /** Footprint width (x) and depth (z) in metres. */
   footprint_m: [number, number];
   height_m: number;
+  variants?: ModelVariant[];
+  source?: 'hand';
 }
 
 /** How a prop attaches to a procedural building's front. */
@@ -111,6 +124,27 @@ export function parseManifest(input: unknown): Manifest {
       fail(`${at}.footprint_m must be [width, depth] in metres`);
     }
     if (!isPositive(m.height_m)) fail(`${at}.height_m must be a positive number`);
+    if (m.variants !== undefined) {
+      if (!Array.isArray(m.variants)) fail(`${at}.variants must be an array`);
+      m.variants.forEach((v: unknown, i: number) => {
+        const vat = `${at}.variants[${i}]`;
+        if (!isRecord(v) || typeof v.name !== 'string' || !v.name)
+          fail(`${vat}.name must be a string`);
+        if (v.name in models) fail(`${vat}: "${v.name}" clashes with a model name`);
+        if (typeof v.file !== 'string' || !v.file.endsWith('.glb'))
+          fail(`${vat}.file must be a .glb path`);
+        if (
+          !Array.isArray(v.materials) ||
+          !v.materials.every((x) => typeof x === 'string' && x in palette)
+        ) {
+          fail(`${vat}.materials must be palette keys`);
+        }
+        const vfp = v.footprint_m;
+        if (!Array.isArray(vfp) || vfp.length !== 2 || !vfp.every(isPositive))
+          fail(`${vat}.footprint_m must be [width, depth]`);
+        if (!isPositive(v.height_m)) fail(`${vat}.height_m must be a positive number`);
+      });
+    }
   }
 
   if (input.props !== undefined) {
@@ -143,4 +177,17 @@ export function parseManifest(input: unknown): Manifest {
   }
 
   return input as unknown as Manifest;
+}
+
+/** Every loadable model, variant and prop by name, with its file and size. */
+export function kitFiles(
+  manifest: Manifest,
+): Map<string, { file: string; footprint_m: [number, number]; height_m: number }> {
+  const out = new Map<string, { file: string; footprint_m: [number, number]; height_m: number }>();
+  for (const [name, m] of Object.entries(manifest.models)) {
+    out.set(name, m);
+    for (const v of m.variants ?? []) out.set(v.name, v);
+  }
+  for (const [name, p] of Object.entries(manifest.props ?? {})) out.set(name, p);
+  return out;
 }

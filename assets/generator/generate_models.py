@@ -4,15 +4,16 @@ Units: metres. Output GLB is Y-up, building front faces +Z, origin at base centr
 One mesh per material; materials are named (wall, roof, window...) so a renderer
 can swap them for toon materials by name.
 """
-import os, json
+import os, json, shutil
 import numpy as np
 import trimesh
 from trimesh.visual.material import PBRMaterial
 from trimesh.visual import TextureVisuals
 
-OUT = os.environ.get("TOYTOWN_MODELS_OUT", os.path.join(os.path.dirname(__file__), "..", "models"))
+SRC = os.path.abspath(os.environ.get("TOYTOWN_MODELS_SRC", os.path.join(os.path.dirname(__file__), "..", "models")))
+OUT = os.environ.get("TOYTOWN_MODELS_OUT", SRC)
 os.makedirs(OUT, exist_ok=True)
-GENERATED = {"manifest.json", "preview.png"}  # plus every *.glb; everything else in OUT is hand-written and kept
+GENERATED = {"manifest.json", "preview.png"}  # plus the GLBs the last manifest lists as generated; everything else is kept
 
 PALETTE = {
     "wall_cream": "#F4E9D8", "wall_pink": "#F2B5A7", "wall_mint": "#BFE3C9",
@@ -258,7 +259,12 @@ def semi_detached():
 
 def tower_block():
     m = Model("tower_block")
-    m.box(16, 16, 40, color="concrete"); m.windows(16, 16, 12, 3.2, z0=0.4, per_floor=5)
+    m.box(16, 16, 40, color="concrete")
+    for fl in range(12):  # one glass band per floor per side keeps it under the 2,000-triangle budget
+        z = 0.4 + fl * 3.2 + 1.1
+        m.box(14, 0.2, 1.3, 0, -8.05, z, "window"); m.box(14, 0.2, 1.3, 0, 8.05, z, "window")
+        m.box(0.2, 14, 1.3, -8.05, 0, z, "window"); m.box(0.2, 14, 1.3, 8.05, 0, z, "window")
+    m.box(2, 0.2, 2.6, 0, -8.05, 0, "door")
     m.box(16.6, 16.6, 0.8, z=40, color="roof_flat"); m.box(4, 4, 3, 3, 3, 40.8, "metal"); return m
 
 def supermarket():
@@ -391,6 +397,53 @@ BUILDERS = [
     (metal_man, ["landmark override by OSM id"]),
 ]
 
+# Variants: 2 extra looks for the most common categories, chosen per building by a hash of its
+# OSM id so streets don't look cloned. Same conventions and front as the base model.
+def house_2():  # hipped slate roof, pink walls, porch
+    m = Model("house_2")
+    m.box(9, 7, 5, color="wall_pink"); m.hip(9.6, 7.6, 2.8, z=5, color="roof_slate")
+    m.box(1.2, 0.2, 2.2, 0, -3.55, 0, "door"); m.windows(9, 7, 2, 2.5, per_floor=2)
+    m.box(2.6, 1.4, 0.25, 0, -4.2, 2.6, "white"); m.box(0.2, 0.2, 2.6, -1.1, -4.8, 0, "white"); m.box(0.2, 0.2, 2.6, 1.1, -4.8, 0, "white")
+    m.box(0.8, 0.8, 1.6, 0, 0, 7.2, "brick"); return m
+
+def house_3():  # front-facing gable, yellow walls, bay window
+    m = Model("house_3")
+    m.box(7, 9, 5.5, color="wall_yellow"); m.gable(7.6, 9.6, 3.4, z=5.5, color="roof_red", along="y")
+    m.box(1.2, 0.2, 2.2, -1.8, -4.55, 0, "door"); m.windows(7, 9, 2, 2.7, per_floor=2)
+    m.box(2.6, 0.8, 2.2, 1.4, -4.9, 0.4, "white"); m.box(2.2, 0.2, 1.4, 1.4, -5.35, 0.8, "window")
+    m.box(0.8, 0.8, 1.8, -2, 3, 7.6, "brick"); return m
+
+def shop_2():  # blue, flat fascia sign instead of an awning
+    m = Model("shop_2")
+    m.box(8, 8, 7, color="wall_blue"); m.box(6.5, 0.2, 2.6, 0, -4.05, 0.2, "glass")
+    m.box(8.2, 0.35, 1.1, 0, -4.1, 2.9, "white"); m.box(5, 0.4, 0.5, 0, -4.2, 3.2, "red")
+    m.windows(8, 8, 2, 3.5, per_floor=2, skip_ground=True, sides=False)
+    m.box(8.4, 8.4, 0.5, z=7, color="roof_flat"); return m
+
+def shop_3():  # three storeys, pink, red-and-white awning
+    m = Model("shop_3")
+    m.box(7, 8, 9.5, color="wall_pink"); m.box(5.8, 0.2, 2.6, 0, -4.05, 0.2, "glass")
+    for i in range(5):
+        m.box(7.2 / 5, 1.5, 0.15, -3.6 + (i + 0.5) * 7.2 / 5, -4.75, 2.9, "red" if i % 2 == 0 else "white")
+    m.windows(7, 8, 3, 3.1, per_floor=2, skip_ground=True, sides=False)
+    m.gable(7.4, 8.4, 2.4, z=9.5, color="roof_slate"); return m
+
+def apartment_2():  # five storeys, blue, balconies, hipped roof
+    m = Model("apartment_2")
+    m.box(15, 11, 15.5, color="wall_blue"); m.windows(15, 11, 5, 3.1, z0=0.2, per_floor=4)
+    for fl in range(1, 5):
+        for x in (-4.5, 4.5): m.box(3, 1.3, 0.3, x, -6.1, fl * 3.1, "white")
+    m.hip(15.6, 11.6, 3.2, z=15.5, color="roof_slate")
+    m.box(2, 0.2, 2.5, 0, -5.55, 0, "door"); return m
+
+def apartment_3():  # three storeys, brick, long gable
+    m = Model("apartment_3")
+    m.box(16, 9, 9.6, color="brick"); m.windows(16, 9, 3, 3.2, z0=0.2, per_floor=5)
+    m.gable(16.6, 9.6, 3.2, z=9.6, color="roof_red")
+    m.box(2, 0.2, 2.5, 0, -4.55, 0, "door"); m.box(3, 1.2, 0.3, 0, -5.1, 2.8, "white"); return m
+
+VARIANTS = {"house": [house_2, house_3], "shop": [shop_2, shop_3], "apartment": [apartment_2, apartment_3]}
+
 # Props: small parts attached to procedural buildings when a hero model doesn't fit ("decorate").
 # Same conventions as models (front is -Y here, +Z after export). Wall-mounted props have their
 # origin on the wall plane at the prop's base, and extend outwards (-Y).
@@ -434,31 +487,71 @@ PROPS = [
     (prop_canopy, ["petrol_station"], {"at": "front-ground", "z": "ground", "offset": 6}),
 ]
 
+def entry(mdl, path):
+    bounds = trimesh.util.concatenate([x for ms in mdl.parts.values() for x in ms]).bounds
+    return {"file": f"{mdl.pack}/{os.path.basename(path)}", "materials": list(mdl.parts.keys()),
+            "footprint_m": [round(float(bounds[1][0] - bounds[0][0]), 1), round(float(bounds[1][1] - bounds[0][1]), 1)],
+            "height_m": round(float(bounds[1][2]), 1)}
+
+def hand_entry(file):
+    """Metadata for a hand-made GLB (Y-up already): materials, footprint and height from the file."""
+    scene = trimesh.load(os.path.join(SRC, file), force="scene")
+    b = scene.bounds
+    mats = []
+    for g in scene.geometry.values():
+        name = getattr(getattr(g.visual, "material", None), "name", None)
+        if name and name not in mats: mats.append(name)
+    return {"file": file, "materials": mats,
+            "footprint_m": [round(float(b[1][0] - b[0][0]), 1), round(float(b[1][2] - b[0][2]), 1)],
+            "height_m": round(float(b[1][1]), 1), "source": "hand"}
+
+def hand_packs():
+    """Hand-made models declared in <pack>/pack.json next to the kit: {"models": {name: {file, osm_tags, variant_of?}}}."""
+    out = []
+    for d in sorted(os.listdir(SRC)):
+        p = os.path.join(SRC, d, "pack.json")
+        if os.path.isfile(p):
+            for name, spec in json.load(open(p))["models"].items():
+                out.append((d, name, spec))
+    return out
+
 if __name__ == "__main__":
-    for root, _, files in os.walk(OUT):
-        for f in files:
-            if f.endswith(".glb") or (root == OUT and f in GENERATED):
-                os.remove(os.path.join(root, f))
+    # Remove only files this generator made last time (hand-made GLBs and other files stay).
+    old = os.path.join(OUT, "manifest.json")
+    if os.path.exists(old):
+        prev = json.load(open(old))
+        for section in ("models", "props"):
+            for e in prev.get(section, {}).values():
+                for x in [e] + e.get("variants", []):
+                    f = os.path.join(OUT, x["file"])
+                    if x.get("source") != "hand" and os.path.exists(f): os.remove(f)
+    for f in GENERATED:
+        if os.path.exists(os.path.join(OUT, f)): os.remove(os.path.join(OUT, f))
+
     manifest = {}
     models = []
     for b, tags in BUILDERS:
         mdl = b(); path = mdl.export(); models.append(mdl)
-        bounds = trimesh.util.concatenate([x for ms in mdl.parts.values() for x in ms]).bounds
-        manifest[mdl.name] = {"file": f"{mdl.pack}/{os.path.basename(path)}", "pack": mdl.pack,
-                              "osm_tags": tags, "materials": list(mdl.parts.keys()),
-                              "footprint_m": [round(float(bounds[1][0] - bounds[0][0]), 1), round(float(bounds[1][1] - bounds[0][1]), 1)],
-                              "height_m": round(float(bounds[1][2]), 1)}
+        manifest[mdl.name] = {**entry(mdl, path), "pack": mdl.pack, "osm_tags": tags}
+        for v in VARIANTS.get(mdl.name, []):
+            vm = v(); vpath = vm.export(); models.append(vm)
+            manifest[mdl.name].setdefault("variants", []).append({"name": vm.name, **entry(vm, vpath)})
+    for pack, name, spec in hand_packs():
+        if SRC != os.path.abspath(OUT):  # regenerating elsewhere (e.g. the reproducibility check): bring the file along
+            os.makedirs(os.path.join(OUT, pack), exist_ok=True)
+            shutil.copyfile(os.path.join(SRC, spec["file"]), os.path.join(OUT, spec["file"]))
+        e = hand_entry(spec["file"])
+        if spec.get("variant_of"):
+            manifest[spec["variant_of"]].setdefault("variants", []).append({"name": name, **e})
+        else:
+            manifest[name] = {**e, "pack": pack, "osm_tags": spec.get("osm_tags", [])}
     props = {}
     for b, categories, attach in PROPS:
         mdl = b(); path = mdl.export(); models.append(mdl)
-        bounds = trimesh.util.concatenate([x for ms in mdl.parts.values() for x in ms]).bounds
-        props[mdl.name] = {"file": f"{mdl.pack}/{os.path.basename(path)}", "categories": categories,
-                           "attach": attach, "materials": list(mdl.parts.keys()),
-                           "footprint_m": [round(float(bounds[1][0] - bounds[0][0]), 1), round(float(bounds[1][1] - bounds[0][1]), 1)],
-                           "height_m": round(float(bounds[1][2]), 1)}
+        props[mdl.name] = {**entry(mdl, path), "categories": categories, "attach": attach}
     json.dump({"version": 1, "units": "metres", "up": "+Y", "front": "+Z",
                "palette": PALETTE, "models": manifest, "props": props}, open(os.path.join(OUT, "manifest.json"), "w"), indent=2)
-    print(len(manifest), "models,", len(props), "props")
+    print(len(manifest), "models,", sum(len(m.get("variants", [])) for m in manifest.values()), "variants,", len(props), "props")
 
     import matplotlib; matplotlib.use("Agg")
     import matplotlib.pyplot as plt
