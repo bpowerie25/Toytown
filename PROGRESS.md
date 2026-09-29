@@ -8,7 +8,11 @@ Updated at the end of each phase.
 | 1 Style    | done (CI not yet run) | toytown.json, Nunito labels, Playwright screenshot tests.   |
 | 2 Data     | done (CI not yet run) | build-data CLI, tag-map.json, both datasets, report.        |
 
-## Phase 2.5: Visual spike (2026-09-29), awaiting review
+## Phase 2.5: Visual spike (2026-09-29), approved
+
+The screenshots were reviewed and approved on 2026-09-29. Zoom exaggeration and the manifest
+version were left open; the defaults stand (strictly metric models, manifest version 1) until
+decided.
 
 ### What was done
 

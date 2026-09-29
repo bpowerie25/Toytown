@@ -1,6 +1,6 @@
 # Phase 2.5 visual spike
 
-**Status: awaiting review.** This is a throwaway check that the toy-town look works before building
+**Status: approved (2026-09-29).** This is a throwaway check that the toy-town look works before building
 the custom three.js renderer. If phases 3–4 prove too hard, this becomes the fallback v1 renderer.
 
 `examples/spike` renders the phase 1 style with deck.gl's `ScenegraphLayer` (through
