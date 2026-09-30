@@ -1,7 +1,7 @@
 name: Release
 
-# Push a tag like v0.1.0 (after `pnpm version-packages`) to publish toytown-gl and
-# @toytown/models to npm with provenance, and create a GitHub release with the models zip.
+# Push a tag like v0.1.0 (after `pnpm version-packages`) to publish toytown-gl,
+# @toytown/models and @toytown/cli to npm with provenance, and create a GitHub release with the models zip.
 # Needs: the npm @toytown scope, and an NPM_TOKEN secret (or npm trusted publishing for this
 # workflow). npm provenance requires a public repository. See docs/releasing.md.
 on:

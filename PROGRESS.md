@@ -2,18 +2,18 @@
 
 Updated at the end of each phase.
 
-| Phase           | Status               | Notes                                                                          |
-| --------------- | -------------------- | ------------------------------------------------------------------------------ |
-| 0 Scaffold      | done                 | Workspace, tooling, kit validation, CI, licences, examples.                    |
-| 1 Style         | done                 | toytown.json, Nunito labels, Playwright screenshot tests.                      |
-| 2 Data          | done                 | build-data CLI, tag-map.json, both datasets, report.                           |
-| 2.5 Spike       | approved             | deck.gl spike; model kit colour fix. See docs/spike/README.md.                 |
-| 3 Buildings     | done                 | Procedural buildings, worker meshing, minimal render layer.                    |
-| 4 Toon + models | done                 | Toon/ink rendering, fit/decorate/point, props, instancing.                     |
-| 4b Model kit    | done                 | @toytown/models + zip, variants, kit CI, adding-models guide.                  |
-| 5 Performance   | done                 | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs.         |
-| 6 API + demos   | done                 | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages.     |
-| 7 Release       | ready, not published | ESM+UMD, changesets 0.1.0, release workflow, acceptance test. Publish pending. |
+| Phase           | Status               | Notes                                                                             |
+| --------------- | -------------------- | --------------------------------------------------------------------------------- |
+| 0 Scaffold      | done                 | Workspace, tooling, kit validation, CI, licences, examples.                       |
+| 1 Style         | done                 | toytown.json, Nunito labels, Playwright screenshot tests.                         |
+| 2 Data          | done                 | build-data CLI, tag-map.json, both datasets, report.                              |
+| 2.5 Spike       | approved             | deck.gl spike; model kit colour fix. See docs/spike/README.md.                    |
+| 3 Buildings     | done                 | Procedural buildings, worker meshing, minimal render layer.                       |
+| 4 Toon + models | done                 | Toon/ink rendering, fit/decorate/point, props, instancing.                        |
+| 4b Model kit    | done                 | @toytown/models + zip, variants, kit CI, adding-models guide.                     |
+| 5 Performance   | done                 | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs.            |
+| 6 API + demos   | done                 | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages.        |
+| 7 Release       | ready, not published | ESM+UMD, 3 packages at 0.1.0, release workflow, acceptance test. Publish pending. |
 
 ## After phase 7 (2026-09-30)
 
@@ -81,6 +81,20 @@ Updated at the end of each phase.
     unchanged: the screenshot baselines still pass.
   - **esbuild 0.27 → 0.28** and **image-size 0.7 → 2.0** through `overrides` in
     `pnpm-workspace.yaml` (both transitive: tsup/vite, and the deck.gl spike's texture-compressor).
+
+- **`@toytown/cli` is published too** (your call; it was private since phase 2), so a new user's
+  first step is `npx @toytown/cli build-data --bbox … --out town.geojson`, with no clone.
+  - The CLI bundles the core's three.js-free source (`packages/core/src/data.ts`: classification,
+    manifests, footprint geometry) instead of depending on `toytown-gl`. It's one 61 KB file plus
+    `dist/defaults/` (the kit's tag map, manifest and Irish landmarks), 24 kB packed, and its only
+    dependency is `flatgeobuf`. Bundling `toytown-gl`'s `dist` pulled in three.js (508 KB), because
+    module-level three objects can't be tree-shaken.
+  - The acceptance test packs all three packages and runs `npx toytown build-data` in the fresh
+    project against a canned Overpass response on a local server (deterministic, no network).
+  - `toytown build-data --help` prints help (it used to fail as an unknown option).
+  - New guide: [docs/your-own-buildings.md](docs/your-own-buildings.md), for using your own models
+    in an app without forking (by category, by OSM id with a pack, or a new category). The pack
+    route was checked in the browser.
 
 ## Phase 7: Packaging and release (2026-09-29), ready but not published
 

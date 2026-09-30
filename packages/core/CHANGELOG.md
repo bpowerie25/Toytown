@@ -14,3 +14,5 @@
     ESM (with types) and a self-contained UMD build.
   - **@toytown/models**: 31 CC0 low-poly building models, 6 variants and 7 props, with a manifest,
     an Irish landmark pack, and a README for three.js, Babylon.js, Unity and Godot.
+  - **@toytown/cli**: `toytown build-data` builds the data file for any bbox in the world, from
+    Overpass or a PBF extract (`npx @toytown/cli build-data --bbox … --out town.geojson`).

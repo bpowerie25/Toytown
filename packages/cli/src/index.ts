@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,7 +17,12 @@ import { readPbf } from './pbf';
 import { buildData, type BuildStats } from './pipeline';
 import { renderReport } from './report';
 
-const ASSETS = resolve(dirname(fileURLToPath(import.meta.url)), '../../../assets/models');
+// The default tag map, kit manifest and packs: copied next to the build (dist/defaults) so the
+// published CLI carries them; the repo's assets/models when running from source.
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ASSETS = existsSync(resolve(HERE, 'defaults'))
+  ? resolve(HERE, 'defaults')
+  : resolve(HERE, '../../../assets/models');
 const DEFAULTS = {
   manifest: resolve(ASSETS, 'manifest.json'),
   tagMap: resolve(ASSETS, 'tag-map.json'),

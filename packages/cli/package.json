@@ -1,22 +1,52 @@
 {
   "name": "@toytown/cli",
-  "version": "0.0.0",
-  "private": true,
-  "description": "toytown build-data: fetch and classify OSM buildings into a compact data file.",
+  "version": "0.1.0",
+  "description": "toytown build-data: fetch OpenStreetMap buildings, open spaces and trees for any bbox, classify them, and write a compact data file for toytown-gl.",
   "license": "MIT",
+  "author": "Brian Power",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpowerie25/Toytown.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/bpowerie25/Toytown/blob/main/docs/build-data.md",
+  "bugs": {
+    "url": "https://github.com/bpowerie25/Toytown/issues"
+  },
+  "keywords": [
+    "openstreetmap",
+    "osm",
+    "overpass",
+    "pbf",
+    "buildings",
+    "maplibre",
+    "toytown-gl",
+    "cli"
+  ],
   "type": "module",
   "bin": {
     "toytown": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepack": "pnpm build"
   },
   "dependencies": {
-    "flatgeobuf": "^4.5.0",
+    "flatgeobuf": "^4.5.0"
+  },
+  "devDependencies": {
     "toytown-gl": "workspace:*"
   }
 }

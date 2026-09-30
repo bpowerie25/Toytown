@@ -3,9 +3,11 @@
 Fetches OSM buildings for a bbox, classifies them, and writes a compact data file for the plugin.
 
 ```sh
-pnpm --filter toytown-gl --filter @toytown/cli build
-node packages/cli/dist/index.js build-data --bbox -7.18,52.135,-7.12,52.18 --out tramore.geojson
+npx @toytown/cli build-data --bbox -7.18,52.135,-7.12,52.18 --out tramore.geojson
 ```
+
+Published as [`@toytown/cli`](../packages/cli/README.md) (bin `toytown`). In this repo, after
+`pnpm build`, the same CLI is `node packages/cli/dist/index.js`.
 
 ## Sources
 

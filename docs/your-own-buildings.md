@@ -111,10 +111,10 @@ A pack can hold as many models and landmarks as you like. The built-in Irish pac
 ## 4. A new kind of building
 
 The categories come from the data file, so a new kind of building (a `kiosk` for every
-`building=kiosk`) needs a tag rule and a data rebuild. The data CLI isn't on npm yet, so this
-route needs a clone of this repo.
+`building=kiosk`) needs a tag rule and a data rebuild with [`@toytown/cli`](../packages/cli/README.md).
 
-1. Copy `assets/models/tag-map.json` and `assets/models/manifest.json` somewhere of your own.
+1. Copy the kit's `tag-map.json` and `manifest.json` (in `node_modules/@toytown/models/models/`,
+   or `assets/models/` in this repo) somewhere of your own.
 2. Add your model to your copy of the manifest (an entry like the one above, under `models`) and
    a rule to your copy of the tag map:
 
@@ -127,7 +127,7 @@ route needs a clone of this repo.
 3. Rebuild your data with them:
 
    ```sh
-   node packages/cli/dist/index.js build-data --bbox <w,s,e,n> --out public/data/town.geojson \
+   npx @toytown/cli build-data --bbox <w,s,e,n> --out public/data/town.geojson \
      --tag-map my/tag-map.json --manifest my/manifest.json
    ```
 

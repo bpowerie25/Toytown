@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 
 const tag = process.argv[2] ?? '';
-const packages = ['packages/core', 'packages/models'];
+const packages = ['packages/core', 'packages/models', 'packages/cli'];
 const out = [];
 for (const dir of packages) {
   const { name, version } = JSON.parse(readFileSync(`${dir}/package.json`, 'utf8'));

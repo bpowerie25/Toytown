@@ -139,6 +139,7 @@ importers:
       flatgeobuf:
         specifier: ^4.5.0
         version: 4.5.0
+    devDependencies:
       toytown-gl:
         specifier: workspace:*
         version: link:../core

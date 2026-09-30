@@ -3,10 +3,11 @@
 // before anything is published. Used locally and in CI.
 //
 //   pnpm build && node scripts/acceptance.mjs
-import { execSync } from 'node:child_process';
+import { exec, execSync } from 'node:child_process';
 import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, resolve } from 'node:path';
+import { promisify } from 'node:util';
 import { chromium } from '@playwright/test';
 
 const root = resolve(import.meta.dirname, '..');
@@ -17,8 +18,8 @@ const sh = (cmd, cwd = work) =>
 rmSync(work, { recursive: true, force: true });
 mkdirSync(join(work, 'pack'), { recursive: true });
 
-// 1. Pack both packages the way they'd be published.
-for (const pkg of ['packages/core', 'packages/models'])
+// 1. Pack the packages the way they'd be published.
+for (const pkg of ['packages/core', 'packages/models', 'packages/cli'])
   sh(`pnpm pack --pack-destination ${join(work, 'pack')}`, join(root, pkg));
 const tarballs = readdirSync(join(work, 'pack')).map((f) => join(work, 'pack', f));
 console.log('packed', tarballs.map((t) => t.split('/').pop()).join(', '));
@@ -51,6 +52,46 @@ cpSync(
   join(root, 'examples/tramore/public/data/tramore.geojson'),
   join(app, 'public/data/town.geojson'),
 );
+
+// 3b. The published CLI builds a data file with `npx toytown build-data`, against a canned
+// Overpass response served locally (no network, so CI stays deterministic).
+const osm = {
+  osm3s: { timestamp_osm_base: '2026-09-30T00:00:00Z' },
+  elements: [
+    ...[
+      [1, -7.15, 52.16],
+      [2, -7.1498, 52.16],
+      [3, -7.1498, 52.1601],
+      [4, -7.15, 52.1601],
+      [5, -7.151, 52.159],
+      [6, -7.149, 52.159],
+      [7, -7.149, 52.1595],
+      [8, -7.151, 52.1595],
+      [9, -7.152, 52.16],
+      [10, -7.148, 52.16],
+    ].map(([id, lon, lat]) => ({ type: 'node', id, lon, lat })),
+    { type: 'way', id: 100, nodes: [1, 2, 3, 4, 1], tags: { building: 'house' } },
+    { type: 'way', id: 101, nodes: [5, 6, 7, 8, 5], tags: { leisure: 'park', name: 'Test Park' } },
+    { type: 'way', id: 102, nodes: [9, 10], tags: { highway: 'residential' } },
+  ],
+};
+const overpass = createServer((req, res) =>
+  req.url.endsWith('/status')
+    ? res.end('Connected as: 1\n2 slots available now.')
+    : res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(osm)),
+).listen(4398);
+// Async, so this process's event loop keeps serving the canned Overpass response.
+await promisify(exec)(
+  'npx --no-install toytown build-data --bbox=-7.152,52.158,-7.147,52.161 --out cli-town.geojson ' +
+    '--overpass-url http://localhost:4398/api/interpreter --cache-dir .cli-cache',
+  { cwd: app },
+);
+overpass.close();
+const built = JSON.parse(readFileSync(join(app, 'cli-town.geojson'), 'utf8'));
+const cliOk =
+  built.features.some((f) => f.properties.category === 'house') &&
+  built.features.some((f) => f.properties.kind === 'area' && f.properties.name === 'Test Park');
+console.log('cli: npx toytown build-data wrote', built.features.length, 'features');
 
 // 4. Type-check and build, as a user would.
 sh('npm run build', app);
@@ -104,13 +145,15 @@ await page.screenshot({ path: join(work, 'acceptance.png') });
 await browser.close();
 server.close();
 
-const ok = errors.length === 0 && stats.chunks.ready > 0 && stats.visibleInstances > 20;
+const ok = cliOk && errors.length === 0 && stats.chunks.ready > 0 && stats.visibleInstances > 20;
 console.log(
   JSON.stringify(
-    { ok, chunksReady: stats.chunks.ready, instances: stats.visibleInstances, errors },
+    { ok, cli: cliOk, chunksReady: stats.chunks.ready, instances: stats.visibleInstances, errors },
     null,
     2,
   ),
 );
 if (!ok) process.exit(1);
-console.log('ACCEPTANCE OK: npm i toytown-gl + README quick start works in a fresh Vite project');
+console.log(
+  'ACCEPTANCE OK: npx toytown build-data, npm i toytown-gl and the README quick start work in a fresh Vite project',
+);

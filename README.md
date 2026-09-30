@@ -31,12 +31,11 @@ churches and more.
 
 ## Quick start
 
-**1. Build a data file for your area** (any bbox in the world, from Overpass, or from a PBF
-extract) with the CLI in this repo:
+**1. Build a data file for your area** (any bbox in the world, `west,south,east,north`), from
+Overpass or a PBF extract:
 
 ```sh
-pnpm install && pnpm build
-node packages/cli/dist/index.js build-data --bbox -7.17,52.22,-7.05,52.28 --out public/data/town.geojson
+npx @toytown/cli build-data --bbox -7.17,52.22,-7.05,52.28 --out public/data/town.geojson
 ```
 
 **2. Install** (`npm i toytown-gl maplibre-gl @toytown/models`), copy the model kit into your
