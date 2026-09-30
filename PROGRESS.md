@@ -70,6 +70,18 @@ Updated at the end of each phase.
     - Stripes and markings are skipped on pitches that fill less than 80% of their minimum
       rectangle.
 
+- **Dependabot alerts fixed** (10 open: 7 × maplibre-gl, image-size, esbuild):
+  - **maplibre-gl 5 → 6.11** (GHSA-jrc7-96c5-q579, an XSS in the attribution sanitiser; there's no
+    5.x patch). You chose the upgrade over CLAUDE.md's "v5". The plugin's peer range is now
+    `^5.0.0 || ^6.4.1`, so v5 users still work. v6 is ES-modules only: `import * as maplibregl`
+    (no default export), and a bundler must point MapLibre at its worker once with
+    `setWorkerUrl(workerUrl)` from `maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url` (Vite).
+    The READMEs, demos and acceptance test do this. The script-tag example loads MapLibre as a
+    module next to our classic UMD script, which never needed a `maplibregl` global. Rendering is
+    unchanged: the screenshot baselines still pass.
+  - **esbuild 0.27 → 0.28** and **image-size 0.7 → 2.0** through `overrides` in
+    `pnpm-workspace.yaml` (both transitive: tsup/vite, and the deck.gl spike's texture-compressor).
+
 ## Phase 7: Packaging and release (2026-09-29), ready but not published
 
 ### What was done

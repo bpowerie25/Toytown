@@ -4,7 +4,7 @@ Every footprint in a `toytown build-data` file becomes a toy building. Hero mode
 top of these later.
 
 ```ts
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import { ToyTown } from 'toytown-gl';
 
 const map = new maplibregl.Map({

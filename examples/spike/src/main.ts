@@ -11,8 +11,9 @@ import { MapboxOverlay } from '@deck.gl/mapbox';
 import { ScenegraphLayer } from '@deck.gl/mesh-layers';
 import { load } from '@loaders.gl/core';
 import { GLTFLoader } from '@loaders.gl/gltf';
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import {
   LocalProjection,
   centroid,
@@ -23,6 +24,8 @@ import {
   type Manifest,
 } from 'toytown-gl';
 import dataUrl from '../../waterford/public/data/waterford.geojson?url';
+
+maplibregl.setWorkerUrl(workerUrl);
 
 // The Quay and city centre.
 const AREA: [number, number, number, number] = [-7.1175, 52.257, -7.103, 52.2635];

@@ -5,3 +5,12 @@ packages:
 # Only these dependencies may run install scripts.
 allowBuilds:
   esbuild: true
+
+# Security overrides (Dependabot):
+# - esbuild: GHSA for the dev server reading files on Windows, fixed in 0.28.1. tsup 8.5.1 still
+#   asks for ^0.27, but builds and tests pass on 0.28.
+# - image-size: ICNS parser infinite loop, fixed in 2.0.3. Only reached through texture-compressor
+#   (a CLI loaders.gl can shell out to), which the spike example never runs.
+overrides:
+  esbuild: ^0.28.1
+  image-size: ^2.0.3

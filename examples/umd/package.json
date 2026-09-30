@@ -7,7 +7,7 @@
     "build": "node build.mjs"
   },
   "dependencies": {
-    "maplibre-gl": "^5.24.0",
+    "maplibre-gl": "^6.11.2",
     "toytown-gl": "workspace:*"
   }
 }

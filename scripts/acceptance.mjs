@@ -26,7 +26,7 @@ console.log('packed', tarballs.map((t) => t.split('/').pop()).join(', '));
 // 2. A fresh Vite project.
 sh('npm create vite@8 app -- --template vanilla-ts --no-interactive');
 const app = join(work, 'app');
-sh(`npm install --no-audit --no-fund ${tarballs.join(' ')} maplibre-gl@5`, app);
+sh(`npm install --no-audit --no-fund ${tarballs.join(' ')} maplibre-gl@6`, app);
 sh('npm install --no-audit --no-fund', app);
 
 // 3. The README quick start, verbatim: the first ```ts block under "## Use" in the package README.
@@ -59,6 +59,7 @@ sh('npm run build', app);
 const types = {
   '.html': 'text/html',
   '.js': 'text/javascript',
+  '.mjs': 'text/javascript',
   '.css': 'text/css',
   '.json': 'application/json',
   '.glb': 'model/gltf-binary',

@@ -1,4 +1,4 @@
-// Assemble a no-bundler page: the UMD build, MapLibre's own UMD build, the Tramore data and the
+// Assemble a no-bundler page: the UMD build, MapLibre's ES module build, the Tramore data and the
 // model kit, copied into dist/ as they'd be served from a CDN or static host.
 import { cpSync, mkdirSync, rmSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -13,7 +13,9 @@ const toytown = dirname(require.resolve('toytown-gl/package.json'));
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(join(dist, 'lib'), { recursive: true });
 cpSync(join(here, 'index.html'), join(dist, 'index.html'));
-cpSync(join(maplibre, 'dist/maplibre-gl.js'), join(dist, 'lib/maplibre-gl.js'));
+// MapLibre 6 ships ES modules only: the entry, its shared chunk and the worker it loads.
+for (const f of ['maplibre-gl.mjs', 'maplibre-gl-shared.mjs', 'maplibre-gl-worker.mjs'])
+  cpSync(join(maplibre, 'dist', f), join(dist, 'lib', f));
 cpSync(join(maplibre, 'dist/maplibre-gl.css'), join(dist, 'lib/maplibre-gl.css'));
 cpSync(join(toytown, 'dist/toytown-gl.umd.js'), join(dist, 'lib/toytown-gl.umd.js'));
 cpSync(join(here, '../tramore/public/data'), join(dist, 'data'), { recursive: true });

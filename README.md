@@ -42,9 +42,13 @@ static files (`cp -r node_modules/@toytown/models/models public/models`), **and 
 MapLibre map:**
 
 ```ts
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+// Vite; other bundlers: see MapLibre's setWorkerUrl docs.
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { ToyTown } from 'toytown-gl';
+
+maplibregl.setWorkerUrl(workerUrl);
 
 const map = new maplibregl.Map({
   container: 'map',

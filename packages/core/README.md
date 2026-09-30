@@ -15,9 +15,13 @@ npm i toytown-gl maplibre-gl @toytown/models
 ## Use
 
 ```ts
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+// Vite; other bundlers: see MapLibre's setWorkerUrl docs.
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { ToyTown } from 'toytown-gl';
+
+maplibregl.setWorkerUrl(workerUrl);
 
 const map = new maplibregl.Map({
   container: 'map',
@@ -44,12 +48,17 @@ toy.on('click', (b) => console.log(b.category, b.name, b.osm));
 Without a bundler:
 
 ```html
-<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6/dist/maplibre-gl.css" />
 <script src="https://unpkg.com/toytown-gl/dist/toytown-gl.umd.js"></script>
-<script>
+<script type="module">
+  import * as maplibregl from 'https://unpkg.com/maplibre-gl@6/dist/maplibre-gl.mjs';
   const { ToyTown } = ToyTownGL;
 </script>
 ```
+
+MapLibre 6 ships ES modules only, so it's imported in a module script. toytown-gl also works with
+MapLibre 5 (`^5.0.0 || ^6.4.1`), but 6.4.1 and later fix an attribution XSS
+([GHSA-jrc7-96c5-q579](https://github.com/advisories/GHSA-jrc7-96c5-q579)).
 
 Full documentation: [API](https://github.com/bpowerie25/Toytown/blob/main/docs/api.md) ·
 [Adding models](https://github.com/bpowerie25/Toytown/blob/main/docs/adding-models.md) ·

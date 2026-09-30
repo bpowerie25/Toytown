@@ -1,8 +1,12 @@
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { ToyTown, VERSION, type ToyTownClickEvent } from 'toytown-gl';
 import type { Landmark } from './landmarks';
 import './demo.css';
+
+// MapLibre 6 can't find its worker inside a bundle; Vite gives it a URL.
+maplibregl.setWorkerUrl(workerUrl);
 
 export interface DemoOptions {
   title: string;
