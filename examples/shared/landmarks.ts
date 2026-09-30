@@ -77,3 +77,35 @@ export const TRAMORE: Landmark[] = [
     bearing: 0,
   },
 ];
+
+// From the Castlemagner build-data output (OSM ids and footprint positions), 2026-09-29.
+export const CASTLEMAGNER: Landmark[] = [
+  {
+    name: "Saint Mary's Church",
+    osm: 'way/340657250',
+    center: [-8.82766, 52.16522],
+    zoom: 18,
+    bearing: 20,
+  },
+  {
+    name: "Geoff's Pub",
+    osm: 'way/331400676',
+    center: [-8.82482, 52.16655],
+    zoom: 18.2,
+    bearing: -40,
+  },
+  {
+    name: 'The Rectory',
+    osm: 'way/331400671',
+    center: [-8.81923, 52.16718],
+    zoom: 18,
+    bearing: 60,
+  },
+  {
+    name: 'The whole village',
+    osm: 'relation/14597374',
+    center: [-8.825, 52.1666],
+    zoom: 16.3,
+    bearing: 0,
+  },
+];

@@ -53,6 +53,20 @@ describe('themes', () => {
 });
 
 describe('themed base style', () => {
+  it('theming with the default theme changes nothing', () => {
+    expect(toytownStyle({ theme: 'default' }).layers).toEqual(toytownStyle().layers);
+  });
+
+  it('keeps road fills, label halos and casings on their own keys', () => {
+    const colors = (toytownStyle().metadata as Record<string, Record<string, string>>)[
+      'toytown:colors'
+    ]!;
+    expect(colors['road-minor/line-color']).toBe('road');
+    expect(colors['road-minor-casing/line-color']).toBe('road_casing');
+    expect(colors['label-place/text-halo-color']).toBe('label_halo');
+    expect(colors['toytown-base-buildings/fill-outline-color']).toBe('building_outline');
+  });
+
   it('recolours every coloured paint property from the theme palette', () => {
     const style = toytownStyle({ theme: 'night' });
     const night = new Set(Object.values(NIGHT_THEME.style));

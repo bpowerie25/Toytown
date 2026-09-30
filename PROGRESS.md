@@ -15,6 +15,21 @@ Updated at the end of each phase.
 | 6 API + demos   | done                 | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages.     |
 | 7 Release       | ready, not published | ESM+UMD, changesets 0.1.0, release workflow, acceptance test. Publish pending. |
 
+## After phase 7 (2026-09-30)
+
+- **Castlemagner demo** (`examples/castlemagner`), added on request: a village in north County
+  Cork. The bbox is `-8.845,52.155,-8.805,52.178` (the village relation 14597374 plus about
+  1 km), giving 190 buildings (139 houses, 33 barns, 2 churches, 1 pub). Landmarks come from the
+  data: Saint Mary's Church, Geoff's Pub and The Rectory. It's on the Pages landing page too.
+- **Bug fixed: white roads were drawn tan since phase 6.** The theme colour map
+  (`toytown:colors`) was built by matching hex values. `#FFFFFF` belongs to both `road` and
+  `label_halo`, and my tie-break sent every shared colour to `road_casing`. So road, path and
+  rail-sleeper fills, and every label halo, took the casing colour, in both themes. The tests
+  didn't notice, because `#D9C9A3` is a valid palette colour, and the phase 6 baseline refresh
+  captured the bug. The map is now built by what each property is (halo, casing, fill), and a
+  new test checks that theming with `default` leaves the style unchanged. The screenshot
+  baselines and the README GIF were regenerated.
+
 ## Phase 7: Packaging and release (2026-09-29), ready but not published
 
 ### What was done
