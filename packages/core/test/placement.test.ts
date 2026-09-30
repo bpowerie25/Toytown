@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { LocalProjection, type LngLat, type XY } from '../src/geometry';
 import { parseManifest } from '../src/manifest';
 import {
+  attachedBuildings,
   chooseVariant,
   decorate,
   fitModel,
@@ -46,7 +47,7 @@ describe('fitModel', () => {
   it('fits a house-shaped footprint, at its centroid, facing its front', () => {
     const p = fitModel(building(BASE_HOUSE, 'house', 9, 8, 180), kit, theme)!;
     expect(p).toMatchObject({ kind: 'model', name: 'house', front: 180, z: 0 });
-    expect(p.scale).toBeCloseTo(Math.sqrt((9 * 8) / (8.6 * 7.8)), 3);
+    expect(p.scale).toBeCloseTo(Math.min(9 / 8.6, 8 / 7.8), 6); // fits inside the footprint
     const [x, y] = xy(p.position);
     expect(Math.abs(x)).toBeLessThan(0.01);
     expect(Math.abs(y)).toBeLessThan(0.01);
@@ -81,7 +82,7 @@ describe('fitModel', () => {
 
   it('always places landmarks, clamping the scale', () => {
     const p = fitModel(building('way/46694890', 'landmark_metal_man', 4, 4, 90), kit, theme)!;
-    expect(p).toMatchObject({ name: 'landmark_metal_man', scale: 0.6 });
+    expect(p).toMatchObject({ name: 'landmark_metal_man', scale: theme.models.fit.minScale });
   });
 });
 
@@ -111,6 +112,36 @@ describe('variants', () => {
 
   it('categories without variants always get their base model', () => {
     expect(chooseVariant('church', kit.models.church!, 'way/1').name).toBe('church');
+  });
+});
+
+describe('fit rules that keep models tidy', () => {
+  it('rejects a model much taller than the building', () => {
+    expect(fitModel(building(BASE_HOUSE, 'house', 9, 8, 180, 0, 0, 3), kit, theme)).toBeNull(); // 3 m shed-height
+    expect(fitModel(building(BASE_HOUSE, 'house', 9, 8, 180, 0, 0, 8), kit, theme)).not.toBeNull();
+  });
+
+  it('lets spires and towers stand taller than the building', () => {
+    expect(
+      fitModel(building('way/1', 'church', 10.8, 28.7, 180, 0, 0, 12), kit, theme),
+    ).not.toBeNull();
+  });
+
+  it('keeps buildings that share walls procedural (terraces stay consistent)', () => {
+    const a = building(BASE_HOUSE, 'house', 9, 8, 180, 0);
+    const b = building('way/9001', 'house', 9, 8, 180, 9); // shares a 8 m wall with a
+    const c = building('way/9002', 'house', 9, 8, 180, 40); // stands alone
+    const attached = attachedBuildings([a, b, c]);
+    expect([...attached].sort()).toEqual([BASE_HOUSE, 'way/9001'].sort());
+    expect(fitModel(a, kit, theme, true)).toBeNull();
+    const plan = planBuildings([a, b, c], kit, theme);
+    expect(plan.meshed.map((x) => x.id).sort()).toEqual([BASE_HOUSE, 'way/9001'].sort());
+  });
+
+  it('does not treat buildings a few metres apart as attached', () => {
+    const a = building(BASE_HOUSE, 'house', 9, 8, 180, 0);
+    const b = building('way/9001', 'house', 9, 8, 180, 12);
+    expect(attachedBuildings([a, b]).size).toBe(0);
   });
 });
 

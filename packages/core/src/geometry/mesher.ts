@@ -5,7 +5,7 @@
  * Frame: local metres around the chunk origin, x east, y north, z up.
  */
 import { ShapeUtils, Vector2 } from 'three';
-import { wallPalette, type BuildingTheme } from '../themes';
+import { wallPalette, windowStyle, type BuildingTheme, type WindowStyle } from '../themes';
 import { pick } from './hash';
 import { LocalProjection, type LngLat, type XY } from './project';
 import { roofRise, selectRoof, type RoofKind } from './roof';
@@ -18,6 +18,8 @@ export interface BuildingInputFeature {
   height: number;
   /** Polygon parts in lng/lat: each part is [outer, ...holes]. */
   parts: LngLat[][][];
+  /** Compass bearing the building faces (from build-data), for doors and shopfronts. */
+  front?: number | null;
 }
 
 /** One chunk's merged geometry. Attribute layouts match the render material. */
@@ -37,6 +39,12 @@ export interface ChunkMesh {
    * (y is shared by both ends of the quad's diagonal). All 255 means no outline (roof decks).
    */
   edges: Uint8Array;
+  /**
+   * Per vertex, walls only: window style for the shader (0–255 each): spacing ÷ 10 m, width
+   * fraction, height fraction, and flags (1 frame, 2 shopfront, 4 street-facing wall, 8 tall
+   * arched, 16 high strip, 32 front door). All 0 means no windows.
+   */
+  windows: Uint8Array;
   indices: Uint32Array;
   ids: string[];
   /** Roof chosen per building, same order as `ids`. */
@@ -50,6 +58,41 @@ const NO_EDGE: Edge = [255, 255, 255, 255];
 const QUAD_EDGES: Edge[] = [[255, 0, 0, 0], [0, 255, 0, 0], [0, 0, 255, 0], [0, 255, 0, 0]]; // prettier-ignore
 const TRI_EDGES: Edge[] = [[255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255]]; // prettier-ignore
 type RGB = [number, number, number];
+/** Packed window style, see `ChunkMesh.windows`. */
+type Win = [number, number, number, number];
+const NO_WIN: Win = [0, 0, 0, 0];
+const FRONT = 4;
+
+function packWindows(s: WindowStyle): Win {
+  const flags =
+    (s.frame ? 1 : 0) |
+    (s.shopfront ? 2 : 0) |
+    (s.tall ? 8 : 0) |
+    (s.strip ? 16 : 0) |
+    (s.door ? 32 : 0);
+  const byte = (x: number) => Math.max(0, Math.min(255, Math.round(x * 255)));
+  return [byte(s.spacing / 10), byte(s.width), byte(s.height), flags];
+}
+
+/** Index of the outer-ring edge facing the street: the longest one within 45° of `front`, or -1. */
+export function frontEdge(ring: XY[], front: number | null | undefined): number {
+  if (front === null || front === undefined) return -1;
+  let best = -1;
+  let bestLen = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i]!;
+    const b = ring[(i + 1) % ring.length]!;
+    const [nx, ny] = edgeNormal(a, b);
+    const bearing = (Math.atan2(nx, ny) * 180) / Math.PI;
+    const diff = Math.abs(((bearing - front + 540) % 360) - 180);
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (diff <= 45 && len > bestLen) {
+      best = i;
+      bestLen = len;
+    }
+  }
+  return best;
+}
 
 const UP: V3 = [0, 0, 1];
 const MIN_HEIGHT = 2.5;
@@ -77,8 +120,11 @@ class MeshBuilder {
   wall: number[] = [];
   bid: number[] = [];
   edge: number[] = [];
+  win: number[] = [];
   idx: number[] = [];
   building = 0;
+  /** Window style for the vertices being added (walls set it, everything else leaves it off). */
+  windows: Win = NO_WIN;
 
   private vert(
     p: V3,
@@ -89,6 +135,7 @@ class MeshBuilder {
   ): number {
     const i = this.pos.length / 3;
     this.edge.push(e[0], e[1], e[2], e[3]);
+    this.win.push(this.windows[0], this.windows[1], this.windows[2], this.windows[3]);
     this.pos.push(p[0], p[1], p[2]);
     this.nrm.push(Math.round(n[0] * 127), Math.round(n[1] * 127), Math.round(n[2] * 127));
     this.col.push(c[0], c[1], c[2]);
@@ -145,6 +192,7 @@ class MeshBuilder {
       walls: Float32Array.from(this.wall),
       buildings: Float32Array.from(this.bid),
       edges: Uint8Array.from(this.edge),
+      windows: Uint8Array.from(this.win),
       indices: Uint32Array.from(this.idx),
       ids,
       roofs,
@@ -152,22 +200,27 @@ class MeshBuilder {
   }
 }
 
-/** Vertical walls along a ring from z0 to z1. Windows are drawn on them when `windows` is true. */
+/**
+ * Vertical walls along a ring from z0 to z1, with the given window style (null: no windows).
+ * `front` is the index of the street-facing edge, for doors and shopfronts (-1: none).
+ */
 function walls(
   m: MeshBuilder,
   ring: XY[],
   z0: number,
   z1: number,
   color: RGB,
-  windows: boolean,
+  win: Win | null,
   eave: number,
+  front = -1,
 ) {
   for (let i = 0; i < ring.length; i++) {
     const a = ring[i]!;
     const b = ring[(i + 1) % ring.length]!;
     const [nx, ny] = edgeNormal(a, b);
     const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    const L = windows ? len : 0;
+    const L = win ? len : 0;
+    m.windows = win ? [win[0], win[1], win[2], win[3] | (i === front ? FRONT : 0)] : NO_WIN;
     m.face(
       [
         [a[0], a[1], z0],
@@ -185,6 +238,7 @@ function walls(
       ],
     );
   }
+  m.windows = NO_WIN;
 }
 
 /** Sloped band from ring `a` at za to ring `b` (same vertex count) at zb, facing `facingUp` blended with each edge's normal. */
@@ -225,7 +279,8 @@ function flatBuilding(
   h: number,
   wall: RGB,
   deck: RGB,
-  windows: boolean,
+  win: Win | null,
+  front: number | null | undefined,
   t: BuildingTheme,
 ) {
   const { bevel, parapetHeight, parapetWidth } = t.flat;
@@ -236,14 +291,14 @@ function flatBuilding(
     const detailed = h >= 4 && inset1.every(Boolean) && inset2.every(Boolean);
     if (!detailed) {
       // Too small or too thin for a bevel and parapet: a plain box.
-      for (const r of rings) walls(m, r, 0, h, wall, windows, h);
+      rings.forEach((r, k) => walls(m, r, 0, h, wall, win, h, k === 0 ? frontEdge(r, front) : -1));
       m.cap(outer, holes, h, deck);
       continue;
     }
     const zb = h - bevel;
     const zd = h - parapetHeight;
     rings.forEach((r, k) => {
-      walls(m, r, 0, zb, wall, windows, zd);
+      walls(m, r, 0, zb, wall, win, zd, k === 0 ? frontEdge(r, front) : -1);
       band(m, r, zb, inset1[k]!, h, wall, 1); // bevelled top edge
       // Flat top of the parapet, from the bevel to the inner face.
       band(m, inset1[k]!, h, inset2[k]!, h, wall, 1);
@@ -278,11 +333,12 @@ function pitchedBuilding(
   rise: number,
   wall: RGB,
   roof: RGB,
-  windows: boolean,
+  win: Win | null,
+  front: number | null | undefined,
   t: BuildingTheme,
 ) {
   const eave = h - rise;
-  walls(m, outer, 0, eave, wall, windows, eave);
+  walls(m, outer, 0, eave, wall, win, eave, frontEdge(outer, front));
 
   const e: XY = [Math.cos(rect.angle), Math.sin(rect.angle)];
   const f: XY = [-e[1], e[0]];
@@ -371,7 +427,10 @@ export function meshChunk(
     ids.push(f.id);
     const h = Math.max(MIN_HEIGHT, f.height);
     const wall = hexToRgb(pick(wallPalette(theme, f.category), `${f.id}:wall`));
-    const windows = h >= theme.minWindowHeight && !theme.windowsOff.includes(f.category);
+    const win =
+      h >= theme.minWindowHeight && !theme.windowsOff.includes(f.category)
+        ? packWindows(windowStyle(theme, f.category))
+        : null;
 
     const choice = selectRoof(
       f.id,
@@ -391,12 +450,13 @@ export function meshChunk(
         rise,
         wall,
         roof,
-        windows,
+        win,
+        f.front,
         theme,
       );
       roofs.push(choice.kind);
     } else {
-      flatBuilding(m, parts, h, wall, hexToRgb(theme.flatRoof), windows, theme);
+      flatBuilding(m, parts, h, wall, hexToRgb(theme.flatRoof), win, f.front, theme);
       roofs.push('flat');
     }
   }
@@ -445,7 +505,7 @@ export function meshChunkPlain(
       choice.kind !== 'flat' && !!choice.rect && roofRise(choice.rect.width, h, theme) > 0;
     const top = hexToRgb(pitched ? pick(theme.roofs, `${f.id}:roofcolor`) : theme.flatRoof);
     for (const { outer, holes } of parts) {
-      for (const r of [outer, ...holes]) walls(m, r, 0, h, wall, false, h);
+      for (const r of [outer, ...holes]) walls(m, r, 0, h, wall, null, h);
       m.cap(outer, holes, h, top);
     }
     roofs.push('flat');

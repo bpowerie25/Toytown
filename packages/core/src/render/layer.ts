@@ -7,6 +7,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   Camera,
+  DirectionalLight,
   Frustum,
   InstancedBufferAttribute,
   InstancedMesh,
@@ -156,7 +157,7 @@ export class ToyTownLayer implements CustomLayerInterface {
     this.camera.matrixAutoUpdate = false;
     for (const light of createLights(theme)) {
       this.scene.add(light);
-      if ('target' in light) this.scene.add(light.target);
+      if (light instanceof DirectionalLight) this.scene.add(light.target);
     }
   }
 
@@ -302,6 +303,7 @@ export class ToyTownLayer implements CustomLayerInterface {
     g.setAttribute('color', new BufferAttribute(m.colors, 3, true));
     g.setAttribute('aWall', new BufferAttribute(m.walls, 4));
     g.setAttribute('aEdge', new BufferAttribute(m.edges, 4, true));
+    g.setAttribute('aWin', new BufferAttribute(m.windows, 4, true));
     g.setAttribute('aBuilding', new BufferAttribute(m.buildings, 1));
     g.setIndex(new BufferAttribute(m.indices, 1));
     g.computeBoundingSphere();

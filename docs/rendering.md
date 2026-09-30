@@ -37,14 +37,14 @@ hides the style's flat `toytown-base-buildings` layer while it draws.
 
 ## Toon shading
 
-- **Materials**: `MeshToonMaterial` with a 3-step gradient map (`lighting.toonSteps`, default 0,
-  0.5, 1), one directional sun and ambient light. three's Lambert term divides by π, so the lights
+- **Materials**: `MeshToonMaterial` with a 5-step gradient map (`lighting.toonSteps`), one
+  directional sun, ambient light, and a soft sky/ground hemisphere fill (`lighting.hemisphere`). three's Lambert term divides by π, so the lights
   are scaled by π. A face's brightness is then `ambient + sun × step`: 0.7, 0.85 or 1.0 with the
   defaults. Faces towards the sun show the exact palette hex, because colours are sRGB used as-is
   and the renderer does no output colour-space conversion.
 - **Procedural buildings** use the same toon material, extended in `onBeforeCompile`:
   - **Windows**: the phase 3 window strips, drawn from per-vertex wall coordinates.
-  - **Ink edges** (`#2B2D42`): each face carries barycentric edge coordinates. Quads flag their
+  - **Ink edges**: a darker tone of each face, nudged towards the theme's ink colour (`#2B2D42`). each face carries barycentric edge coordinates. Quads flag their
     diagonal (the `y` channel, shared by both ends of the diagonal) so it's skipped. The line width
     comes from `fwidth`, so it's constant in pixels (`outline.edgeWidth`). The `smoothstep` upper
     edge is clamped above 0, because constant channels have `fwidth` 0 and GLSL's smoothstep is
@@ -64,20 +64,22 @@ hides the style's flat `toytown-base-buildings` layer while it draws.
 Planning is pure and runs in the chunk workers, before meshing (`packages/core/src/placement.ts`).
 
 - **fit**: a building gets its category's hero model instead of procedural geometry when all of
-  these hold:
+  these hold (defaults in `models.fit`):
   - the category has a model and isn't in `models.exclude`;
   - the building has a `front`, and is a single part without holes;
-  - it fills at least `fit.minRectangularity` (0.75) of its minimum rectangle;
-  - its frontage:depth ratio matches the model's width:depth within `fit.aspectTolerance`
-    (0.4, a natural-log ratio). Frontage is measured across the front, so a long building facing
-    its short side doesn't get a wide model;
-  - the uniform scale `√(footprint area ÷ model area)` is within `fit.minScale`–`fit.maxScale`
-    (0.6–1.6).
+  - it's **detached** (`detachedOnly`): buildings sharing at least 3 m (or 15% of their outline)
+    with a neighbour stay procedural, so terraces look consistent;
+  - it fills at least 80% of its minimum rectangle;
+  - its frontage:depth ratio matches the model's within 0.35 (natural log);
+  - the model, scaled uniformly to fit _inside_ the footprint, needs a scale of 0.75–1.3×;
+  - the scaled model covers at least 60% of the footprint;
+  - its scaled height is within 1.6× of the building's. Churches, round towers and lighthouses
+    are exempt (`heightExempt`), since spires are meant to be tall.
 
-  The model sits at the footprint centroid, scaled uniformly and turned so its +Z front faces the
-  building's `front` bearing. For categories with variants (house, shop and apartment), a stable
-  hash of the OSM id picks the base model or one of its variants first, and fit uses that look's
-  footprint, so neighbouring houses differ. Categories named `landmark_*` always fit, with the scale clamped.
+  The model sits at the footprint centroid, turned so its +Z front faces the building's `front`
+  bearing. For categories with variants (house, shop and apartment), a stable hash of the OSM id
+  picks the base model or one of its variants first, and fit uses that look's footprint.
+  Categories named `landmark_*` always fit, with the scale clamped.
 
 - **decorate**: otherwise the procedural building stays and gets its category's props from the
   manifest's `props`:

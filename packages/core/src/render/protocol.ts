@@ -27,7 +27,7 @@ export type ChunkResponse = ({ id: number } & ChunkResult) | { id: number; error
 /** Typed arrays in a chunk result, for zero-copy transfer from the worker. */
 export function transferables(r: ChunkResult): ArrayBuffer[] {
   return [r.full, r.fitted, r.plain].flatMap((m) =>
-    [m.positions, m.normals, m.colors, m.walls, m.buildings, m.edges, m.indices].map(
+    [m.positions, m.normals, m.colors, m.walls, m.buildings, m.edges, m.windows, m.indices].map(
       (a) => a.buffer as ArrayBuffer,
     ),
   );

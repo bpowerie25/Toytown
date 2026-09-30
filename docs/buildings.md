@@ -48,13 +48,22 @@ Buildings are meshed in local metres (x east, y north, z up) around a chunk orig
     and terraces are always gable, schools always hip, houses about 40% hip.
   - **Gable ends** are wall-coloured triangles in the wall plane.
 - **Colours**: the wall colour is a stable hash of the id into the category's wall palette, e.g.
-  terraces cycle `#F2B5A7`, `#F6D57A`, `#A9CBE8`, `#BFE3C9`, `#F4E9D8`. The roof colour is a hash
-  into `roofs` (`#D9644A`, `#5B6C8F`). Flat decks are `#B8B2A7`.
+  terraces cycle `#EDBFB2`, `#EFD99A`, `#BFD3E6`, `#C9E2CF`, `#F3E9DA`. The roof colour is a hash
+  into `roofs` (`#C96B55`, `#66728C`). Flat decks are `#CDC5B6`, with a faint panel pattern.
 - **Windows** are not geometry. Each wall vertex carries its position along the edge, its height,
-  the edge length and the eave height, and the fragment shader draws a grid of `#7EC8E3` windows:
-  one per `windowSpacing` (2.6 m) along the edge, one row per `floorHeight` (3 m), clear of the
-  ground and the eaves. Edges shorter than 1.8 m get none. `warehouse`, `barn` and
-  `parking_garage` get none, and neither does anything under 3.5 m tall.
+  the edge length, the eave height, and a packed **window style**. The fragment shader draws the
+  windows from these. Styles are defined in the theme (`windowStyles`, and `windowStyleFor` per
+  category):
+  - `house`: framed windows with sills, and a front door in the middle of the street-facing wall.
+    The front wall is the longest outer wall facing within 45° of the building's `front`.
+  - `shop` (shops, cafés, pubs, pharmacies, banks, supermarkets): a glass shopfront with
+    mullions and a darker fascia along the street-facing ground floor, and framed windows above.
+  - `church`: tall arched windows, one per bay.
+  - `strip` (warehouses, factories): a high window strip.
+  - `sparse` (generic): a few small windows.
+  - `grid` (everything else): framed windows on every storey.
+
+  `barn` and `parking_garage` get none, and neither does anything under 3.5 m tall.
 
 All of the above comes from `packages/core/src/themes/default.json`, so a theme can change colours,
 roof rules and windows without code changes.

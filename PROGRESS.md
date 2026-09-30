@@ -30,6 +30,22 @@ Updated at the end of each phase.
   new test checks that theming with `default` leaves the style unchanged. The screenshot
   baselines and the README GIF were regenerated.
 
+- **Look pass (buildings looked ugly)**: you picked windows, clumsy models, and colours/shading
+  as the problems.
+  - **Window styles per category** in the theme: houses get framed windows and a front door on
+    the street-facing wall; shops get shopfronts with a fascia; churches get tall arched windows;
+    warehouses and factories get a high strip; generic buildings get sparse windows.
+  - **Model fit**: models are scaled to fit _inside_ the footprint (0.75–1.3×), must cover 60% of
+    it, and must be within 1.6× of the building's height (spires and towers exempt).
+    **Attached buildings stay procedural** (`detachedOnly`), so terraces are consistent. Fewer
+    hero models appear as a result.
+  - **Colours and shading**: a softer palette, 5 toon steps plus a hemisphere fill, ink tinted
+    from each face, and warmer flat roofs with a faint panel pattern.
+  - **This departs from PLAN.md's colours at your request**: windows `#7EC8E3` → `#8EC5DA`, roofs
+    `#D9644A` / `#5B6C8F` → `#C96B55` / `#66728C`. The night theme was re-derived from the new
+    day colours.
+  - `scripts/views.mjs` captures fixed comparison views for design reviews.
+
 ## Phase 7: Packaging and release (2026-09-29), ready but not published
 
 ### What was done

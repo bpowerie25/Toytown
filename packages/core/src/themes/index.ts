@@ -31,9 +31,38 @@ export interface BuildingTheme {
   /** Buildings lower than this get no windows (sheds, garages). */
   minWindowHeight: number;
   floorHeight: number;
-  windowSpacing: number;
   /** 0: windows are lit like walls (day). 1: windows glow at full colour whatever the light (night). */
   windowGlow: number;
+  /** Window frames and sills. */
+  frame: string;
+  /** Front doors on houses. */
+  door: string;
+  /** Named window styles; see `WindowStyle`. */
+  windowStyles: Record<string, WindowStyle>;
+  /** Which window style each category uses (`default` for the rest). */
+  windowStyleFor: Record<string, string>;
+}
+
+/**
+ * How windows are drawn on a building's walls (by the shader, not as geometry). Sizes are
+ * fractions of the window's cell (width) and of the storey (height).
+ */
+export interface WindowStyle {
+  /** Metres between window centres along a wall. */
+  spacing: number;
+  width: number;
+  /** Fraction of the storey; 0 for `tall` and `strip` styles. */
+  height: number;
+  /** A light frame and a sill around each window. */
+  frame?: boolean;
+  /** A front door in the middle of the street-facing wall. */
+  door?: boolean;
+  /** A glass shopfront with mullions and a fascia on the ground floor of the street-facing wall. */
+  shopfront?: boolean;
+  /** One tall arched window per bay (churches). */
+  tall?: boolean;
+  /** A continuous high window strip (warehouses, factories). */
+  strip?: boolean;
 }
 
 /**
@@ -46,7 +75,10 @@ export interface LightingTheme {
   sun: number;
   /** Direction towards the sun in local east-north-up coordinates. */
   sunDirection: [number, number, number];
-  toonSteps: [number, number, number];
+  /** Brightness steps of the toon ramp, darkest to lightest. */
+  toonSteps: number[];
+  /** Soft sky/ground fill light, for depth between the toon steps. */
+  hemisphere?: { sky: string; ground: string; intensity: number };
 }
 
 export interface OutlineTheme {
@@ -68,6 +100,14 @@ export interface FitRules {
   aspectTolerance: number;
   /** …and the footprint fills at least this much of its minimum rectangle. */
   minRectangularity: number;
+  /** …the model, scaled to fit inside, covers at least this much of the footprint… */
+  minCoverage: number;
+  /** …its scaled height is within this factor of the building's… */
+  heightTolerance: number;
+  /** …and, if set, the building doesn't share walls with a neighbour (terraces stay procedural). */
+  detachedOnly: boolean;
+  /** Categories whose models are meant to be taller than the building (spires, towers). */
+  heightExempt: string[];
 }
 
 export interface ModelsTheme {
@@ -111,4 +151,9 @@ export function resolveTheme(theme?: string | Theme): Theme {
 
 export function wallPalette(theme: BuildingTheme, category: string): string[] {
   return theme.walls[category] ?? theme.walls.default!;
+}
+
+export function windowStyle(theme: BuildingTheme, category: string): WindowStyle {
+  const name = theme.windowStyleFor[category] ?? theme.windowStyleFor.default ?? 'grid';
+  return theme.windowStyles[name] ?? theme.windowStyles.grid!;
 }

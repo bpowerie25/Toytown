@@ -179,6 +179,24 @@ describe('meshChunk', () => {
     expect(meshChunk(f, ORIGIN, t)).toEqual(meshChunk(f, ORIGIN, t));
   });
 
+  it('packs each category’s window style onto wall vertices, and flags the street-facing wall', () => {
+    const house = { ...building('way/1', 'house', 8, [rect(0, 0, 10, 8)]), front: 180 };
+    const m = meshChunk([house], ORIGIN, t);
+    const flags = new Set<number>();
+    const fronts = new Set<string>();
+    for (let v = 0; v < m.windows.length / 4; v++) {
+      const f = m.windows[v * 4 + 3]!;
+      if (!f) continue;
+      flags.add(f & ~4);
+      // The front flag sits on the south wall (y = 0 at both its bottom corners).
+      if (f & 4) fronts.add(m.positions[v * 3 + 1]!.toFixed(1));
+    }
+    expect(flags).toEqual(new Set([1 | 32])); // framed windows, front door
+    expect(fronts).toEqual(new Set(['0.0']));
+    const church = meshChunk([building('way/2', 'church', 12, [rect(0, 0, 10, 25)])], ORIGIN, t);
+    expect(church.windows.some((x, i) => i % 4 === 3 && (x & 8) !== 0)).toBe(true); // tall arched
+  });
+
   it('marks wall edges for windows, except for window-less categories and sheds', () => {
     const edgeLengths = (m: ChunkMesh) => {
       const s = new Set<number>();
@@ -189,7 +207,7 @@ describe('meshChunk', () => {
       edgeLengths(meshChunk([building('way/1', 'office', 12, [rect(0, 0, 20, 15)])], ORIGIN, t)),
     ).toEqual(new Set([0, 15, 20]));
     expect(
-      edgeLengths(meshChunk([building('way/1', 'warehouse', 9, [rect(0, 0, 20, 15)])], ORIGIN, t)),
+      edgeLengths(meshChunk([building('way/1', 'barn', 9, [rect(0, 0, 20, 15)])], ORIGIN, t)),
     ).toEqual(new Set([0]));
     expect(
       edgeLengths(meshChunk([building('way/1', 'generic', 3, [rect(0, 0, 4, 5)])], ORIGIN, t)),

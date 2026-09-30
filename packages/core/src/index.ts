@@ -28,6 +28,7 @@ export {
 export {
   planKit,
   fitModel,
+  attachedBuildings,
   decorate,
   planBuildings,
   planPoints,

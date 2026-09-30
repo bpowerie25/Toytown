@@ -11,6 +11,7 @@ import {
   LocalProjection,
   centroid,
   cleanRing,
+  closestOnSegment,
   hashUnit,
   minRotatedRect,
   pointInPolygon,
@@ -133,9 +134,17 @@ function frame(b: PlannedBuilding): Frame | null {
 
 /**
  * Try to fit a hero model to a building. Returns the placement, or null if it doesn't fit.
- * Landmark categories (`landmark_*`) always fit, with the scale clamped.
+ * The model is scaled to fit *inside* the footprint (so it never spills onto neighbours), must
+ * cover most of it, and its height must be close to the building's. `attached` buildings (that
+ * share walls with neighbours) keep their procedural shape when `fit.detachedOnly` is set, so
+ * terraces stay consistent. Landmark categories (`landmark_*`) always fit, with the scale clamped.
  */
-export function fitModel(b: PlannedBuilding, kit: PlanKit, theme: Theme): Placement | null {
+export function fitModel(
+  b: PlannedBuilding,
+  kit: PlanKit,
+  theme: Theme,
+  attached = false,
+): Placement | null {
   const model = kit.models[b.category];
   if (!model || theme.models.exclude.includes(b.category)) return null;
   if (b.parts.length !== 1 || b.parts[0]!.length !== 1) return null;
@@ -144,12 +153,19 @@ export function fitModel(b: PlannedBuilding, kit: PlanKit, theme: Theme): Placem
   const rules = theme.models.fit;
   const look = chooseVariant(b.category, model, b.id);
   const [fw, fd] = look.footprint_m;
-  const scale = Math.sqrt((fr.frontage * fr.depth) / (fw * fd));
+  const scale = Math.min(fr.frontage / fw, fr.depth / fd);
   const landmark = b.category.startsWith(LANDMARK_PREFIX);
   if (!landmark) {
+    if (attached && rules.detachedOnly) return null;
     if (rectangularity([fr.ring]) < rules.minRectangularity) return null;
     if (Math.abs(Math.log(fr.frontage / fr.depth / (fw / fd))) > rules.aspectTolerance) return null;
     if (scale < rules.minScale || scale > rules.maxScale) return null;
+    if ((scale * scale * fw * fd) / (fr.frontage * fr.depth) < rules.minCoverage) return null;
+    const heightRatio = (look.height_m * scale) / Math.max(2.5, b.height);
+    const heightOk =
+      rules.heightExempt.includes(b.category) ||
+      Math.abs(Math.log(heightRatio)) <= Math.log(rules.heightTolerance);
+    if (!heightOk) return null;
   }
   return {
     id: b.id,
@@ -160,6 +176,71 @@ export function fitModel(b: PlannedBuilding, kit: PlanKit, theme: Theme): Placem
     front: b.front!,
     scale: clamp(scale, rules.minScale, rules.maxScale),
   };
+}
+
+/**
+ * Ids of buildings that share walls with a neighbour: at least `minShared` metres (or 15% of
+ * the perimeter) of their outline runs within 0.5 m of another building's outline.
+ */
+export function attachedBuildings(buildings: BuildingInputFeature[], minShared = 3): Set<string> {
+  const out = new Set<string>();
+  if (buildings.length < 2) return out;
+  const proj = new LocalProjection(buildings[0]!.parts[0]![0]![0]!);
+  const CELL = 20;
+  const rings = buildings.map((b) => b.parts.map((p) => p[0]!.map((q) => proj.toXY(q))));
+  const grid = new Map<string, { owner: number; a: XY; b: XY }[]>();
+  const cells = (a: XY, b: XY) => {
+    const keys: string[] = [];
+    for (
+      let gx = Math.floor(Math.min(a[0], b[0]) / CELL);
+      gx <= Math.floor(Math.max(a[0], b[0]) / CELL);
+      gx++
+    ) {
+      for (
+        let gy = Math.floor(Math.min(a[1], b[1]) / CELL);
+        gy <= Math.floor(Math.max(a[1], b[1]) / CELL);
+        gy++
+      )
+        keys.push(`${gx},${gy}`);
+    }
+    return keys;
+  };
+  rings.forEach((parts, owner) => {
+    for (const r of parts) {
+      for (let i = 0; i + 1 < r.length; i++) {
+        const seg = { owner, a: r[i]!, b: r[i + 1]! };
+        for (const k of cells(seg.a, seg.b)) {
+          const list = grid.get(k);
+          if (list) list.push(seg);
+          else grid.set(k, [seg]);
+        }
+      }
+    }
+  });
+  rings.forEach((parts, owner) => {
+    let shared = 0;
+    let perimeter = 0;
+    for (const r of parts) {
+      for (let i = 0; i + 1 < r.length; i++) {
+        const a = r[i]!;
+        const b = r[i + 1]!;
+        const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        perimeter += len;
+        const steps = Math.max(1, Math.round(len));
+        for (let k = 0; k < steps; k++) {
+          const t = (k + 0.5) / steps;
+          const p: XY = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+          const near = (
+            grid.get(`${Math.floor(p[0] / CELL)},${Math.floor(p[1] / CELL)}`) ?? []
+          ).some((s) => s.owner !== owner && closestOnSegment(p, s.a, s.b).dist2 < 0.25);
+          if (near) shared += len / steps;
+        }
+      }
+    }
+    if (shared >= Math.min(minShared, 0.15 * perimeter) && shared > 0.5)
+      out.add(buildings[owner]!.id);
+  });
+  return out;
 }
 
 /** Props for a building that keeps its procedural geometry. */
@@ -218,8 +299,9 @@ export function planBuildings(
   if (!kit) return { meshed: buildings, placements: [] };
   const meshed: BuildingInputFeature[] = [];
   const placements: Placement[] = [];
+  const attached = theme.models.fit.detachedOnly ? attachedBuildings(buildings) : new Set<string>();
   for (const b of buildings) {
-    const fit = fitModel(b, kit, theme);
+    const fit = fitModel(b, kit, theme, attached.has(b.id));
     if (fit) {
       placements.push(fit);
     } else {
