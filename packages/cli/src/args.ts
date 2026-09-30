@@ -9,7 +9,8 @@ export type Command =
 
 export function parseCommand(argv: string[]): Command {
   const [first, ...rest] = argv;
-  if (!first || first === '-h' || first === '--help' || first === 'help') return { name: 'help' };
+  const help = (a: string) => a === '-h' || a === '--help';
+  if (!first || help(first) || first === 'help' || rest.some(help)) return { name: 'help' };
   if (first === '-v' || first === '--version') return { name: 'version' };
   if (first === 'build-data') return { name: 'build-data', argv: rest };
   if (first === 'report') return { name: 'report', argv: rest };

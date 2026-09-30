@@ -61,6 +61,7 @@ MapLibre 5 (`^5.0.0 || ^6.4.1`), but 6.4.1 and later fix an attribution XSS
 ([GHSA-jrc7-96c5-q579](https://github.com/advisories/GHSA-jrc7-96c5-q579)).
 
 Full documentation: [API](https://github.com/bpowerie25/Toytown/blob/main/docs/api.md) ·
+[Your own buildings](https://github.com/bpowerie25/Toytown/blob/main/docs/your-own-buildings.md) ·
 [Adding models](https://github.com/bpowerie25/Toytown/blob/main/docs/adding-models.md) ·
 [Performance](https://github.com/bpowerie25/Toytown/blob/main/docs/performance.md) ·
 [Repository](https://github.com/bpowerie25/Toytown)

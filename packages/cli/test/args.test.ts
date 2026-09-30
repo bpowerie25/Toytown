@@ -5,6 +5,8 @@ const defaults = { manifest: 'm.json', tagMap: 't.json', packs: ['p.json'] };
 
 describe('parseCommand', () => {
   it('defaults to help', () => expect(parseCommand([])).toEqual({ name: 'help' }));
+  it('shows help for --help after a command', () =>
+    expect(parseCommand(['build-data', '--help'])).toEqual({ name: 'help' }));
   it('parses --version', () => expect(parseCommand(['--version'])).toEqual({ name: 'version' }));
   it('passes subcommand args through', () => {
     expect(parseCommand(['build-data', '--bbox', '1,2,3,4'])).toEqual({

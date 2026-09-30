@@ -9,7 +9,7 @@ churches and more.
 
 > **Status: `v0.1.0` is ready to publish** (versions, changelogs and release workflow are in
 > place, and the fresh-project install is tested from packed tarballs). The demos are Waterford
-> City and Tramore, Ireland, but nothing in the plugin is specific to them.
+> City, Tramore and Castlemagner, Ireland, but nothing in the plugin is specific to them.
 
 ## What you get
 
@@ -21,6 +21,8 @@ churches and more.
 - **Hero models where they fit**: 31 low-poly CC0 models plus variants, matched to buildings by
   OSM tags. Where a model doesn't fit, the building gets props instead: awnings, spires, a red
   cross, a petrol canopy.
+- **Open spaces**: parks, gardens and cemeteries with trees; striped pitches with real markings,
+  goals and GAA posts; playgrounds; racecourses and running tracks with white rails.
 - **Trees**, from mapped trees and seeded scatter in parks.
 - **Themes**: `default` and `night` (glowing windows). Themes are JSON, so you can recolour the
   whole kit.
@@ -72,17 +74,24 @@ toy.addPack('/models/ireland/manifest.json'); // a regional pack: landmark model
 
 The full API is in [docs/api.md](docs/api.md). Without a bundler, use the UMD build:
 `<script src="https://unpkg.com/toytown-gl/dist/toytown-gl.umd.js">` gives a global
-`ToyTownGL`.
+`ToyTownGL`, with MapLibre 6 imported in a `<script type="module">` (see the
+[package README](packages/core/README.md)).
 
-## Add your own model
+## Add your own buildings
 
-Models are GLB files: Y-up, in metres, front facing +Z, origin at the base centre, one material
-per palette key. You can:
+Design a building in Blender (or anything that exports `.glb`) and put it on your map, without
+forking this repo. **[docs/your-own-buildings.md](docs/your-own-buildings.md)** walks through it:
 
-- swap one in at runtime with `toy.setCategoryModel(category, url)`;
-- add it to the kit (generated, made in Blender, or from Kenney or Quaternius) with
-  [docs/adding-models.md](docs/adding-models.md);
-- put region-specific models and landmarks in a pack (`<pack>/pack.json`, `landmarks.json`).
+- **Replace a whole category**: `toy.setCategoryModel('hospital', '/models/my/hospital.glb')`.
+- **One specific building** (your town hall): a small pack with a landmark by OSM id, loaded with
+  `toy.addPack('/models/my-town/manifest.json')`.
+- **A new kind of building**: a rule in your own tag map, then rebuild the data.
+- **Share it**: generic CC0 or CC-BY models are welcome in the kit; see
+  [docs/adding-models.md](docs/adding-models.md).
+
+Models are GLB files: Y-up, in metres, front facing +Z, origin at the base centre, flat colours.
+Materials named after palette keys (`wall_cream`, `window`…) follow the theme; others keep their
+own colours.
 
 The kit is also published separately as [`@toytown/models`](packages/models/README.md) (CC0),
 for use in three.js, Babylon.js, Unity or Godot.
@@ -103,7 +112,8 @@ combinations, and add rules. See [docs/tag-mapping.md](docs/tag-mapping.md).
 - [Procedural buildings](docs/buildings.md)
 - [Rendering: toon shading, hero models and trees](docs/rendering.md)
 - [Performance and levels of detail](docs/performance.md)
-- [Adding models](docs/adding-models.md) and the kit package, [`@toytown/models`](packages/models/README.md)
+- [Your own buildings](docs/your-own-buildings.md): custom models in your app, no fork needed
+- [Adding models](docs/adding-models.md) to the shared kit, and the kit package, [`@toytown/models`](packages/models/README.md)
 - [Releasing](docs/releasing.md)
 - [Contributing](CONTRIBUTING.md)
 

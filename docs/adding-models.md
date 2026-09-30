@@ -1,5 +1,8 @@
 # Adding models
 
+> Just want your own building on your own map? You don't need to change the kit: see
+> [your-own-buildings.md](your-own-buildings.md). This page is for adding models to the shared kit.
+
 The model kit lives in `assets/models/`. `assets/generator/generate_models.py` is the source of
 truth for the built-in models, and it writes `manifest.json`. You can add models in three ways:
 generate them, make them by hand (e.g. in Blender), or bring them from a CC0 pack such as Kenney
