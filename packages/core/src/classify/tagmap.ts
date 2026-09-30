@@ -25,6 +25,13 @@ export interface TagMapSpec {
   level_height_m: number;
   /** Height in metres when a building has neither height nor building:levels. */
   default_height_m: Record<string, number>;
+  /**
+   * Open spaces (parks, pitches, racecourses…): matched against an area's tags, highest priority
+   * wins. Area categories are free-form; the theme styles them.
+   */
+  areas?: TagRuleSpec[];
+  /** Square metres per scattered tree, by area category (absent: no trees). */
+  areaTrees?: Record<string, number>;
 }
 
 export interface TagRule extends TagRuleSpec {
@@ -37,6 +44,7 @@ export interface TagMap {
   fallback: string;
   rules: TagRule[];
   heuristics: TagRule[];
+  areas: TagRule[];
   categories: Set<string>;
 }
 
@@ -80,6 +88,7 @@ export function parseTagMap(input: unknown, categories?: Iterable<string>): TagM
 
   const rules = compile(spec.rules ?? [], 'rules');
   const heuristics = compile(spec.heuristics ?? [], 'heuristics');
+  const areas = compile(spec.areas ?? [], 'areas');
   const used = new Set([
     spec.fallback,
     ...rules.map((r) => r.category),
@@ -96,5 +105,5 @@ export function parseTagMap(input: unknown, categories?: Iterable<string>): TagM
         throw new TagMapError(`default_height_m: "${c}" is not a model in the manifest`);
     }
   }
-  return { spec, fallback: spec.fallback, rules, heuristics, categories: used };
+  return { spec, fallback: spec.fallback, rules, heuristics, areas, categories: used };
 }

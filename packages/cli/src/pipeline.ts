@@ -24,8 +24,9 @@ import {
   isHighway,
   isPoi,
   isTree,
-  isTreeArea,
-  isTreeAreaRelation,
+  isArea,
+  isAreaRelation,
+  isTrackLine,
   type BBox,
   type OsmData,
 } from './osm';
@@ -33,18 +34,12 @@ import {
 export interface TreeOptions {
   /** Seed for scattered trees. The same seed and data always give the same trees. */
   seed: number;
-  /** Square metres of park per scattered tree. */
-  parkDensity: number;
-  /** Square metres of grass per scattered tree. */
-  grassDensity: number;
   /** Maximum scattered trees per area. */
   maxPerArea: number;
 }
 
 export const DEFAULT_TREES: TreeOptions = {
   seed: 1,
-  parkDensity: 350,
-  grassDensity: 900,
   maxPerArea: 300,
 };
 
@@ -52,6 +47,10 @@ export interface BuildOptions {
   bbox: BBox;
   classify: Classifier;
   fallback: string;
+  /** Category of an open space from its tags (the tag map's `areas` rules), or null to skip it. */
+  classifyArea?: (tags: Tags) => string | null;
+  /** Square metres per scattered tree, by area category (absent: no trees). */
+  areaTrees?: Record<string, number>;
   trees?: Partial<TreeOptions>;
   /** How far to look for a street when computing a building's front, in metres. */
   frontRadius?: number;
@@ -68,6 +67,15 @@ export interface BuildingProps {
   front: number | null;
   name?: string;
 }
+/** An open space (polygon) or a race/running track (line). */
+export interface AreaProps {
+  id: string;
+  category: string;
+  kind: 'area' | 'track';
+  name?: string;
+  sport?: string;
+}
+
 export interface PointProps {
   id: string;
   category: string;
@@ -78,11 +86,12 @@ export interface PointProps {
 }
 
 type Geometry =
+  | { type: 'LineString'; coordinates: LngLat[] }
   | { type: 'Polygon'; coordinates: LngLat[][] }
   | { type: 'MultiPolygon'; coordinates: LngLat[][][] }
   | { type: 'Point'; coordinates: LngLat };
 
-export interface Feature<P = BuildingProps | PointProps> {
+export interface Feature<P = BuildingProps | PointProps | AreaProps> {
   type: 'Feature';
   geometry: Geometry;
   properties: P;
@@ -104,6 +113,8 @@ export interface BuildStats {
   withFront: number;
   pois: { inBuildings: number; standalone: number };
   trees: { osm: number; scattered: number };
+  /** Open spaces and tracks written, per category. */
+  areas: Record<string, number>;
   /** Tag combinations of buildings that fell through to the fallback, most common first. */
   unmapped: { tags: string; count: number }[];
 }
@@ -330,22 +341,65 @@ export function buildData(
     osmTrees++;
   }
 
-  const areas: [string, LngLatPolygon[], Tags][] = [];
+  // Open spaces: parks, pitches, playgrounds, racecourses… classified by the tag map's `areas`
+  // rules and written as polygons (and tracks as lines) for the plugin to draw.
+  const classifyArea = opts.classifyArea ?? (() => null);
+  const areaTrees = opts.areaTrees ?? {};
+  const areas: [string, LngLatPolygon[], Tags, string][] = [];
+  const areaCounts: Record<string, number> = {};
+  const touchesBBox = (polys: LngLatPolygon[]) =>
+    polys.some((p) => p[0]!.some(([x, y]) => inBBox(x, y, bbox)));
   for (const [id, rel] of [...osm.relations].sort((a, b) => a[0] - b[0])) {
-    if (!isTreeAreaRelation(rel.tags)) continue;
-    const polys = relationPolygons(rel, osm);
-    if (polys) areas.push([`relation/${id}`, polys, rel.tags!]);
+    if (!isAreaRelation(rel.tags)) continue;
+    const category = classifyArea(rel.tags!);
+    const polys = category ? relationPolygons(rel, osm) : null;
+    if (category && polys && touchesBBox(polys))
+      areas.push([`relation/${id}`, polys, rel.tags!, category]);
   }
   for (const [id, way] of [...osm.ways].sort((a, b) => a[0] - b[0])) {
-    if (!isTreeArea(way.tags)) continue;
-    const poly = wayPolygon(way.refs, osm);
-    if (poly) areas.push([`way/${id}`, [poly], way.tags!]);
+    if (isArea(way.tags)) {
+      const category = classifyArea(way.tags!);
+      const poly = category ? wayPolygon(way.refs, osm) : null;
+      if (category && poly && touchesBBox([poly])) {
+        areas.push([`way/${id}`, [poly], way.tags!, category]);
+        continue;
+      }
+    }
+    if (isTrackLine(way.tags)) {
+      const line = way.refs.map((r) => osm.nodes.get(r)).filter((n) => n !== undefined);
+      if (line.length < 2 || !line.some((n) => inBBox(n.lon, n.lat, bbox))) continue;
+      const props: AreaProps = { id: `way/${id}`, category: 'track', kind: 'track' };
+      if (way.tags!.sport) props.sport = way.tags!.sport;
+      features.push({
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: line.map((n) => roundCoords([n.lon, n.lat])) },
+        properties: props,
+      });
+      areaCounts.track = (areaCounts.track ?? 0) + 1;
+    }
+  }
+  for (const [areaId, polys, tags, category] of areas) {
+    const props: AreaProps = { id: areaId, category, kind: 'area' };
+    if (tags.name) props.name = tags.name;
+    if (tags.sport) props.sport = tags.sport;
+    const coords = polys.map((poly) => rewind(poly).map((ring) => ring.map(roundCoords)));
+    features.push({
+      type: 'Feature',
+      geometry:
+        coords.length === 1
+          ? { type: 'Polygon', coordinates: coords[0]! }
+          : { type: 'MultiPolygon', coordinates: coords },
+      properties: props,
+    });
+    areaCounts[category] = (areaCounts[category] ?? 0) + 1;
   }
 
+  // Trees scattered in areas whose category has a density in the tag map (`areaTrees`).
   let scattered = 0;
-  for (const [areaId, polys, tags] of areas) {
+  for (const [areaId, polys, , category] of areas) {
+    const density = areaTrees[category];
+    if (!density) continue;
     const random = rng(hash32(`${treeOpts.seed}:${areaId}`));
-    const density = tags.leisure === 'park' ? treeOpts.parkDensity : treeOpts.grassDensity;
     for (const [pi, poly] of polys.entries()) {
       const xy = poly.map((ring) => ring.map(toXY));
       const want = Math.min(treeOpts.maxPerArea, Math.floor(polygonArea(xy) / density));
@@ -398,6 +452,7 @@ export function buildData(
     withFront,
     pois: { inBuildings: poisInBuildings, standalone },
     trees: { osm: osmTrees, scattered },
+    areas: sortRecord(areaCounts),
     unmapped: [...unmapped]
       .map(([tags, count]) => ({ tags, count }))
       .sort((a, b) => b.count - a.count || (a.tags < b.tags ? -1 : 1))

@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { VERSION } from 'toytown-gl';
 import {
+  AREA_LANDUSE,
+  AREA_LEISURE,
   fromOverpassJson,
   HIGHWAY_EXCLUDE,
   POI_KEYS,
@@ -21,10 +23,12 @@ export function overpassQuery([w, s, e, n]: BBox): string {
   way[building][building!=no];
   relation[building][building!=no][type=multipolygon];
   way[highway][highway!~"^(${HIGHWAY_EXCLUDE.join('|')})$"];
-  way[leisure=park];
-  relation[leisure=park][type=multipolygon];
-  way[landuse=grass];
-  relation[landuse=grass][type=multipolygon];
+  way[leisure~"^(${AREA_LEISURE.join('|')})$"];
+  relation[leisure~"^(${AREA_LEISURE.join('|')})$"][type=multipolygon];
+  way[landuse~"^(${AREA_LANDUSE.join('|')})$"];
+  relation[landuse~"^(${AREA_LANDUSE.join('|')})$"][type=multipolygon];
+  way[amenity=grave_yard];
+  way[highway=raceway];
 );
 out body;
 >;

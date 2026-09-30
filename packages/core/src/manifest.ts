@@ -31,10 +31,15 @@ export interface ModelEntry {
   source?: 'hand';
 }
 
-/** How a prop attaches to a procedural building's front. */
+/** How a prop attaches to a procedural building's front, or to an open space. */
 export interface PropAttach {
-  /** `front-wall`: on the front wall; `front-edge`: centred on the front wall line, from the ground; `front-ground`: in front of the building. */
-  at: 'front-wall' | 'front-edge' | 'front-ground';
+  /**
+   * Buildings: `front-wall`: on the front wall; `front-edge`: centred on the front wall line,
+   * from the ground; `front-ground`: in front of the building.
+   * Open spaces (the prop's `categories` are area categories): `pitch-ends`: one at each end of
+   * the pitch, facing in; `area-centre`: one in the middle of the area.
+   */
+  at: 'front-wall' | 'front-edge' | 'front-ground' | 'pitch-ends' | 'area-centre';
   /** Mounting height: `ground`, `ground-floor` (2.4 m) or `top` (just under the eaves). */
   z: 'ground' | 'ground-floor' | 'top';
   /** Metres out from the front wall (front-ground). */
@@ -64,6 +69,8 @@ export interface Manifest {
   models: Record<string, ModelEntry>;
   props?: Record<string, PropEntry>;
 }
+
+const ATTACH_AT = ['front-wall', 'front-edge', 'front-ground', 'pitch-ends', 'area-centre'];
 
 export class ManifestError extends Error {
   override name = 'ManifestError';
@@ -158,8 +165,8 @@ export function parseManifest(input: unknown): Manifest {
         fail(`${at}.categories must be an array of strings`);
       }
       const a = p.attach;
-      if (!isRecord(a) || !['front-wall', 'front-edge', 'front-ground'].includes(a.at as string)) {
-        fail(`${at}.attach.at must be front-wall, front-edge or front-ground`);
+      if (!isRecord(a) || !ATTACH_AT.includes(a.at as string)) {
+        fail(`${at}.attach.at must be one of ${ATTACH_AT.join(', ')}`);
       }
       if (!['ground', 'ground-floor', 'top'].includes(a.z as string))
         fail(`${at}.attach.z must be ground, ground-floor or top`);

@@ -121,6 +121,26 @@ export interface ModelsTheme {
   glow: string[];
 }
 
+/** Open spaces (parks, pitches, playgrounds, racecourses), drawn flat under the roads. */
+export interface AreaTheme {
+  /** Fill colour per area category (from tag-map.json's `areas` rules); `default` covers the rest. */
+  fill: Record<string, string>;
+  /** Thin edge around every area except plain grass. */
+  outline: string;
+  /** Mowing stripes on pitches. */
+  stripe: string;
+  /** Pitch and court lines. */
+  markings: string;
+  /** Running rails around racecourses and tracks. */
+  rail: string;
+  /** The running surface of tracks (athletics, greyhound). */
+  trackSurface: string;
+  /** The running surface of grass tracks (horse racing). */
+  turfTrack: string;
+  label: string;
+  labelHalo: string;
+}
+
 export interface Theme {
   name: string;
   /** Base map colours by style palette key (land, water, grass, roads, labels…). */
@@ -129,6 +149,8 @@ export interface Theme {
   lighting: LightingTheme;
   outline: OutlineTheme;
   models: ModelsTheme;
+  /** Optional in custom themes; the default theme's areas are used when missing. */
+  areas?: AreaTheme;
 }
 
 export const DEFAULT_THEME = defaultTheme as unknown as Theme;

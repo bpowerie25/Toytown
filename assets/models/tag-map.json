@@ -339,5 +339,102 @@
       "when": ["building=yes", "@area>=50", "@area<=250"],
       "note": "small untagged buildings are usually homes"
     }
-  ]
+  ],
+  "areas": [
+    {
+      "category": "racecourse",
+      "priority": 90,
+      "when": ["sport=horse_racing", "leisure=sports_centre|pitch|stadium|racetrack"]
+    },
+    {
+      "category": "racecourse",
+      "priority": 89,
+      "when": ["leisure=racetrack"]
+    },
+    {
+      "category": "track",
+      "priority": 80,
+      "when": ["leisure=track"]
+    },
+    {
+      "category": "pitch_gaa",
+      "priority": 75,
+      "when": [
+        "leisure=pitch",
+        "sport=gaelic_games|hurling|gaelic_football|rugby_union|rugby_league|rugby"
+      ]
+    },
+    {
+      "category": "pitch_soccer",
+      "priority": 74,
+      "when": ["leisure=pitch", "sport=soccer|football"]
+    },
+    {
+      "category": "pitch_court",
+      "priority": 73,
+      "when": ["leisure=pitch", "sport=tennis|basketball|netball|volleyball|padel|multi"]
+    },
+    {
+      "category": "pitch",
+      "priority": 70,
+      "when": ["leisure=pitch"]
+    },
+    {
+      "category": "playground",
+      "priority": 70,
+      "when": ["leisure=playground"]
+    },
+    {
+      "category": "golf_course",
+      "priority": 65,
+      "when": ["leisure=golf_course"]
+    },
+    {
+      "category": "sports_ground",
+      "priority": 60,
+      "when": ["leisure=sports_centre|stadium|recreation_ground"]
+    },
+    {
+      "category": "sports_ground",
+      "priority": 59,
+      "when": ["landuse=recreation_ground"]
+    },
+    {
+      "category": "garden",
+      "priority": 55,
+      "when": ["leisure=garden"]
+    },
+    {
+      "category": "park",
+      "priority": 50,
+      "when": ["leisure=park|village_green|common|dog_park"]
+    },
+    {
+      "category": "park",
+      "priority": 49,
+      "when": ["landuse=village_green"]
+    },
+    {
+      "category": "cemetery",
+      "priority": 50,
+      "when": ["landuse=cemetery"]
+    },
+    {
+      "category": "cemetery",
+      "priority": 49,
+      "when": ["amenity=grave_yard"]
+    },
+    {
+      "category": "grass",
+      "priority": 10,
+      "when": ["landuse=grass|meadow"]
+    }
+  ],
+  "areaTrees": {
+    "park": 350,
+    "garden": 450,
+    "cemetery": 600,
+    "grass": 900,
+    "golf_course": 1800
+  }
 }

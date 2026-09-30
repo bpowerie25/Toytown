@@ -479,12 +479,52 @@ def prop_canopy():
         m.box(1.0, 0.6, 1.5, x, 1.2, 0, "red"); m.box(0.8, 0.62, 0.5, x, 1.2, 0.9, "white")  # pumps
     return m
 
+def prop_goal_soccer():  # front (-Y here) faces into the pitch
+    m = Model("goal_soccer", pack="props")
+    for x in (-3.66, 3.66): m.box(0.12, 0.12, 2.44, x, 0, 0, "white")
+    m.box(7.44, 0.12, 0.12, 0, 0, 2.38, "white")
+    for x in (-3.66, 3.66): m.box(0.06, 1.8, 0.06, x, 0.9, 0, "metal")  # net frame along the ground
+    m.box(7.32, 0.06, 0.06, 0, 1.8, 0, "metal")
+    for x in (-3.66, 3.66): m.box(0.05, 0.05, 2.44, x, 1.8, 0, "metal")
+    m.box(7.32, 1.8, 0.03, 0, 0.9, 2.41, "offwhite")  # net roof
+    m.box(7.32, 0.03, 2.4, 0, 1.8, 0, "offwhite")  # back net
+    return m
+
+def prop_posts_gaa():  # H-shaped posts for Gaelic games and rugby
+    m = Model("posts_gaa", pack="props")
+    for x in (-3.25, 3.25): m.box(0.14, 0.14, 8.5, x, 0, 0, "white")
+    m.box(6.64, 0.14, 0.14, 0, 0, 2.44, "white")
+    m.box(6.36, 1.6, 0.03, 0, 0.8, 2.47, "offwhite")  # net under the bar
+    m.box(6.36, 0.03, 2.4, 0, 1.6, 0, "offwhite")
+    return m
+
+def prop_playset():  # swings and a slide
+    m = Model("playset", pack="props")
+    for x in (-3.2, -0.2):  # swing A-frames
+        for y in (-0.7, 0.7): m.box(0.1, 0.1, 2.6, x, y * 0.6, 0, "metal")
+    m.box(3.2, 0.12, 0.12, -1.7, 0, 2.5, "metal")
+    for x in (-2.5, -0.9):
+        m.box(0.03, 0.03, 1.9, x - 0.2, 0, 0.55, "black"); m.box(0.03, 0.03, 1.9, x + 0.2, 0, 0.55, "black")
+        m.box(0.5, 0.25, 0.06, x, 0, 0.5, "red")
+    m.box(1.4, 1.4, 1.5, 2.2, 0, 0, "wall_yellow")  # slide tower
+    m.box(1.6, 1.6, 0.12, 2.2, 0, 1.5, "wall_blue")
+    m.cone(1.1, 0.9, 2.2, 0, 2.3, "red", sections=4, rot=np.pi / 4)
+    for x in (1.6, 2.8): m.box(0.08, 0.08, 0.8, x, -0.7, 1.6, "metal"); m.box(0.08, 0.08, 0.8, x, 0.7, 1.6, "metal")
+    slide = trimesh.creation.box(extents=[0.7, 3.0, 0.1])
+    slide.apply_transform(trimesh.transformations.rotation_matrix(-0.45, [1, 0, 0]))
+    slide.apply_translation([2.2, -2.1, 0.75]); m.add(slide, "red")
+    return m
+
 PROPS = [
     # (builder, categories it decorates, how it attaches)
     (prop_awning, ["shop", "cafe"], {"at": "front-wall", "z": "ground-floor", "fit_frontage": 0.7}),
     (prop_red_cross, ["hospital"], {"at": "front-wall", "z": "top"}),
     (prop_spire, ["church"], {"at": "front-edge", "z": "ground"}),
     (prop_canopy, ["petrol_station"], {"at": "front-ground", "z": "ground", "offset": 6}),
+    # Open spaces: "categories" here are area categories from tag-map.json's "areas" rules.
+    (prop_goal_soccer, ["pitch_soccer", "pitch"], {"at": "pitch-ends", "z": "ground"}),
+    (prop_posts_gaa, ["pitch_gaa"], {"at": "pitch-ends", "z": "ground"}),
+    (prop_playset, ["playground"], {"at": "area-centre", "z": "ground"}),
 ]
 
 def entry(mdl, path):

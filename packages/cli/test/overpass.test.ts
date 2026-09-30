@@ -36,8 +36,9 @@ describe('overpass', () => {
       'node[amenity]',
       'node[craft]',
       'node[natural=tree]',
-      'way[leisure=park]',
-      'way[landuse=grass]',
+      'way[leisure~"^(park|',
+      'way[landuse~"^(grass|',
+      'way[highway=raceway]',
     ]) {
       expect(q).toContain(s);
     }

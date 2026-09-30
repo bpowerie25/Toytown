@@ -35,7 +35,14 @@ export const ways: TestWay[] = [
   // A footpath at y = -3, closer to the house than the street is
   { id: 201, refs: [node(-50, -3), node(100, -3)], tags: { highway: 'footway' } },
   // A park, 60×40 m, north of the street
-  { id: 300, refs: rect(0, 30, 60, 40), tags: { leisure: 'park' } },
+  { id: 300, refs: rect(0, 30, 60, 40), tags: { leisure: 'park', name: 'Green Park' } },
+  // A GAA pitch east of the park, and a racetrack line beyond it
+  { id: 301, refs: rect(70, 30, 30, 50), tags: { leisure: 'pitch', sport: 'gaelic_games' } },
+  {
+    id: 302,
+    refs: [node(105, 30), node(110, 60), node(105, 85)],
+    tags: { leisure: 'track', sport: 'horse_racing' },
+  },
   // Multipolygon parts: outer split into two ways, plus an inner courtyard
   { id: 400, refs: [node(60, 0), node(90, 0), node(90, 15)] },
   { id: 401, refs: [] }, // filled below (shares endpoints with 400)

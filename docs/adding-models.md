@@ -118,6 +118,15 @@ The generator writes the entry, so you never edit `manifest.json` by hand:
 | `variants`    | Other looks for the category, picked per building by a hash of its OSM id.                  |
 | `source`      | `"hand"` for hand-made models; absent for generated ones.                                   |
 
+### Props
+
+Props live under `props` in the manifest, with `categories` and an `attach` rule instead of
+`osm_tags`. Building props (`awning`, `red_cross`, `spire`, `canopy`) decorate procedural
+buildings of those categories: `at` is `front-wall`, `front-edge` or `front-ground`. Open-space
+props name area categories from `tag-map.json`'s `areas` instead: `at: "pitch-ends"` puts one at
+each end of a pitch, facing in (`goal_soccer`, `posts_gaa`); `at: "area-centre"` puts one in the
+middle (`playset`). Their front faces into the pitch or area.
+
 ## OSM tag rules
 
 A model is only used if some buildings are classified into its category. Add or adjust rules in

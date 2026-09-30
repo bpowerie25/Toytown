@@ -73,6 +73,7 @@ describe('renderReport', () => {
       withFront: 9,
       pois: { inBuildings: 1, standalone: 0 },
       trees: { osm: 1, scattered: 2 },
+      areas: { park: 1 },
       unmapped: [{ tags: 'building=yes + man_made=silo', count: 3 }],
     };
     const md = renderReport([{ name: 'Testville', stats }]);

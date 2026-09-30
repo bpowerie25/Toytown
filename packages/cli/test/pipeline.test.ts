@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createClassifier, parseTagMap } from 'toytown-gl';
+import { classifyArea, createClassifier, parseTagMap } from 'toytown-gl';
 import { describe, expect, it } from 'vitest';
 import type { OsmData } from '../src/osm';
 import { buildData, type BuildingProps, type PointProps } from '../src/pipeline';
@@ -16,12 +16,17 @@ const osm = (): OsmData => ({
   relations: new Map(relations.map((r) => [r.id, { members: r.members, tags: r.tags }])),
   timestamp: '2026-09-29T00:00:00Z',
 });
+const areaOpts = {
+  classifyArea: (t: Record<string, string>) => classifyArea(tagMap, t),
+  areaTrees: tagMap.spec.areaTrees ?? {},
+};
 const run = (seed = 1) =>
   buildData(osm(), {
     bbox: BBOX,
     classify: createClassifier(tagMap),
     fallback: 'generic',
     trees: { seed },
+    ...areaOpts,
   });
 
 const { collection, stats } = run();
@@ -121,6 +126,28 @@ describe('buildData', () => {
       expect(Math.round(x * 1e6) / 1e6).toBe(x);
       expect(Math.round(y * 1e6) / 1e6).toBe(y);
     }
+  });
+
+  it('exports open spaces with their category, name and sport, and tracks as lines', () => {
+    expect(byId('way/300')).toMatchObject({
+      geometry: { type: 'Polygon' },
+      properties: { category: 'park', kind: 'area', name: 'Green Park' },
+    });
+    expect(byId('way/301').properties).toMatchObject({
+      category: 'pitch_gaa',
+      kind: 'area',
+      sport: 'gaelic_games',
+    });
+    expect(byId('way/302')).toMatchObject({
+      geometry: { type: 'LineString' },
+      properties: { category: 'track', kind: 'track' },
+    });
+    expect(stats.areas).toEqual({ park: 1, pitch_gaa: 1, track: 1 });
+  });
+
+  it('scatters trees only in area categories with a tree density (not on pitches)', () => {
+    const trees = collection.features.filter((f) => f.properties.id.startsWith('scatter/'));
+    expect(trees.every((t) => t.properties.id.startsWith('scatter/way/300/'))).toBe(true);
   });
 
   it('reports unmapped tag combinations', () => {

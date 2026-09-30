@@ -1,5 +1,6 @@
 import type { LngLat as MaplibreLngLat, Map as MaplibreMap, MapMouseEvent } from 'maplibre-gl';
 import { Box3 } from 'three';
+import { areaLayers, planAreaProps, type AreaFeature } from './areas';
 import { tileCenter, tileOf, type LngLat } from './geometry';
 import { parseManifest, parsePackManifest, type Manifest, type ModelEntry } from './manifest';
 import {
@@ -10,6 +11,7 @@ import {
   type PlannedBuilding,
   type PointFeature,
 } from './placement';
+import { addAreaLayers, removeAreaLayers } from './render/area-style';
 import { SceneFrame } from './render/frame';
 import { ToyTownLayer, type ChunkInput, type PickHit } from './render/layer';
 import type { LodOptions } from './render/lod';
@@ -28,6 +30,9 @@ interface DataFeature {
     height?: number;
     front?: number | null;
     name?: string;
+    /** `area` (open-space polygons) and `track` (lines); absent for buildings, POIs and trees. */
+    kind?: 'area' | 'track';
+    sport?: string;
   };
 }
 export interface DataCollection {
@@ -97,6 +102,7 @@ export class ToyTown {
     buildings: PlannedBuilding[];
     points: PointFeature[];
     trees: { id: string; position: LngLat; height?: number }[];
+    areas: AreaFeature[];
     info: Map<string, { category: string; name?: string; height?: number }>;
     frame: SceneFrame;
   };
@@ -132,6 +138,7 @@ export class ToyTown {
     this.overlay?.remove();
     this.map?.off('click', this.onClick);
     if (this.map?.getLayer(this.id)) this.map.removeLayer(this.id);
+    if (this.map) removeAreaLayers(this.map, this.id);
     if (this.map) setBaseBuildingsVisible(this.map, true);
     this.map = undefined;
     this.layer = undefined;
@@ -229,6 +236,8 @@ export class ToyTown {
       info,
       frame: new SceneFrame([(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]),
     };
+    if (split.areas.length)
+      addAreaLayers(map, this.id, areaLayers(split.areas), this.theme, this.id);
     this.pool = new ChunkPool();
     await this.reapply();
     this.resolveLoaded();
@@ -299,11 +308,15 @@ export class ToyTown {
     this.manifest = manifest;
 
     const kit = manifest ? planKit(manifest) : null;
-    const { buildings, points, trees, frame } = this.data;
+    const { buildings, points, trees, areas, frame } = this.data;
     // Points and trees don't depend on a chunk's meshing, so they're planned once up front and
     // handed to the chunk whose tile they're in.
     const extras: Placement[] = kit
-      ? [...planPoints(points, buildings, kit, this.theme), ...planTrees(trees, kit, this.theme)]
+      ? [
+          ...planPoints(points, buildings, kit, this.theme),
+          ...planTrees(trees, kit, this.theme),
+          ...planAreaProps(areas, kit),
+        ]
       : [];
     const pool = this.pool;
     this.layer.clear();
@@ -343,19 +356,39 @@ export function toChunks(buildings: PlannedBuilding[], extras: Placement[]): Chu
   return [...chunks.values()].sort((a, b) => (a.key < b.key ? -1 : 1));
 }
 
-/** Split a build-data collection into buildings, POI points and trees. */
+/** Split a build-data collection into buildings, POI points, trees and open spaces. */
 export function splitData(data: DataCollection): {
   buildings: PlannedBuilding[];
   points: PointFeature[];
   trees: { id: string; position: LngLat; height?: number }[];
+  areas: AreaFeature[];
 } {
   const buildings: PlannedBuilding[] = [];
   const points: PointFeature[] = [];
   const trees: { id: string; position: LngLat; height?: number }[] = [];
+  const areas: AreaFeature[] = [];
   for (const f of data.features) {
     const g = f.geometry;
     const p = f.properties;
-    if (g.type === 'Polygon' || g.type === 'MultiPolygon') {
+    if (p.kind === 'area' || p.kind === 'track') {
+      const parts =
+        g.type === 'Polygon'
+          ? [g.coordinates as LngLat[][]]
+          : g.type === 'MultiPolygon'
+            ? (g.coordinates as LngLat[][][])
+            : g.type === 'LineString'
+              ? [[g.coordinates as LngLat[]]]
+              : [];
+      if (parts.length)
+        areas.push({
+          id: p.id,
+          category: p.category,
+          kind: p.kind,
+          parts,
+          ...(p.name ? { name: p.name } : {}),
+          ...(p.sport ? { sport: p.sport } : {}),
+        });
+    } else if (g.type === 'Polygon' || g.type === 'MultiPolygon') {
       buildings.push({
         id: p.id,
         category: p.category,
@@ -371,7 +404,7 @@ export function splitData(data: DataCollection): {
       else points.push({ id: p.id, category: p.category, position, front: p.front ?? null });
     }
   }
-  return { buildings, points, trees };
+  return { buildings, points, trees, areas };
 }
 
 function bboxOf(buildings: PlannedBuilding[]): [number, number, number, number] {

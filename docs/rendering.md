@@ -101,6 +101,32 @@ Planning is pure and runs in the chunk workers, before meshing (`packages/core/s
 In Waterford, 9,561 of the 26,870 buildings fit a hero model (mostly houses), 296 buildings get
 awnings and 27 get spires, and there are 3,839 trees.
 
+## Open spaces
+
+Areas from build-data (`kind: "area"` and `kind: "track"`, see [build-data.md](build-data.md))
+are drawn by MapLibre, not three.js. Four GeoJSON sources (`<id>-areas`, `-stripes`, `-markings`
+and `-labels`) feed these layers under the first road layer, so roads, paths and the 3D layer draw
+on top:
+
+- `<id>-areas`: a fill per category from `theme.areas.fill`;
+- `<id>-area-stripes`: mowing stripes on pitches, from z15;
+- `<id>-area-edges`: a thin outline, except on plain grass and tracks;
+- `<id>-track-surface` and `<id>-rails-inner|outer`: a running surface along each track (20 m of
+  turf for horse racing, 8 m of `trackSurface` otherwise), with a white rail on each side;
+- `<id>-area-markings`: pitch lines, from z15.5.
+
+`<id>-area-labels` goes under the style's first label layer. Stripes and markings come from the
+pitch's minimum rectangle (only if the pitch fills at least 80% of it). They follow the real
+layout (soccer boxes, the GAA 13, 20 and 45 m lines) and shrink on smaller pitches. The label sits
+at the point farthest from the area's edges.
+
+Screenshots: [docs/open-spaces/](open-spaces/) (Tramore racecourse, People's Park by day and
+night, Walsh Park, Kilcohan greyhound track).
+
+Area props from the kit are placed on the main thread with the trees: `pitch-ends` props go at
+both ends of a pitch, facing in and scaled to its width, and `area-centre` props go at the area's
+middle if they fit.
+
 ## Instancing, lazy loading and levels of detail
 
 There is one `InstancedMesh` per model, variant or prop (plus its hull), filled only with the
@@ -122,6 +148,8 @@ A theme is JSON (`packages/core/src/themes/default.json`, `night.json`):
   shown at full colour whatever the light, for night).
 - `lighting`: ambient, sun and toon steps.
 - `outline`: ink colour, hull width, edge width and fade.
+- `areas`: open-space fills per area category, pitch stripes and markings, track surfaces and
+  rails, and label colours. Optional in custom themes, which fall back to the default's.
 - `models`: palette overrides for the kit, `glow` palette keys (shown unlit, e.g. `window` at
   night), fit rules and tree sizes.
 

@@ -836,6 +836,68 @@
         "z": "ground",
         "offset": 6
       }
+    },
+    "goal_soccer": {
+      "file": "props/goal_soccer.glb",
+      "materials": [
+        "white",
+        "metal",
+        "offwhite"
+      ],
+      "footprint_m": [
+        7.4,
+        1.9
+      ],
+      "height_m": 2.5,
+      "categories": [
+        "pitch_soccer",
+        "pitch"
+      ],
+      "attach": {
+        "at": "pitch-ends",
+        "z": "ground"
+      }
+    },
+    "posts_gaa": {
+      "file": "props/posts_gaa.glb",
+      "materials": [
+        "white",
+        "offwhite"
+      ],
+      "footprint_m": [
+        6.6,
+        1.7
+      ],
+      "height_m": 8.5,
+      "categories": [
+        "pitch_gaa"
+      ],
+      "attach": {
+        "at": "pitch-ends",
+        "z": "ground"
+      }
+    },
+    "playset": {
+      "file": "props/playset.glb",
+      "materials": [
+        "metal",
+        "black",
+        "red",
+        "wall_yellow",
+        "wall_blue"
+      ],
+      "footprint_m": [
+        6.3,
+        4.3
+      ],
+      "height_m": 3.2,
+      "categories": [
+        "playground"
+      ],
+      "attach": {
+        "at": "area-centre",
+        "z": "ground"
+      }
     }
   }
 }

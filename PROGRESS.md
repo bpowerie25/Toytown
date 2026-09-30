@@ -46,6 +46,30 @@ Updated at the end of each phase.
     day colours.
   - `scripts/views.mjs` captures fixed comparison views for design reviews.
 
+- **Open spaces** (you noticed that Tramore racecourse and People's Park were blank): OpenMapTiles
+  has no racecourse or sports-ground areas, and our data only had buildings, POIs and trees.
+  - **Data**: build-data now exports open spaces as `kind: "area"` polygons (and unclosed tracks
+    as `kind: "track"` lines) with `name` and `sport`. They're classified by new `areas` rules in
+    `tag-map.json`: racecourse, track, pitch_gaa, pitch_soccer, pitch_court, pitch, playground,
+    golf_course, sports_ground, garden, park, cemetery and grass. Tree scatter is now driven by
+    `areaTrees` in the tag map, so pitches and playgrounds stay clear. Waterford has 704 areas
+    (9.4 MB, still under 10 MB) and Tramore 148.
+  - **Plugin**: the areas are drawn as MapLibre layers under the roads: fills per category from
+    the theme's new `areas` palette, mowing stripes and real-layout markings on pitches (soccer
+    boxes; GAA 13, 20 and 45 m lines), tracks as a surface between two white rails (turf for
+    horse racing, red for athletics and greyhounds), outlines, and name labels.
+  - **Props**: the generator makes three new CC0 props: `goal_soccer` (120 tris), `posts_gaa`
+    (60) and `playset` (224). The manifest's `attach.at` gains `pitch-ends` and `area-centre`.
+  - **Tag map fix**: a `leisure=track` with `sport=horse_racing` is now a `track` (the running
+    loop), not a `racecourse`; the racecourse is the grounds (`sports_centre` etc.).
+  - New views in `scripts/views.mjs`: `tramore-racecourse`, `waterford-peoples-park` and
+    `waterford-walsh-park`.
+  - Known issues:
+    - Where OSM maps a club's grounds and its pitch as separately named areas, both labels show
+      (Walsh Park and "Páirc an Bhreatnaigh GAA").
+    - Stripes and markings are skipped on pitches that fill less than 80% of their minimum
+      rectangle.
+
 ## Phase 7: Packaging and release (2026-09-29), ready but not published
 
 ### What was done

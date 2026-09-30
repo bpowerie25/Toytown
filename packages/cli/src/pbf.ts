@@ -13,7 +13,7 @@ import {
   isBuildingRelation,
   isPoi,
   isTree,
-  isTreeAreaRelation,
+  isAreaRelation,
   type BBox,
   type OsmData,
   type OsmMember,
@@ -280,7 +280,7 @@ export function readPbf(path: string, opts: PbfOptions): OsmData {
     },
     relation(id, members, tags) {
       const t = tags();
-      if (!(isBuildingRelation(t) || isTreeAreaRelation(t))) return;
+      if (!(isBuildingRelation(t) || isAreaRelation(t))) return;
       if (!members.some((m) => m.type === 'way' && data.ways.has(m.ref))) return;
       data.relations.set(id, { members, tags: t });
     },

@@ -214,5 +214,31 @@
     "label_halo": "#1B2238",
     "building": "#2A3252",
     "building_outline": "#111728"
+  },
+  "areas": {
+    "fill": {
+      "default": "#24453A",
+      "park": "#244A3A",
+      "garden": "#27503B",
+      "grass": "#22423A",
+      "cemetery": "#2A4540",
+      "golf_course": "#255038",
+      "sports_ground": "#23483A",
+      "pitch": "#2A5A3C",
+      "pitch_soccer": "#2A5A3C",
+      "pitch_gaa": "#2A5A3C",
+      "pitch_court": "#5A3E3E",
+      "playground": "#4E4A3A",
+      "racecourse": "#28533B",
+      "track": "#28533B"
+    },
+    "outline": "#1B3A30",
+    "stripe": "#26533A",
+    "markings": "#C9D3E0",
+    "rail": "#C9D3E0",
+    "trackSurface": "#5E4238",
+    "label": "#BFE3C4",
+    "labelHalo": "#1B2238",
+    "turfTrack": "#23503A"
   }
 }

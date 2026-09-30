@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  classifyArea,
   createClassifier,
   parseManifest,
   parseTagMap,
@@ -76,6 +77,8 @@ async function buildDataCommand(argv: string[]): Promise<void> {
     bbox: args.bbox,
     classify: createClassifier(tagMap, packs),
     fallback: tagMap.fallback,
+    classifyArea: (tags) => classifyArea(tagMap, tags),
+    areaTrees: tagMap.spec.areaTrees ?? {},
     trees: { seed: args.seed },
   });
   const bytes = await writeGeoJson(args.out, collection);

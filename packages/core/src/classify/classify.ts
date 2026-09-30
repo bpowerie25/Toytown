@@ -117,3 +117,14 @@ export function createClassifier(tagMap: TagMap, packs: LandmarkPack[] = []): Cl
     return withHeight(tagMap.fallback, 'fallback', m);
   };
 }
+
+/** Classify an open space (park, pitch, racecourse…) by its tags; null if no area rule matches. */
+export function classifyArea(tagMap: TagMap, tags: Tags): string | null {
+  let found: TagRule | null = null;
+  const m: Measures = { area: 0, levels: null, height: null };
+  for (const r of tagMap.areas) {
+    if (found && r.priority <= found.priority) continue;
+    if (r.conditions.every((c) => c(tags, m))) found = r;
+  }
+  return found?.category ?? null;
+}

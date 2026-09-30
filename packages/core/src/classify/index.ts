@@ -16,6 +16,7 @@ export {
 } from './tagmap';
 export {
   createClassifier,
+  classifyArea,
   measure,
   type Classifier,
   type Classification,

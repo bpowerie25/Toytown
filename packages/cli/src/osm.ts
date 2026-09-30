@@ -67,9 +67,20 @@ export const isBuildingRelation = (tags?: Tags) =>
   isBuilding(tags) && tags!.type === 'multipolygon';
 export const isHighway = (tags?: Tags) =>
   has(tags, 'highway') && !HIGHWAY_EXCLUDE.includes(tags!.highway!);
-export const isTreeArea = (tags?: Tags) => tags?.leisure === 'park' || tags?.landuse === 'grass';
-export const isTreeAreaRelation = (tags?: Tags) =>
-  isTreeArea(tags) && tags!.type === 'multipolygon';
+/** Open spaces build-data exports (classified by the tag map's `areas` rules). */
+export const AREA_LEISURE = [
+  'park', 'garden', 'pitch', 'playground', 'sports_centre', 'stadium', 'track', 'golf_course',
+  'recreation_ground', 'village_green', 'common', 'dog_park', 'racetrack',
+]; // prettier-ignore
+export const AREA_LANDUSE = ['grass', 'meadow', 'recreation_ground', 'village_green', 'cemetery'];
+export const isArea = (tags?: Tags) =>
+  (!!tags?.leisure && AREA_LEISURE.includes(tags.leisure)) ||
+  (!!tags?.landuse && AREA_LANDUSE.includes(tags.landuse)) ||
+  tags?.amenity === 'grave_yard';
+export const isAreaRelation = (tags?: Tags) => isArea(tags) && tags!.type === 'multipolygon';
+/** Race and running tracks drawn as lines (unclosed ways). */
+export const isTrackLine = (tags?: Tags) =>
+  tags?.leisure === 'track' || tags?.highway === 'raceway';
 export const isTree = (tags?: Tags) => tags?.natural === 'tree';
 export const isPoi = (tags?: Tags) =>
   POI_KEYS.some((k) => has(tags, k)) || (!!tags?.railway && POI_RAILWAY.includes(tags.railway));

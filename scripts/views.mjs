@@ -28,11 +28,34 @@ const VIEWS = [
     zoom: 17.6,
     bearing: 20,
   },
+  {
+    name: 'tramore-racecourse',
+    url: '/tramore/',
+    center: [-7.1487, 52.1727],
+    zoom: 16.2,
+    bearing: 10,
+  },
+  {
+    name: 'waterford-peoples-park',
+    url: '/waterford/',
+    center: [-7.1048, 52.2563],
+    zoom: 16.8,
+    bearing: 0,
+  },
+  {
+    name: 'waterford-walsh-park',
+    url: '/waterford/',
+    center: [-7.1289, 52.2548],
+    zoom: 17.6,
+    bearing: 25,
+  },
 ];
+// Pass view names after the label to capture only those.
+const only = process.argv.slice(3);
 mkdirSync('.cache/views', { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome' });
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
-for (const v of VIEWS) {
+for (const v of VIEWS.filter((v) => !only.length || only.includes(v.name))) {
   await page.goto(`http://localhost:4310${v.url}`);
   await page.evaluate(() => document.querySelector('.panel')?.remove());
   await page.waitForFunction(() => !!window.toy);

@@ -7,12 +7,14 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { validateBytes } from 'gltf-validator';
+import { parseTagMap } from '../src/classify';
 import { parseManifest } from '../src/manifest';
 
 const MODELS = join(dirname(fileURLToPath(import.meta.url)), '../../../assets/models');
 const manifest = parseManifest(JSON.parse(readFileSync(join(MODELS, 'manifest.json'), 'utf8')));
 const entries = Object.entries(manifest.models);
 const props = Object.entries(manifest.props ?? {});
+const tagMap = parseTagMap(JSON.parse(readFileSync(join(MODELS, 'tag-map.json'), 'utf8')));
 const variants = entries.flatMap(([base, m]) =>
   (m.variants ?? []).map((v) => [v.name, { ...v, base }] as const),
 );
@@ -85,10 +87,25 @@ describe('model kit', () => {
     expect(entries).toHaveLength(31);
   });
 
-  it('has the four decorate props, each for categories that have models', () => {
-    expect(props.map(([n]) => n).sort()).toEqual(['awning', 'canopy', 'red_cross', 'spire']);
-    for (const [, p] of props)
-      for (const c of p.categories) expect(manifest.models).toHaveProperty(c);
+  it('has four building props for categories with models, and three open-space props', () => {
+    const areaProp = ([, p]: (typeof props)[number]) =>
+      p.attach.at === 'pitch-ends' || p.attach.at === 'area-centre';
+    expect(
+      props
+        .filter((p) => !areaProp(p))
+        .map(([n]) => n)
+        .sort(),
+    ).toEqual(['awning', 'canopy', 'red_cross', 'spire']);
+    expect(
+      props
+        .filter(areaProp)
+        .map(([n]) => n)
+        .sort(),
+    ).toEqual(['goal_soccer', 'playset', 'posts_gaa']);
+    const areaCategories = new Set(tagMap.areas.map((r) => r.category));
+    for (const p of props)
+      for (const c of p[1].categories)
+        expect(areaProp(p) ? areaCategories.has(c) : c in manifest.models).toBe(true);
   });
 
   it('lists every GLB on disk, and nothing else', () => {

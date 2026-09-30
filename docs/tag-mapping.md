@@ -53,6 +53,23 @@ Every condition in `when` must hold. The condition syntax:
 Multi-valued tags (`shop=bakery;cafe`) match if any value matches. A condition on an unknown
 measure never matches: `@levels<=2` is false for a building with no levels or height.
 
+## Open spaces
+
+Parks, pitches, playgrounds, racecourses and other open spaces are classified by the separate
+`areas` rules in the same file. They use the same rule format, but their categories are area
+categories, not models: `racecourse`, `track`, `pitch_gaa`, `pitch_soccer`, `pitch_court`,
+`pitch`, `playground`, `golf_course`, `sports_ground`, `garden`, `park`, `cemetery` and `grass`.
+The highest priority wins, so a `leisure=pitch` with `sport=hurling` is `pitch_gaa`, not `pitch`.
+Areas that match no rule are left out.
+
+`areaTrees` gives the tree density per area category, in m² per tree (e.g. `"park": 350`). Areas
+whose category isn't listed get no scattered trees, so pitches and playgrounds stay clear.
+
+The plugin colours each category from the theme's `areas.fill`. Pitches get stripes and markings,
+tracks a running surface between two rails, and named areas a label. Kit props whose
+`categories` are area categories (goals, posts, a playset) are placed on them; see
+[adding-models.md](adding-models.md#the-manifest-entry).
+
 ## Heights
 
 `height` (or `building:height`) is used if present. Otherwise it's `building:levels` ×
