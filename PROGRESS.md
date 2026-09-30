@@ -2,20 +2,30 @@
 
 Updated at the end of each phase.
 
-| Phase           | Status               | Notes                                                                             |
-| --------------- | -------------------- | --------------------------------------------------------------------------------- |
-| 0 Scaffold      | done                 | Workspace, tooling, kit validation, CI, licences, examples.                       |
-| 1 Style         | done                 | toytown.json, Nunito labels, Playwright screenshot tests.                         |
-| 2 Data          | done                 | build-data CLI, tag-map.json, both datasets, report.                              |
-| 2.5 Spike       | approved             | deck.gl spike; model kit colour fix. See docs/spike/README.md.                    |
-| 3 Buildings     | done                 | Procedural buildings, worker meshing, minimal render layer.                       |
-| 4 Toon + models | done                 | Toon/ink rendering, fit/decorate/point, props, instancing.                        |
-| 4b Model kit    | done                 | @toytown/models + zip, variants, kit CI, adding-models guide.                     |
-| 5 Performance   | done                 | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs.            |
-| 6 API + demos   | done                 | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages.        |
-| 7 Release       | ready, not published | ESM+UMD, 3 packages at 0.1.0, release workflow, acceptance test. Publish pending. |
+| Phase           | Status               | Notes                                                                      |
+| --------------- | -------------------- | -------------------------------------------------------------------------- |
+| 0 Scaffold      | done                 | Workspace, tooling, kit validation, CI, licences, examples.                |
+| 1 Style         | done                 | toytown.json, Nunito labels, Playwright screenshot tests.                  |
+| 2 Data          | done                 | build-data CLI, tag-map.json, both datasets, report.                       |
+| 2.5 Spike       | approved             | deck.gl spike; model kit colour fix. See docs/spike/README.md.             |
+| 3 Buildings     | done                 | Procedural buildings, worker meshing, minimal render layer.                |
+| 4 Toon + models | done                 | Toon/ink rendering, fit/decorate/point, props, instancing.                 |
+| 4b Model kit    | done                 | @toytown/models + zip, variants, kit CI, adding-models guide.              |
+| 5 Performance   | done                 | LOD by zoom, lazy chunks, per-chunk culling, debug overlay, perf docs.     |
+| 6 API + demos   | done                 | Themes, click/pick, overrides, packs, demos, README/GIF, templates, Pages. |
+| 7 Release       | published 2026-09-30 | v0.1.0: toytown-gl, @toytown/models, @toytown/cli on npm; demos on Pages.  |
 
 ## After phase 7 (2026-09-30)
+
+- **Released v0.1.0 (2026-09-30).** `toytown-gl`, `@toytown/models` and `@toytown/cli` are on npm
+  with provenance, the GitHub release has the models zip, and the demos are live at
+  https://bpowerie25.github.io/Toytown/. Checked afterwards from the real registry:
+  `npx @toytown/cli build-data` for Castlemagner gives the same 190 buildings, and a fresh Vite
+  project with the README quick start renders with no errors. Before tagging, the commit history
+  was rewritten to brian@duhallowdigital.com and the repo made public. Two release-workflow
+  problems showed up on the first real run and were fixed: the release notes were written into
+  the repo, where the formatting check failed on them; and npm needs the CI token to have "bypass
+  2FA", because the account uses two-factor authentication.
 
 - **Castlemagner demo** (`examples/castlemagner`), added on request: a village in north County
   Cork. The bbox is `-8.845,52.155,-8.805,52.178` (the village relation 14597374 plus about

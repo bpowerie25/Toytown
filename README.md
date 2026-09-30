@@ -7,9 +7,10 @@ churches and more.
 
 ![Waterford City as a toy town, by day and by night](docs/demo.gif)
 
-> **Status: `v0.1.0` is ready to publish** (versions, changelogs and release workflow are in
-> place, and the fresh-project install is tested from packed tarballs). The demos are Waterford
-> City, Tramore and Castlemagner, Ireland, but nothing in the plugin is specific to them.
+> **`v0.1.0` is out**: [`toytown-gl`](https://www.npmjs.com/package/toytown-gl),
+> [`@toytown/models`](https://www.npmjs.com/package/@toytown/models) and
+> [`@toytown/cli`](https://www.npmjs.com/package/@toytown/cli) on npm. **[Try the live demos](https://bpowerie25.github.io/Toytown/)**:
+> Waterford City, Tramore and Castlemagner, Ireland. Nothing in the plugin is specific to them.
 
 ## What you get
 
