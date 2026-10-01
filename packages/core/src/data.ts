@@ -4,6 +4,7 @@
  * installs without three.js or MapLibre.
  */
 export * from './classify';
+export * from './build';
 export { parseManifest, parsePackManifest, type Manifest, type ModelEntry } from './manifest';
 export { LocalProjection, type LngLat, type XY } from './geometry/project';
 export {

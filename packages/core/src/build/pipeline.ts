@@ -1,20 +1,18 @@
 /**
  * build-data pipeline: OSM data in, classified toy-town features out.
  */
+// Specific geometry files, not '../geometry': its index pulls in the mesher and three.js, which
+// the CLI bundle (and anyone building data without rendering) shouldn't carry.
+import type { Classifier, Tags } from '../classify';
 import {
-  LocalProjection,
   centroid,
   closestOnSegment,
-  orientation as footprintOrientation,
   pointInPolygon,
   polygonArea,
-  snapFront,
-  type Classifier,
-  type LngLat,
   type PolygonXY,
-  type Tags,
-  type XY,
-} from 'toytown-gl';
+} from '../geometry/polygon';
+import { LocalProjection, type LngLat, type XY } from '../geometry/project';
+import { orientation as footprintOrientation, snapFront } from '../geometry/rect';
 import { relationPolygons, rewind, wayPolygon, type LngLatPolygon } from './assemble';
 import { Grid, bounds, hash32, rng } from './grid';
 import {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { joinRings, relationPolygons, rewind, wayPolygon } from '../src/assemble';
-import type { OsmData } from '../src/osm';
+import { joinRings, relationPolygons, rewind, wayPolygon } from '../src/build/assemble';
+import type { OsmData } from '../src/build/osm';
 
 const data = (coords: Record<number, [number, number]>): OsmData => ({
   nodes: new Map(Object.entries(coords).map(([id, [lon, lat]]) => [Number(id), { lon, lat }])),

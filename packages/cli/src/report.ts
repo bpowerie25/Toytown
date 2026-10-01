@@ -1,4 +1,4 @@
-import type { BuildStats } from './pipeline';
+import type { BuildStats } from 'toytown-gl';
 
 export interface TownStats {
   name: string;

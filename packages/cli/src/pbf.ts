@@ -17,7 +17,7 @@ import {
   type BBox,
   type OsmData,
   type OsmMember,
-} from './osm';
+} from 'toytown-gl';
 import { ProtoReader, svarint, uvarint } from './protobuf';
 
 const MEMBER_TYPES: OsmMember['type'][] = ['node', 'way', 'relation'];

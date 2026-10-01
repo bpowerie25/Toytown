@@ -1,4 +1,4 @@
-import type { Tags } from 'toytown-gl';
+import type { Tags } from '../classify';
 
 export interface OsmNode {
   lon: number;

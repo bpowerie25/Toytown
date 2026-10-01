@@ -1,6 +1,6 @@
-import type { XY } from 'toytown-gl';
+import type { XY } from '../geometry/project';
 
-export { hash32 } from 'toytown-gl';
+export { hash32 } from '../geometry/hash';
 
 /** Uniform grid spatial index over axis-aligned boxes in local metres. */
 export class Grid<T> {

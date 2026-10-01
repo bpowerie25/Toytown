@@ -2,7 +2,25 @@
  * A tiny synthetic town around (0, 0). Coordinates are built in metres and converted to degrees,
  * so tests can reason about distances. Everything here is made up.
  */
-import type { TestNode, TestRelation, TestWay } from './pbf-writer';
+/** Plain OSM elements; the CLI's PBF writer encodes the same shapes. */
+export interface TestNode {
+  id: number;
+  lon: number;
+  lat: number;
+  tags?: Record<string, string>;
+}
+
+export interface TestWay {
+  id: number;
+  refs: number[];
+  tags?: Record<string, string>;
+}
+
+export interface TestRelation {
+  id: number;
+  members: { type: 'node' | 'way' | 'relation'; ref: number; role: string }[];
+  tags?: Record<string, string>;
+}
 
 const M = 1 / 111_320; // ~1 m in degrees at the equator
 let nextNode = 1;

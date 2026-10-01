@@ -1,11 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { classifyArea, createClassifier, parseTagMap } from 'toytown-gl';
+import { classifyArea, createClassifier, parseTagMap } from '../src/classify';
 import { describe, expect, it } from 'vitest';
-import type { OsmData } from '../src/osm';
-import { buildData, type BuildingProps, type PointProps } from '../src/pipeline';
-import { BBOX, nodes, relations, ways } from './fixtures';
+import type { OsmData } from '../src/build/osm';
+import { buildData, type BuildingProps, type PointProps } from '../src/build/pipeline';
+import { BBOX, nodes, relations, ways } from './build-fixtures';
 
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), '../../../assets/models');
 const tagMap = parseTagMap(JSON.parse(readFileSync(join(ASSETS, 'tag-map.json'), 'utf8')));

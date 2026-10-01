@@ -1,5 +1,5 @@
 import { parseArgs } from 'node:util';
-import type { BBox } from './osm';
+import type { BBox } from 'toytown-gl';
 
 export type Command =
   | { name: 'help' }

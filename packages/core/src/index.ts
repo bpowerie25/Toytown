@@ -16,6 +16,7 @@ export {
 export type { StyleOptions, LayerHost, StyleHost } from './style';
 export * from './geometry';
 export * from './classify';
+export * from './build';
 export {
   DEFAULT_THEME,
   NIGHT_THEME,

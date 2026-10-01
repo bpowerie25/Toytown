@@ -1,7 +1,7 @@
 import { geojson } from 'flatgeobuf';
 import { describe, expect, it } from 'vitest';
 import { toFlatGeobuf } from '../src/output';
-import type { ToyTownCollection } from '../src/pipeline';
+import type { ToyTownCollection } from 'toytown-gl';
 import { renderReport } from '../src/report';
 
 const fc: ToyTownCollection = {

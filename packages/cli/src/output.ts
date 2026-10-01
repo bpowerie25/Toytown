@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { geojson as fgb } from 'flatgeobuf';
-import type { Feature, ToyTownCollection } from './pipeline';
+import type { Feature, ToyTownCollection } from 'toytown-gl';
 
 async function write(path: string, data: string | Uint8Array): Promise<void> {
   await mkdir(dirname(path), { recursive: true });

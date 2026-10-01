@@ -1,7 +1,8 @@
 /**
  * Turn OSM ways and multipolygon relations into polygons (in lng/lat), including holes.
  */
-import { LocalProjection, pointInPolygon, signedArea, type LngLat, type XY } from 'toytown-gl';
+import { pointInPolygon, signedArea } from '../geometry/polygon';
+import { LocalProjection, type LngLat, type XY } from '../geometry/project';
 import type { OsmData, OsmRelation } from './osm';
 
 /** GeoJSON-style polygons: each is [outer, ...holes], rings closed. */

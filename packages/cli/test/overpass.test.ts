@@ -2,7 +2,7 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import { fromOverpassJson } from '../src/osm';
+import { fromOverpassJson } from 'toytown-gl';
 import { fetchOverpass, overpassQuery, slotWaitSeconds } from '../src/overpass';
 
 const response = {

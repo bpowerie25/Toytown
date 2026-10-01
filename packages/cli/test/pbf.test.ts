@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { readPbf } from '../src/pbf';
-import { BBOX, nodes, relations, ways } from './fixtures';
+import { BBOX, nodes, relations, ways } from '../../core/test/build-fixtures';
 import { encodePbf } from './pbf-writer';
 
 describe('readPbf', () => {

@@ -14,7 +14,7 @@ import { parseBuildDataArgs, parseCommand } from './args';
 import { writeFlatGeobuf, writeGeoJson } from './output';
 import { fetchOverpass } from './overpass';
 import { readPbf } from './pbf';
-import { buildData, type BuildStats } from './pipeline';
+import { buildData, type BuildStats } from 'toytown-gl';
 import { renderReport } from './report';
 
 // The default tag map, kit manifest and packs: copied next to the build (dist/defaults) so the
