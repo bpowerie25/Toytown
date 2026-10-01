@@ -1,5 +1,5 @@
 === Toytown Map ===
-Contributors: bpowerie
+Contributors: imperialresources
 Tags: map, 3d, openstreetmap, town, maplibre
 Requires at least: 6.5
 Tested up to: 7.1
