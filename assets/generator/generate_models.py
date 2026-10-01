@@ -560,7 +560,8 @@ def _nearest_faces(mesh, points):
         b2 = (d00 * d21 - d01 * d20) / den
         inside = (b1 >= -0.05) & (b2 >= -0.05) & (b1 + b2 <= 1.05)
         dist = np.where(inside, plane, np.linalg.norm(d, axis=1) + 0.25)
-        best[i] = int(np.argmin(dist))
+        # Round so near-ties are exact ties, which argmin breaks the same way on every platform.
+        best[i] = int(np.argmin(np.round(dist, 5)))
     return best
 
 def voxelize(mdl, max_tris=1900):
@@ -568,10 +569,15 @@ def voxelize(mdl, max_tris=1900):
     colour each cube like the nearest original surface. The cube size grows until the model fits
     the triangle budget."""
     parts, allm, labels = _combined(mdl)
+    # Kit models are built on round numbers, so many vertices would sit exactly on voxel
+    # boundaries, where float noise decides occupancy differently across platforms. Nudge the
+    # model off the grid by a fixed odd offset, and undo it afterwards.
+    nudge = np.array([0.0131, 0.0173, 0.0119])
+    allm = allm.copy(); allm.apply_translation(nudge)
     cube = trimesh.creation.box(extents=[1, 1, 1])
     dirs = [np.array(d) for d in ([1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1])]
     tmpl = {tuple(d): cube.triangles[np.isclose(cube.face_normals @ d, 1)] for d in dirs}
-    pitch = max(0.5, float(allm.extents.max()) / 18)
+    pitch = max(0.5, round(float(allm.extents.max()) / 18, 2))
     while True:
         vg = allm.voxelized(pitch)
         try:
@@ -585,7 +591,7 @@ def voxelize(mdl, max_tris=1900):
             idx = np.argwhere(occ & ~nb) - 1
             if len(idx): faces.append((d, idx))
         if sum(len(i) for _, i in faces) * 2 <= max_tris or pitch > 3: break
-        pitch *= 1.15
+        pitch = round(pitch * 1.15, 3)
     out = Model(mdl.name, mdl.pack)
     tris = {}
     for d, idx in faces:
@@ -595,7 +601,7 @@ def voxelize(mdl, max_tris=1900):
             tris.setdefault(int(lab), []).append(tmpl[tuple(d)] * pitch + c)
     bottom = min(float(np.min(np.array(t)[..., 2])) for t in tris.values())
     for lab, ts in sorted(tris.items()):
-        v = np.array(ts).reshape(-1, 3) - [0, 0, bottom]
+        v = np.round(np.array(ts).reshape(-1, 3) - nudge - [0, 0, bottom - nudge[2]], 4)
         m = trimesh.Trimesh(v, np.arange(len(v)).reshape(-1, 3), process=True)
         out.add(m, parts[lab][0])
     return out
@@ -620,6 +626,7 @@ def chunkify(mdl, max_tris=1900):
                 v[:, 0] *= 1.04 * bulge
                 v[:, 1] *= 1.04 * bulge
                 v[:, 2] = np.where(z > eave, eave * 0.8 + (z - eave) * 1.8, z * 0.8)
+                v = np.round(v, 4)  # same bytes on every platform, whatever its libm's sin()
                 out.add(trimesh.Trimesh(v, f, process=False), color)
                 n += len(f)
         if n <= max_tris: return out

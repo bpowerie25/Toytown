@@ -225,6 +225,7 @@ test.describe('demo', () => {
   });
 
   test('skin picker switches live, through every built-in skin', async ({ page }) => {
+    test.setTimeout(360_000); // about 20 skins, a re-plan and a screenshot each
     // Falling snow is animated; with reduced motion it's off, so screenshots are stable.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const errors: string[] = [];
