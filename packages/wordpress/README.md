@@ -19,8 +19,9 @@ visitor's browser. 20 skins, no API keys, no data files for areas up to 12 km².
 ## Build
 
 ```sh
-pnpm --filter toytown-gl build && pnpm --filter @toytown/wordpress build
+pnpm --filter toytown-gl build && pnpm --filter @toytown/wordpress zip
 # → packages/wordpress/dist/toytown-map.zip (Plugins → Add New → Upload Plugin)
+# (`build` alone assembles dist/toytown-map/, which the Docker test WordPress mounts)
 ```
 
 The zip is also attached to each GitHub release.

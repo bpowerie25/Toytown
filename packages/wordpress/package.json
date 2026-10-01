@@ -6,7 +6,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs",
+    "zip": "node build.mjs --zip"
   },
   "dependencies": {
     "maplibre-gl": "^6.11.2",

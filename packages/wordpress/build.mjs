@@ -1,6 +1,6 @@
 // Assemble the Toytown Map WordPress plugin: plugin/ plus its bundled libraries and model kit,
-// into dist/toytown-map/ and dist/toytown-map.zip (the file to upload or submit).
-//   pnpm --filter toytown-gl build && pnpm --filter @toytown/wordpress build
+// into dist/toytown-map/; with --zip, also dist/toytown-map.zip (the file to upload or submit).
+//   pnpm --filter toytown-gl build && pnpm --filter @toytown/wordpress zip
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -44,5 +44,9 @@ const readme = readFileSync(join(out, 'readme.txt'), 'utf8');
 const stable = /Stable tag:\s*([\d.]+)/.exec(readme)[1];
 if (version !== stable) throw new Error(`plugin version ${version} != readme stable tag ${stable}`);
 
-execFileSync('zip', ['-qr', 'toytown-map.zip', 'toytown-map'], { cwd: join(here, 'dist') });
-console.log(`built dist/toytown-map.zip (Toytown Map ${version})`);
+if (process.argv.includes('--zip')) {
+  execFileSync('zip', ['-qr', 'toytown-map.zip', 'toytown-map'], { cwd: join(here, 'dist') });
+  console.log(`built dist/toytown-map.zip (Toytown Map ${version})`);
+} else {
+  console.log(`built dist/toytown-map/ (Toytown Map ${version}); add --zip for the zip`);
+}
