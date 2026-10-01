@@ -17,7 +17,34 @@
     <script type="module">
       // The block editor's preview: the same view module, configured from the URL hash.
       const root = document.querySelector('.toytown-map');
-      root.dataset.config = decodeURIComponent(location.hash.slice(1));
+      // Settings come from the editor via the URL hash. Accept only what the editor sends: numbers,
+      // a known-shaped skin name, the model kit from this site, and an http(s) data URL.
+      const raw = JSON.parse(decodeURIComponent(location.hash.slice(1)) || '{}');
+      const url = (u, sameOrigin) => {
+        try {
+          const p = new URL(u, location.href);
+          if (!/^https?:$/.test(p.protocol) || (sameOrigin && p.origin !== location.origin)) return null;
+          return p.href;
+        } catch {
+          return null;
+        }
+      };
+      const num = (x, lo, hi, d) => (Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : d);
+      const config = {
+        preview: String(raw.preview ?? '').slice(0, 64),
+        lat: num(raw.lat, -85, 85, NaN),
+        lng: num(raw.lng, -180, 180, NaN),
+        size: num(raw.size, 0.3, 3.4, 1.5),
+        skin: /^[a-z]{1,20}$/.test(raw.skin) ? raw.skin : 'default',
+        zoom: num(raw.zoom, 13, 19, 16.2),
+        pitch: num(raw.pitch, 0, 70, 55),
+        bearing: num(raw.bearing, -180, 180, 0),
+        models: url(raw.models, true),
+        ...(raw.data && url(raw.data, false) ? { data: url(raw.data, false) } : {}),
+      };
+      if (!Number.isFinite(config.lat) || !Number.isFinite(config.lng) || !config.models)
+        throw new Error('Toytown Map preview: missing or invalid settings');
+      root.dataset.config = JSON.stringify(config);
       const { mount } = await import('./view.js');
       mount(root);
       // Tell the editor where the preview has been moved to, for its "Use this view" button.

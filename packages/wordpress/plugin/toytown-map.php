@@ -75,8 +75,11 @@ function toytown_map_config( $atts ) {
 		'models'  => plugins_url( 'public/models/manifest.json', __FILE__ ),
 	);
 	// Optional prebuilt data file (from `npx @toytown/cli build-data`), for towns over 12 km².
-	if ( ! empty( $atts['data'] ) ) {
-		$config['data'] = esc_url_raw( $atts['data'] );
+	if ( ! empty( $atts['data'] ) && is_string( $atts['data'] ) ) {
+		$data = esc_url_raw( $atts['data'], array( 'http', 'https' ) );
+		if ( $data ) {
+			$config['data'] = $data;
+		}
 	}
 	return $config;
 }
@@ -159,7 +162,8 @@ function toytown_map_register_block() {
 				'preview' => plugins_url( 'public/preview.html', __FILE__ ),
 				'models'  => plugins_url( 'public/models/manifest.json', __FILE__ ),
 				'skins'   => toytown_map_skins(),
-			)
+			),
+			JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
 		) . ';',
 		'before'
 	);
