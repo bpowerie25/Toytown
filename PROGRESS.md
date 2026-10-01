@@ -39,7 +39,13 @@ Updated at the end of each phase.
     from `default.json` by `scripts/make-skins.py`. Retro's first pass blended buildings into
     the ground (its two light greens are nearly equal), so walls and flat roofs use the darker
     shades.
-  - The demo picker became a dropdown of all 15 skins (dark skins get the dark panel). The e2e
+  - **Theme effects** (`effects` in a theme, all off by default): `halftone` and `wobble` in the
+    building and model shaders; `paper`, `haze` and `snow` as DOM overlays above the map canvas,
+    so they cover the base map too. Snow is off under `prefers-reduced-motion`, which the e2e test
+    uses for stable screenshots. They're used by three new skins, `comic`, `handdrawn` and
+    `golden`, and by snow on `winter` and `christmas`. Golden's first haze (0.85) turned the whole
+    scene orange, so it's now 0.6.
+  - The demo picker became a dropdown of all the skins (dark skins get the dark panel). The e2e
     test walks every skin in the dropdown and screenshots each on Tramore.
   - Earlier, the picker was buttons (Day / Night / Sitcom / Pastel / Winter / Blueprint) that switches live and keeps `?theme=`
     in the URL. A new e2e test covers the picker with sitcom and pastel baselines. The night

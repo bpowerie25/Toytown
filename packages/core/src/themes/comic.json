@@ -1,0 +1,240 @@
+{
+  "name": "comic",
+  "buildings": {
+    "windows": "#9FE2FF",
+    "roofs": ["#E63946", "#3A86FF", "#141414"],
+    "flatRoof": "#E9E1CF",
+    "walls": {
+      "default": ["#F4F1DE", "#F4F1DE", "#F4F1DE"],
+      "house": ["#E63946", "#FFD23F", "#3A86FF", "#F4F1DE", "#06D6A0", "#FF8C42"],
+      "bungalow": ["#E63946", "#FFD23F", "#3A86FF", "#F4F1DE", "#06D6A0", "#FF8C42"],
+      "semi_detached": ["#E63946", "#FFD23F", "#3A86FF", "#F4F1DE", "#06D6A0", "#FF8C42"],
+      "terraced_house": ["#E63946", "#FFD23F", "#3A86FF", "#F4F1DE", "#06D6A0", "#FF8C42"],
+      "apartment": ["#F4F1DE", "#F4F1DE", "#F4F1DE"],
+      "tower_block": ["#F4F1DE", "#F4F1DE"],
+      "shop": ["#06D6A0", "#3A86FF", "#F4F1DE", "#E63946"],
+      "supermarket": ["#F4F1DE", "#F4F1DE"],
+      "cafe": ["#3A86FF", "#F4F1DE", "#06D6A0"],
+      "pub": ["#F4F1DE", "#F4F1DE", "#3A86FF"],
+      "pharmacy": ["#F4F1DE"],
+      "bank": ["#3A86FF"],
+      "office": ["#06D6A0", "#F4F1DE"],
+      "hotel": ["#F4F1DE", "#F4F1DE"],
+      "petrol_station": ["#F4F1DE"],
+      "hospital": ["#F4F1DE", "#F4F1DE"],
+      "school": ["#3A86FF", "#F4F1DE"],
+      "library": ["#3A86FF", "#3A86FF"],
+      "town_hall": ["#3A86FF"],
+      "police_station": ["#F4F1DE"],
+      "fire_station": ["#3A86FF"],
+      "church": ["#3A86FF"],
+      "train_station": ["#3A86FF"],
+      "warehouse": ["#E63946", "#F4F1DE", "#E63946"],
+      "factory": ["#E63946", "#F4F1DE"],
+      "barn": ["#FFD23F"],
+      "parking_garage": ["#F4F1DE"],
+      "round_tower": ["#3A86FF"],
+      "lighthouse": ["#F4F1DE"],
+      "generic": ["#F4F1DE", "#F4F1DE", "#F4F1DE"]
+    },
+    "pitchedRoofs": {
+      "categories": [
+        "house",
+        "bungalow",
+        "semi_detached",
+        "terraced_house",
+        "apartment",
+        "pub",
+        "church",
+        "school"
+      ],
+      "minRectangularity": 0.85,
+      "pitchDeg": 35,
+      "maxRoofHeightRatio": 0.45,
+      "maxRoofHeight": 8,
+      "overhang": 0.3,
+      "hipShare": {
+        "default": 0.4,
+        "church": 0,
+        "pub": 0,
+        "terraced_house": 0,
+        "school": 1,
+        "apartment": 0.7
+      }
+    },
+    "flat": {
+      "bevel": 0.3,
+      "parapetHeight": 0.6,
+      "parapetWidth": 0.3
+    },
+    "windowsOff": ["barn", "parking_garage"],
+    "minWindowHeight": 3.5,
+    "floorHeight": 3,
+    "windowGlow": 0,
+    "frame": "#FFFFFF",
+    "door": "#141414",
+    "windowStyles": {
+      "grid": {
+        "spacing": 3.0,
+        "width": 0.42,
+        "height": 0.46,
+        "frame": true
+      },
+      "house": {
+        "spacing": 3.6,
+        "width": 0.36,
+        "height": 0.44,
+        "frame": true,
+        "door": true
+      },
+      "shop": {
+        "spacing": 3.2,
+        "width": 0.38,
+        "height": 0.44,
+        "frame": true,
+        "shopfront": true
+      },
+      "church": {
+        "spacing": 4.2,
+        "width": 0.26,
+        "height": 0,
+        "tall": true
+      },
+      "strip": {
+        "spacing": 4.0,
+        "width": 0.9,
+        "height": 0,
+        "strip": true
+      },
+      "sparse": {
+        "spacing": 4.6,
+        "width": 0.3,
+        "height": 0.4,
+        "frame": true
+      }
+    },
+    "windowStyleFor": {
+      "default": "grid",
+      "house": "house",
+      "bungalow": "house",
+      "semi_detached": "house",
+      "terraced_house": "house",
+      "shop": "shop",
+      "cafe": "shop",
+      "pub": "shop",
+      "pharmacy": "shop",
+      "bank": "shop",
+      "supermarket": "shop",
+      "church": "church",
+      "factory": "strip",
+      "warehouse": "strip",
+      "generic": "sparse"
+    }
+  },
+  "lighting": {
+    "ambient": 0.62,
+    "sun": 0.38,
+    "sunDirection": [-0.45, -0.6, 0.66],
+    "toonSteps": [0.35, 1.0]
+  },
+  "outline": {
+    "color": "#141414",
+    "hullWidth": 0.3,
+    "edgeWidth": 2.2,
+    "inkShade": 0.0,
+    "inkMix": 1.0,
+    "fadeStart": 0.8,
+    "fadeEnd": 1.8
+  },
+  "models": {
+    "palette": {
+      "roof_red": "#E63946",
+      "roof_slate": "#3A86FF",
+      "wall_pink": "#3A86FF",
+      "wall_yellow": "#F4F1DE",
+      "wall_blue": "#E63946",
+      "wall_mint": "#06D6A0",
+      "wall_cream": "#F4F1DE",
+      "window": "#9FE2FF",
+      "brick": "#3A86FF",
+      "awning": "#3A86FF",
+      "red": "#FFD23F",
+      "fire_red": "#FFD23F",
+      "pub_green": "#F4F1DE",
+      "barn_red": "#FFD23F",
+      "glass": "#9FE2FF",
+      "glass_band": "#06D6A0",
+      "leaf": "#5DBB63",
+      "roof_flat": "#E9E1CF",
+      "stone": "#3A86FF",
+      "concrete": "#F4F1DE",
+      "offwhite": "#F4F1DE",
+      "trunk": "#8B5A2B",
+      "white": "#FFFFFF"
+    },
+    "exclude": ["generic", "tree"],
+    "fit": {
+      "minScale": 0.75,
+      "maxScale": 1.3,
+      "aspectTolerance": 0.35,
+      "minRectangularity": 0.8,
+      "minCoverage": 0.6,
+      "heightTolerance": 1.6,
+      "detachedOnly": true,
+      "heightExempt": ["church", "round_tower", "lighthouse"]
+    },
+    "trees": {
+      "minScale": 0.8,
+      "maxScale": 1.25
+    },
+    "glow": []
+  },
+  "style": {
+    "land": "#FFF4D6",
+    "water": "#5BC0EB",
+    "grass": "#9BDE7E",
+    "wood": "#5DBB63",
+    "sand": "#FFE08A",
+    "road": "#FFFFFF",
+    "road_casing": "#141414",
+    "major_road": "#FFE45C",
+    "major_road_casing": "#141414",
+    "rail": "#141414",
+    "label": "#141414",
+    "label_halo": "#FFFFFF",
+    "building": "#F2E2C4",
+    "building_outline": "#141414"
+  },
+  "areas": {
+    "fill": {
+      "default": "#9BDE7E",
+      "park": "#9BDE7E",
+      "garden": "#9BDE7E",
+      "grass": "#9BDE7E",
+      "cemetery": "#9BDE7E",
+      "golf_course": "#9BDE7E",
+      "sports_ground": "#9BDE7E",
+      "pitch": "#5DBB63",
+      "pitch_soccer": "#5DBB63",
+      "pitch_gaa": "#5DBB63",
+      "pitch_court": "#FF8C42",
+      "playground": "#FFD23F",
+      "racecourse": "#9BDE7E",
+      "track": "#9BDE7E"
+    },
+    "outline": "#141414",
+    "stripe": "#4FAE55",
+    "markings": "#FFFFFF",
+    "rail": "#FFFFFF",
+    "trackSurface": "#E63946",
+    "turfTrack": "#4FAE55",
+    "label": "#141414",
+    "labelHalo": "#FFFFFF"
+  },
+  "effects": {
+    "halftone": {
+      "size": 7,
+      "strength": 1.0
+    }
+  }
+}

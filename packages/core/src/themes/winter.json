@@ -232,5 +232,10 @@
     "turfTrack": "#D3DFE9",
     "label": "#2F3B4C",
     "labelHalo": "#FFFFFF"
+  },
+  "effects": {
+    "snow": {
+      "density": 0.45
+    }
   }
 }

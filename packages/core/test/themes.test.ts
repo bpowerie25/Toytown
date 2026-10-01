@@ -179,3 +179,18 @@ describe('pack manifests', () => {
     expect(() => parsePackManifest(bad)).toThrow(ManifestError);
   });
 });
+
+describe('theme effects', () => {
+  it('comic has halftone, handdrawn has wobble and paper, golden has haze, winter has snow', () => {
+    expect(THEMES.comic!.effects?.halftone?.strength).toBeGreaterThan(0);
+    expect(THEMES.handdrawn!.effects?.wobble).toBeGreaterThan(0);
+    expect(THEMES.handdrawn!.effects?.paper).toBeGreaterThan(0);
+    expect(THEMES.golden!.effects?.haze?.color).toMatch(/^#[0-9A-F]{6}$/);
+    expect(THEMES.winter!.effects?.snow?.density).toBeGreaterThan(0);
+  });
+
+  it('the original look has no effects', () => {
+    expect(DEFAULT_THEME.effects).toBeUndefined();
+    expect(NIGHT_THEME.effects).toBeUndefined();
+  });
+});

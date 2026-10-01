@@ -12,6 +12,7 @@ import {
   type PointFeature,
 } from './placement';
 import { addAreaLayers, removeAreaLayers } from './render/area-style';
+import { EffectsOverlay } from './render/effects';
 import { SceneFrame } from './render/frame';
 import { ToyTownLayer, type ChunkInput, type PickHit } from './render/layer';
 import type { LodOptions } from './render/lod';
@@ -88,6 +89,7 @@ export class ToyTown {
   private layer?: ToyTownLayer;
   private pool?: ChunkPool;
   private overlay?: DebugOverlay;
+  private effects?: EffectsOverlay;
   private theme: Theme;
   private areaData?: AreaLayers;
   private readonly id: string;
@@ -137,6 +139,8 @@ export class ToyTown {
   remove(): void {
     this.pool?.terminate();
     this.overlay?.remove();
+    this.effects?.remove();
+    this.effects = undefined;
     this.map?.off('click', this.onClick);
     if (this.map?.getLayer(this.id)) this.map.removeLayer(this.id);
     if (this.map) removeAreaLayers(this.map, this.id);
@@ -212,6 +216,7 @@ export class ToyTown {
           addAreaLayers(map, this.id, this.areaData, this.theme, this.id);
         }
       };
+      this.effects?.set(this.theme.effects);
       if (map.isStyleLoaded()) restyle();
       else map.once('load', restyle);
     }
@@ -243,6 +248,8 @@ export class ToyTown {
     // Draw under the labels.
     const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
     map.addLayer(this.layer, firstSymbol);
+    this.effects = new EffectsOverlay(map);
+    this.effects.set(this.theme.effects);
     if (this.options.debug) this.overlay = new DebugOverlay(map, () => this.layer?.stats());
 
     const [data, manifest] = await Promise.all([

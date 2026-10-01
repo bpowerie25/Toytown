@@ -13,6 +13,9 @@ import sketchTheme from './sketch.json';
 import christmasTheme from './christmas.json';
 import halloweenTheme from './halloween.json';
 import shamrockTheme from './shamrock.json';
+import comicTheme from './comic.json';
+import handdrawnTheme from './handdrawn.json';
+import goldenTheme from './golden.json';
 
 /** Building look: colours, roof rules and window settings. All colours are exact hex. */
 export interface BuildingTheme {
@@ -160,6 +163,20 @@ export interface AreaTheme {
   labelHalo: string;
 }
 
+/** Optional finishing effects. All default to off. */
+export interface EffectsTheme {
+  /** Comic-book dots in the shadows of buildings and models: dot spacing in CSS pixels, strength 0–1. */
+  halftone?: { size: number; strength: number };
+  /** Hand-drawn ink: building edge lines vary in width along their length (0 = off, 1 = full). */
+  wobble?: number;
+  /** Paper grain over the whole map, as an opacity (0–1). */
+  paper?: number;
+  /** Haze towards the horizon, stronger as the map is pitched: colour and opacity (0–1). */
+  haze?: { color: string; amount: number };
+  /** Falling snow, density 0–1. Off for users who prefer reduced motion. */
+  snow?: { density: number };
+}
+
 export interface Theme {
   name: string;
   /** Base map colours by style palette key (land, water, grass, roads, labels…). */
@@ -170,6 +187,7 @@ export interface Theme {
   models: ModelsTheme;
   /** Optional in custom themes; the default theme's areas are used when missing. */
   areas?: AreaTheme;
+  effects?: EffectsTheme;
 }
 
 export const DEFAULT_THEME = defaultTheme as unknown as Theme;
@@ -185,7 +203,8 @@ export const BLUEPRINT_THEME = blueprintTheme as unknown as Theme;
 
 /**
  * Built-in themes (skins) by name: `default`, `night`, `sitcom`, `pastel`, `winter`, `blueprint`,
- * `neon`, `vintage`, `toybox`, `retro`, `autumn`, `sketch`, `christmas`, `halloween`, `shamrock`.
+ * `neon`, `vintage`, `toybox`, `retro`, `autumn`, `sketch`, `christmas`, `halloween`, `shamrock`,
+ * `comic`, `handdrawn`, `golden`.
  */
 export const THEMES: Record<string, Theme> = {
   default: DEFAULT_THEME,
@@ -203,6 +222,9 @@ export const THEMES: Record<string, Theme> = {
   christmas: christmasTheme as unknown as Theme,
   halloween: halloweenTheme as unknown as Theme,
   shamrock: shamrockTheme as unknown as Theme,
+  comic: comicTheme as unknown as Theme,
+  handdrawn: handdrawnTheme as unknown as Theme,
+  golden: goldenTheme as unknown as Theme,
 };
 
 /** A theme by name (`default`, `night`) or as an object; undefined means the default theme. */

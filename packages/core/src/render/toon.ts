@@ -28,6 +28,29 @@ export const rgb = (hex: string) =>
   );
 const vec = (hex: string) => new Vector3(...hexToRgb(hex).map((c) => c / 255));
 
+/**
+ * Comic halftone: dots in a 45° screen-space grid whose size grows with how far a fragment is
+ * from fully lit. `uHalftone` is (cell size in device pixels, strength); strength 0 is off.
+ */
+const halftoneGlsl = /* glsl */ `
+uniform vec2 uHalftone;
+vec3 halftone(vec3 lit, vec3 base) {
+  if (uHalftone.y <= 0.0) return lit;
+  const vec3 W = vec3(0.299, 0.587, 0.114);
+  float shade = clamp(1.0 - dot(lit, W) / max(dot(base, W), 1e-3), 0.0, 1.0);
+  vec2 p = mat2(0.7071, -0.7071, 0.7071, 0.7071) * gl_FragCoord.xy / uHalftone.x;
+  float d = length(fract(p) - 0.5);
+  float r = 0.55 * sqrt(clamp(shade * uHalftone.y * 2.2, 0.0, 1.0));
+  float aa = max(fwidth(d), 1e-4);
+  return mix(lit, lit * 0.42, 1.0 - smoothstep(r - aa, r + aa, d));
+}`;
+
+const pixelRatio = () => (typeof devicePixelRatio === 'number' ? devicePixelRatio : 1);
+const halftoneUniform = (theme: Theme) => {
+  const h = theme.effects?.halftone;
+  return { value: h ? [h.size * pixelRatio(), h.strength] : [1, 0] };
+};
+
 /** The toon ramp: one texel per brightness step, darkest to lightest. */
 export function gradientMap(steps: number[]): DataTexture {
   const t = new DataTexture(
@@ -78,6 +101,7 @@ export function createModelMaterial(theme: Theme): MeshToonMaterial {
     gradientMap: gradientMap(theme.lighting.toonSteps),
   });
   m.onBeforeCompile = (shader) => {
+    shader.uniforms.uHalftone = halftoneUniform(theme);
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
@@ -85,10 +109,11 @@ export function createModelMaterial(theme: Theme): MeshToonMaterial {
       )
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlow = aGlow;');
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying float vGlow;')
+      .replace('#include <common>', `#include <common>\nvarying float vGlow;\n${halftoneGlsl}`)
       .replace(
         '#include <dithering_fragment>',
-        '#include <dithering_fragment>\ngl_FragColor.rgb = mix(gl_FragColor.rgb, diffuseColor.rgb, vGlow);',
+        `#include <dithering_fragment>
+gl_FragColor.rgb = mix(halftone(gl_FragColor.rgb, diffuseColor.rgb), diffuseColor.rgb, vGlow);`,
       );
   };
   return m;
@@ -223,6 +248,8 @@ export function createBuildingMaterial(theme: Theme): MeshToonMaterial {
       uFloor: { value: b.floorHeight },
       uEdgeWidth: { value: o.edgeWidth },
       uInkTone: { value: [o.inkShade ?? 0.45, o.inkMix ?? 0.35] },
+      uWobble: { value: theme.effects?.wobble ?? 0 },
+      uHalftone: halftoneUniform(theme),
       uFade: { value: [o.fadeStart, o.fadeEnd] },
       uWindowGlow: { value: b.windowGlow },
     });
@@ -257,13 +284,27 @@ uniform vec3 uInk;
 uniform float uFloor;
 uniform float uEdgeWidth;
 uniform vec2 uInkTone; // face shade, mix towards uInk
+uniform float uWobble;
 uniform vec2 uFade;
 uniform float uWindowGlow;
 varying vec4 vWall; // u along edge, height, edge length (0 = no windows), eave height
 varying vec4 vEdge;
 varying vec4 vWin;
 varying vec3 vLocal;
-${wallDetail}`,
+${wallDetail}
+${halftoneGlsl}
+float hash12(vec2 p) {
+  vec3 q = fract(vec3(p.xyx) * 0.1031);
+  q += dot(q, q.yzx + 33.33);
+  return fract((q.x + q.y) * q.z);
+}
+float vnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash12(i), hash12(i + vec2(1.0, 0.0)), u.x),
+             mix(hash12(i + vec2(0.0, 1.0)), hash12(i + vec2(1.0, 1.0)), u.x), u.y);
+}`,
       )
       .replace(
         '#include <color_fragment>',
@@ -289,12 +330,15 @@ if (vEdge.x > 0.99 && vEdge.y > 0.99 && vEdge.z > 0.99) {
         '#include <dithering_fragment>',
         `#include <dithering_fragment>
 // Night: window glass glows at full colour, whatever the light.
-gl_FragColor.rgb = mix(gl_FragColor.rgb, uWindow, glass * uWindowGlow);
+gl_FragColor.rgb = mix(halftone(gl_FragColor.rgb, diffuseColor.rgb), uWindow, glass * uWindowGlow);
 vec3 bc = vEdge.xyz;
 if (vEdge.w < 0.5) bc.y = 1.0; // quad: skip the diagonal
 // smoothstep is undefined when both edges are equal: constant channels (decks, the quad's
 // ignored y) have fwidth 0, so keep the upper edge above zero.
-vec3 aa = smoothstep(vec3(0.0), max(fwidth(bc) * uEdgeWidth, vec3(1e-5)), bc);
+// Hand-drawn wobble: the line width wanders along the edge (noise over the building's surface).
+float wob = vnoise(vLocal.xy * 0.45 + vLocal.z * 0.3) * 0.7 + vnoise(vLocal.yx * 1.7 + vLocal.z) * 0.3;
+float width = uEdgeWidth * mix(1.0, 0.25 + 1.6 * wob, uWobble);
+vec3 aa = smoothstep(vec3(0.0), max(fwidth(bc) * width, vec3(1e-5)), bc);
 float ink = uEdgeWidth > 0.0 ? (1.0 - min(min(aa.x, aa.y), aa.z)) * detail : 0.0;
 // Ink is a darker tone of the face itself, nudged towards the theme's ink colour.
 gl_FragColor.rgb = mix(gl_FragColor.rgb, mix(gl_FragColor.rgb * uInkTone.x, uInk, uInkTone.y), ink);`,

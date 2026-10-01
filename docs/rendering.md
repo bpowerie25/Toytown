@@ -139,25 +139,30 @@ overlapping geometry always draws the same way, whatever order the workers finis
 
 ## Themes
 
-A theme (a "skin") is JSON in `packages/core/src/themes/`. There are 15 built in:
+A theme (a "skin") is JSON in `packages/core/src/themes/`. There are 18 built in:
 
-| Skin        | Look                                                                       |
-| ----------- | -------------------------------------------------------------------------- |
-| `default`   | Warm cream and terracotta, soft toon shading.                              |
-| `night`     | Dark blue, glowing yellow windows.                                         |
-| `sitcom`    | Flat saturated colours, solid black outlines, hard two-band shading.       |
-| `pastel`    | Soft candy colours, gentle shading, faint tinted edges, no model outlines. |
-| `toybox`    | Primary-coloured plastic bricks on a green baseplate, chunky outlines.     |
-| `retro`     | Four shades of green, like an old pocket game console.                     |
-| `neon`      | Synthwave night: dark purple, magenta line work, glowing cyan windows.     |
-| `vintage`   | An old postcard: aged paper, sepia walls, brown ink.                       |
-| `sketch`    | White buildings, black pen lines, cream paper.                             |
-| `blueprint` | Paper blue, white line work on every edge, flat shading.                   |
-| `autumn`    | Orange trees, golden low light, warm brick.                                |
-| `winter`    | Snow on the ground and roofs, evergreens, warm glowing windows.            |
-| `christmas` | Snow, red and green houses, warm lights.                                   |
-| `halloween` | Purple dusk, orange glowing windows, bare dark trees.                      |
-| `shamrock`  | Greens, white and gold.                                                    |
+| Skin        | Look                                                                             |
+| ----------- | -------------------------------------------------------------------------------- |
+| `default`   | Warm cream and terracotta, soft toon shading.                                    |
+| `night`     | Dark blue, glowing yellow windows.                                               |
+| `sitcom`    | Flat saturated colours, solid black outlines, hard two-band shading.             |
+| `pastel`    | Soft candy colours, gentle shading, faint tinted edges, no model outlines.       |
+| `toybox`    | Primary-coloured plastic bricks on a green baseplate, chunky outlines.           |
+| `retro`     | Four shades of green, like an old pocket game console.                           |
+| `neon`      | Synthwave night: dark purple, magenta line work, glowing cyan windows.           |
+| `vintage`   | An old postcard: aged paper, sepia walls, brown ink.                             |
+| `sketch`    | White buildings, black pen lines, cream paper.                                   |
+| `blueprint` | Paper blue, white line work on every edge, flat shading.                         |
+| `autumn`    | Orange trees, golden low light, warm brick.                                      |
+| `winter`    | Snow on the ground and roofs, evergreens, warm glowing windows.                  |
+| `christmas` | Snow, red and green houses, warm lights.                                         |
+| `halloween` | Purple dusk, orange glowing windows, bare dark trees.                            |
+| `shamrock`  | Greens, white and gold.                                                          |
+| `comic`     | Bold flat colours, black ink, halftone dots in the shadows (effect: `halftone`). |
+| `handdrawn` | Watercolour washes, wobbly brown ink, paper grain (effects: `wobble`, `paper`).  |
+| `golden`    | Low warm sun, long shadows, haze towards the horizon (effect: `haze`).           |
+
+`winter` and `christmas` also have falling snow (effect: `snow`).
 
 The skins after `blueprint` are generated from `default.json` by `scripts/make-skins.py`, which
 records each skin's colour mapping; edit it and rerun it to retune them. Pass one to `new ToyTown({ theme })` and `ToyTown.style({ theme })`, or switch live with
@@ -179,6 +184,18 @@ A theme has:
   black lines.
 - `areas`: open-space fills per area category, pitch stripes and markings, track surfaces and
   rails, and label colours. Optional in custom themes, which fall back to the default's.
+- `effects` (optional): finishing touches, all off by default.
+  - `halftone: { size, strength }`: comic dots in the shadows of buildings and models, in a 45°
+    screen-space grid (`size` is the dot spacing in CSS pixels). Drawn in the shaders.
+  - `wobble`: 0–1. Building edge lines vary in width along their length, like hand-inked lines.
+  - `paper`: 0–1. Paper grain over the whole map, a seeded tile multiplied over the canvas.
+  - `haze: { color, amount }`: a gradient from the top of the view, faded in as the map is
+    pitched (none looking straight down, full from about 65°).
+  - `snow: { density }`: falling flakes on a 2D canvas. Off for users who prefer reduced motion.
+
+  Paper, haze and snow are DOM overlays above the map canvas and below the controls, so they
+  cover the base map and the 3D layer alike.
+
 - `models`: palette overrides for the kit, `glow` palette keys (shown unlit, e.g. `window` at
   night), fit rules and tree sizes.
 

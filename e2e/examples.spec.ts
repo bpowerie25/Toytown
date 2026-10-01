@@ -225,6 +225,8 @@ test.describe('demo', () => {
   });
 
   test('skin picker switches live, through every built-in skin', async ({ page }) => {
+    // Falling snow is animated; with reduced motion it's off, so screenshots are stable.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto('/tramore/');

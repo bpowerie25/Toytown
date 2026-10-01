@@ -272,6 +272,65 @@ SKINS['shamrock'] = lambda: skin(
                    '#D7865F', '#6DB561', '#1F4A2C', '#FFFFFF', park='#A9DA8C'),
 )
 
+# Comic book: bold flat colours, black ink, halftone dots in the shadows.
+SKINS['comic'] = lambda: skin(
+    'comic',
+    style=style('#FFF4D6', '#5BC0EB', '#9BDE7E', '#5DBB63', '#FFE08A', '#FFFFFF', '#141414',
+                '#FFE45C', '#141414', '#141414', '#141414', '#FFFFFF', '#F2E2C4', '#141414'),
+    wall=lambda h: ['#E63946', '#FFD23F', '#3A86FF', '#F4F1DE', '#06D6A0'][int(hsv(h)[0] * 5 + lum(h) * 3) % 5],
+    houses=['#E63946', '#FFD23F', '#3A86FF', '#F4F1DE', '#06D6A0', '#FF8C42'],
+    roofs=['#E63946', '#3A86FF', '#141414'], flat_roof='#E9E1CF', windows='#9FE2FF',
+    frame='#FFFFFF', door='#141414',
+    lighting={'ambient': 0.62, 'sun': 0.38, 'sunDirection': [-0.45, -0.6, 0.66],
+              'toonSteps': [0.35, 1.0]},
+    outline={'color': '#141414', 'hullWidth': 0.3, 'edgeWidth': 2.2, 'inkShade': 0.0,
+             'inkMix': 1.0, 'fadeStart': 0.8, 'fadeEnd': 1.8},
+    model_extra={'leaf': '#5DBB63', 'trunk': '#8B5A2B', 'white': '#FFFFFF'},
+    areas=area_set('#9BDE7E', '#5DBB63', '#FF8C42', '#FFD23F', '#141414', '#4FAE55', '#FFFFFF',
+                   '#E63946', '#4FAE55', '#141414', '#FFFFFF'),
+    effects={'halftone': {'size': 7, 'strength': 1.0}},
+)
+
+# A storybook drawing: watercolour washes on paper, wobbly brown ink.
+SKINS['handdrawn'] = lambda: skin(
+    'handdrawn',
+    style=style('#F5EEDC', '#A9CBD6', '#CFE0B4', '#A9C48E', '#F1E3C0', '#FBF7EC', '#6B5440',
+                '#F7E7C2', '#6B5440', '#6B5440', '#4A3828', '#F5EEDC', '#E9DDC2', '#6B5440'),
+    wall=lambda h: mix(from_hsv(hsv(h)[0], min(0.32, hsv(h)[1] * 1.3 + 0.06), 0.94), '#F5EEDC', 0.2),
+    houses=['#EBC9B5', '#E8DAA8', '#C9DBC0', '#C8D6E6', '#F1E6D2', '#E2C2C8'],
+    roofs=['#C27B62', '#7E8BA3', '#9A7A62'], flat_roof='#E3D6BC', windows='#B9D3DA',
+    frame='#FBF7EC', door='#7A5238',
+    lighting={'ambient': 0.66, 'sun': 0.34, 'sunDirection': [-0.45, -0.6, 0.66],
+              'toonSteps': [0.2, 0.6, 1.0]},
+    outline={'color': '#4A3828', 'hullWidth': 0.1, 'edgeWidth': 1.6, 'inkShade': 0.45,
+             'inkMix': 0.8, 'fadeStart': 0.6, 'fadeEnd': 1.4},
+    model_extra={'leaf': '#9CBF7E', 'trunk': '#7A5A40'},
+    areas=area_set('#CFE0B4', '#BCD6A0', '#E0B49A', '#EEDDB0', '#8F7A5E', '#B3CF96', '#FBF7EC',
+                   '#D9A383', '#B3CF96', '#4A3828', '#F5EEDC'),
+    effects={'wobble': 1.0, 'paper': 0.55},
+)
+
+# Golden hour: low warm sun, long shadows, haze towards the horizon.
+SKINS['golden'] = lambda: skin(
+    'golden',
+    style=style('#F4DDB4', '#E2A97E', '#D9C98A', '#B49A5E', '#F6D6A0', '#FFF1D6', '#D9A86E',
+                '#FFD98C', '#C98A44', '#B08A6E', '#5A3418', '#FFF1D6', '#EBCB9A', '#D9A86E'),
+    wall=lambda h: mix(from_hsv(0.08 + (hsv(h)[0] - 0.08) * 0.3, min(0.45, hsv(h)[1] * 1.4 + 0.12),
+                                hsv(h)[2]), '#FFC98A', 0.18),
+    houses=['#F2C79A', '#EFAE8E', '#F4D58E', '#D9B8A8', '#F6E2BE', '#E8A87C'],
+    roofs=['#B24A36', '#6E4E5A'], flat_roof='#E5C79C', windows='#FFE2A0', frame='#FFF1D6',
+    door='#6B3A24', window_glow=0.3, glow=['window'],
+    lighting={'ambient': 0.46, 'sun': 0.54, 'sunDirection': [-0.85, -0.25, 0.3],
+              'toonSteps': [0.0, 0.4, 0.75, 1.0],
+              'hemisphere': {'sky': '#FFC98A', 'ground': '#8A5A6E', 'intensity': 0.18}},
+    outline={'color': '#4A2A20', 'hullWidth': 0.12, 'edgeWidth': 1.1, 'fadeStart': 0.35,
+             'fadeEnd': 0.9},
+    model_extra={'leaf': '#9AA650', 'trunk': '#6B4226'},
+    areas=area_set('#D9C98A', '#C4C276', '#D98F6E', '#F3D08E', '#B8A066', '#B5B56A', '#FFF1D6',
+                   '#D7865F', '#B5B56A', '#5A3418', '#FFF1D6'),
+    effects={'haze': {'color': '#FFC98A', 'amount': 0.6}},
+)
+
 if __name__ == '__main__':
     written = []
     for name in sys.argv[1:] or SKINS:
