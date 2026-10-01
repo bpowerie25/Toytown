@@ -1,0 +1,234 @@
+{
+  "name": "sketch",
+  "buildings": {
+    "windows": "#DCE3E6",
+    "roofs": ["#E4DED1", "#D6D0C3"],
+    "flatRoof": "#F1ECE0",
+    "walls": {
+      "default": ["#FDFDFC", "#FDFCFB", "#FCFBFA"],
+      "house": ["#FFFFFF", "#FBF8F1", "#F4F0E6"],
+      "bungalow": ["#FFFFFF", "#FBF8F1", "#F4F0E6"],
+      "semi_detached": ["#FFFFFF", "#FBF8F1", "#F4F0E6"],
+      "terraced_house": ["#FFFFFF", "#FBF8F1", "#F4F0E6"],
+      "apartment": ["#FDFDFC", "#FEFEFD", "#FCFBFA"],
+      "tower_block": ["#FCFBF9", "#FCFBFA"],
+      "shop": ["#FCFBFA", "#FBFAF8", "#FCFBFA", "#FBFAF8"],
+      "supermarket": ["#FDFDFC", "#FCFBF9"],
+      "cafe": ["#FBFAF8", "#FCFBFA", "#FCFBFA"],
+      "pub": ["#F2EFE7", "#FDFDFC", "#F7F5F1"],
+      "pharmacy": ["#FEFEFD"],
+      "bank": ["#FBFAF7"],
+      "office": ["#FBFAF7", "#FCFBF9"],
+      "hotel": ["#FDFDFC", "#FEFEFD"],
+      "petrol_station": ["#FEFEFD"],
+      "hospital": ["#FFFEFE", "#FEFEFD"],
+      "school": ["#F7F5F1", "#FDFDFC"],
+      "library": ["#F7F5F1", "#FBFAF7"],
+      "town_hall": ["#FBFAF7"],
+      "police_station": ["#FEFEFD"],
+      "fire_station": ["#F7F5F1"],
+      "church": ["#FBFAF7"],
+      "train_station": ["#F7F5F1"],
+      "warehouse": ["#FBFAF8", "#FCFBF9", "#F8F7F3"],
+      "factory": ["#FBFAF8", "#FCFBF9"],
+      "barn": ["#F3F1EA"],
+      "parking_garage": ["#FCFBF9"],
+      "round_tower": ["#FBFAF7"],
+      "lighthouse": ["#FEFEFD"],
+      "generic": ["#FCFCFB", "#FCFBF9", "#FDFDFC"]
+    },
+    "pitchedRoofs": {
+      "categories": [
+        "house",
+        "bungalow",
+        "semi_detached",
+        "terraced_house",
+        "apartment",
+        "pub",
+        "church",
+        "school"
+      ],
+      "minRectangularity": 0.85,
+      "pitchDeg": 35,
+      "maxRoofHeightRatio": 0.45,
+      "maxRoofHeight": 8,
+      "overhang": 0.3,
+      "hipShare": {
+        "default": 0.4,
+        "church": 0,
+        "pub": 0,
+        "terraced_house": 0,
+        "school": 1,
+        "apartment": 0.7
+      }
+    },
+    "flat": {
+      "bevel": 0.3,
+      "parapetHeight": 0.6,
+      "parapetWidth": 0.3
+    },
+    "windowsOff": ["barn", "parking_garage"],
+    "minWindowHeight": 3.5,
+    "floorHeight": 3,
+    "windowGlow": 0,
+    "frame": "#FFFFFF",
+    "door": "#BDB6A8",
+    "windowStyles": {
+      "grid": {
+        "spacing": 3.0,
+        "width": 0.42,
+        "height": 0.46,
+        "frame": true
+      },
+      "house": {
+        "spacing": 3.6,
+        "width": 0.36,
+        "height": 0.44,
+        "frame": true,
+        "door": true
+      },
+      "shop": {
+        "spacing": 3.2,
+        "width": 0.38,
+        "height": 0.44,
+        "frame": true,
+        "shopfront": true
+      },
+      "church": {
+        "spacing": 4.2,
+        "width": 0.26,
+        "height": 0,
+        "tall": true
+      },
+      "strip": {
+        "spacing": 4.0,
+        "width": 0.9,
+        "height": 0,
+        "strip": true
+      },
+      "sparse": {
+        "spacing": 4.6,
+        "width": 0.3,
+        "height": 0.4,
+        "frame": true
+      }
+    },
+    "windowStyleFor": {
+      "default": "grid",
+      "house": "house",
+      "bungalow": "house",
+      "semi_detached": "house",
+      "terraced_house": "house",
+      "shop": "shop",
+      "cafe": "shop",
+      "pub": "shop",
+      "pharmacy": "shop",
+      "bank": "shop",
+      "supermarket": "shop",
+      "church": "church",
+      "factory": "strip",
+      "warehouse": "strip",
+      "generic": "sparse"
+    }
+  },
+  "lighting": {
+    "ambient": 0.72,
+    "sun": 0.28,
+    "sunDirection": [-0.45, -0.6, 0.66],
+    "toonSteps": [0.2, 0.6, 1.0]
+  },
+  "outline": {
+    "color": "#2B2B2B",
+    "hullWidth": 0.1,
+    "edgeWidth": 1.3,
+    "inkShade": 0.3,
+    "inkMix": 1.0,
+    "fadeStart": 0.8,
+    "fadeEnd": 1.8
+  },
+  "models": {
+    "palette": {
+      "roof_red": "#E4DED1",
+      "roof_slate": "#D6D0C3",
+      "wall_pink": "#F8F7F5",
+      "wall_yellow": "#FAF9F7",
+      "wall_blue": "#F8F7F5",
+      "wall_mint": "#FAF9F7",
+      "wall_cream": "#FCFBFA",
+      "window": "#DCE3E6",
+      "brick": "#F1EFEA",
+      "awning": "#F5F3F0",
+      "red": "#ECE9E3",
+      "fire_red": "#EAE6DF",
+      "pub_green": "#E8E4DD",
+      "barn_red": "#EBE7E0",
+      "glass": "#DCE3E6",
+      "glass_band": "#ECE9E2",
+      "leaf": "#E8EDDF",
+      "roof_flat": "#F1ECE0",
+      "stone": "#F7F6F4",
+      "concrete": "#F9F8F6",
+      "offwhite": "#FDFDFC",
+      "trunk": "#BDB6A8",
+      "black": "#2B2B2B"
+    },
+    "exclude": ["generic", "tree"],
+    "fit": {
+      "minScale": 0.75,
+      "maxScale": 1.3,
+      "aspectTolerance": 0.35,
+      "minRectangularity": 0.8,
+      "minCoverage": 0.6,
+      "heightTolerance": 1.6,
+      "detachedOnly": true,
+      "heightExempt": ["church", "round_tower", "lighthouse"]
+    },
+    "trees": {
+      "minScale": 0.8,
+      "maxScale": 1.25
+    },
+    "glow": []
+  },
+  "style": {
+    "land": "#F7F3EA",
+    "water": "#DCE6EA",
+    "grass": "#EEF0E2",
+    "wood": "#E3E8D6",
+    "sand": "#F3EEDF",
+    "road": "#FFFFFF",
+    "road_casing": "#2B2B2B",
+    "major_road": "#FFFFFF",
+    "major_road_casing": "#2B2B2B",
+    "rail": "#2B2B2B",
+    "label": "#2B2B2B",
+    "label_halo": "#F7F3EA",
+    "building": "#F1ECE0",
+    "building_outline": "#2B2B2B"
+  },
+  "areas": {
+    "fill": {
+      "default": "#EEF0E2",
+      "park": "#EEF0E2",
+      "garden": "#EEF0E2",
+      "grass": "#EEF0E2",
+      "cemetery": "#EEF0E2",
+      "golf_course": "#EEF0E2",
+      "sports_ground": "#EEF0E2",
+      "pitch": "#E9EDDC",
+      "pitch_soccer": "#E9EDDC",
+      "pitch_gaa": "#E9EDDC",
+      "pitch_court": "#EFE6DA",
+      "playground": "#F3EEDF",
+      "racecourse": "#EEF0E2",
+      "track": "#EEF0E2"
+    },
+    "outline": "#2B2B2B",
+    "stripe": "#E3E8D6",
+    "markings": "#2B2B2B",
+    "rail": "#2B2B2B",
+    "trackSurface": "#E4DED1",
+    "turfTrack": "#E3E8D6",
+    "label": "#2B2B2B",
+    "labelHalo": "#F7F3EA"
+  }
+}

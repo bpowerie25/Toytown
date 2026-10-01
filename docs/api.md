@@ -22,7 +22,7 @@ Returns the toy-town MapLibre style (a fresh copy each time):
 | -------- | --------------------------------------------------------------------------------------------------------------------- |
 | `data`   | URL of a `toytown build-data` GeoJSON file, or the collection itself. **Required.**                                   |
 | `models` | URL of a model kit `manifest.json`. Without it, only procedural buildings are drawn.                                  |
-| `theme`  | `'default'`, `'night'`, `'sitcom'`, `'pastel'`, `'winter'`, `'blueprint'` or a theme object (`themes/*.json`).        |
+| `theme`  | A built-in skin name (see [rendering.md](rendering.md#themes)) or a theme object.                                     |
 | `lod`    | `{ minZoom: 14, fullZoom: 15, modelZoom: 16, outlineZoom: 17, keepMs: 20000 }`; see [performance.md](performance.md). |
 | `debug`  | Show the FPS / draw-call overlay.                                                                                     |
 | `id`     | MapLibre layer id (default `"toytown"`).                                                                              |

@@ -224,28 +224,35 @@ test.describe('demo', () => {
     await expect(page).toHaveScreenshot('waterford-night.png');
   });
 
-  test('skin picker switches live: sitcom, pastel, winter and blueprint', async ({ page }) => {
+  test('skin picker switches live, through every built-in skin', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto('/tramore/');
     await page.waitForFunction(() => !!(window as unknown as D).toy);
     await ready(page);
-    const bg = () =>
-      page.evaluate(() =>
-        (window as unknown as D).map.getPaintProperty('background', 'background-color'),
-      );
-    for (const [label, land, shot] of [
-      ['Sitcom', '#B3E07C', 'tramore-sitcom.png'],
-      ['Pastel', '#FAF1E4', 'tramore-pastel.png'],
-      ['Winter', '#EEF3F7', 'tramore-winter.png'],
-      ['Blueprint', '#1F4C8A', 'tramore-blueprint.png'],
-    ] as const) {
-      await page.getByRole('button', { name: label, exact: true }).click();
+    const skins = await page
+      .getByLabel('Skin')
+      .locator('option')
+      .evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value));
+    expect(skins.length).toBeGreaterThanOrEqual(15);
+    for (const skin of skins.filter((s) => s !== 'default' && s !== 'night')) {
+      await page.getByLabel('Skin').selectOption(skin);
       await ready(page);
-      await page.waitForTimeout(1_000);
-      expect(await bg()).toBe(land);
-      await expect(page).toHaveURL(new RegExp(`theme=${label.toLowerCase()}`));
-      await expect(page).toHaveScreenshot(shot);
+      await page.waitForTimeout(800);
+      const state = await page.evaluate(() => {
+        const w = window as unknown as D & {
+          toy: { getTheme(): { name: string; style: { land: string } } };
+        };
+        return {
+          name: w.toy.getTheme().name,
+          land: w.toy.getTheme().style.land,
+          bg: w.map.getPaintProperty('background', 'background-color'),
+        };
+      });
+      expect(state.name).toBe(skin);
+      expect(state.bg).toBe(state.land);
+      await expect(page).toHaveURL(new RegExp(`theme=${skin}`));
+      await expect(page).toHaveScreenshot(`tramore-${skin}.png`);
     }
     expect(errors).toEqual([]);
   });

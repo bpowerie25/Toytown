@@ -139,8 +139,28 @@ overlapping geometry always draws the same way, whatever order the workers finis
 
 ## Themes
 
-A theme (a "skin") is JSON in `packages/core/src/themes/`: `default`, `night`, `sitcom`,
-`pastel`, `winter` and `blueprint`. Pass one to `new ToyTown({ theme })` and `ToyTown.style({ theme })`, or switch live with
+A theme (a "skin") is JSON in `packages/core/src/themes/`. There are 15 built in:
+
+| Skin        | Look                                                                       |
+| ----------- | -------------------------------------------------------------------------- |
+| `default`   | Warm cream and terracotta, soft toon shading.                              |
+| `night`     | Dark blue, glowing yellow windows.                                         |
+| `sitcom`    | Flat saturated colours, solid black outlines, hard two-band shading.       |
+| `pastel`    | Soft candy colours, gentle shading, faint tinted edges, no model outlines. |
+| `toybox`    | Primary-coloured plastic bricks on a green baseplate, chunky outlines.     |
+| `retro`     | Four shades of green, like an old pocket game console.                     |
+| `neon`      | Synthwave night: dark purple, magenta line work, glowing cyan windows.     |
+| `vintage`   | An old postcard: aged paper, sepia walls, brown ink.                       |
+| `sketch`    | White buildings, black pen lines, cream paper.                             |
+| `blueprint` | Paper blue, white line work on every edge, flat shading.                   |
+| `autumn`    | Orange trees, golden low light, warm brick.                                |
+| `winter`    | Snow on the ground and roofs, evergreens, warm glowing windows.            |
+| `christmas` | Snow, red and green houses, warm lights.                                   |
+| `halloween` | Purple dusk, orange glowing windows, bare dark trees.                      |
+| `shamrock`  | Greens, white and gold.                                                    |
+
+The skins after `blueprint` are generated from `default.json` by `scripts/make-skins.py`, which
+records each skin's colour mapping; edit it and rerun it to retune them. Pass one to `new ToyTown({ theme })` and `ToyTown.style({ theme })`, or switch live with
 `toy.setTheme(name)`. That recolours the toy-town base style in place (`recolourStyle`), restyles
 the open-space layers, and re-plans the town: building colours are baked into the chunk meshes
 in the worker and model colours into the model geometry, so both are rebuilt in the new theme.

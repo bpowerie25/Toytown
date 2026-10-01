@@ -52,29 +52,23 @@ body.night .panel {
 }
 .panel .skins {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
   margin-top: 10px;
+  font-size: 13px;
 }
-.panel .skins button {
-  flex: 1 1 30%;
-  margin: 0;
-  padding: 4px 0;
+.panel .skins select {
+  flex: 1;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 8px;
   background: #f1ece0;
-  font-size: 12px;
-  text-align: center;
+  color: #2b2d42;
+  font: inherit;
 }
-.panel .skins button[aria-pressed='true'] {
-  background: #2b2d42;
-  color: #ffffff;
-}
-body.night .panel .skins button {
+body.night .panel .skins select {
   background: #3a4265;
   color: #e8e6f0;
-}
-body.night .panel .skins button[aria-pressed='true'] {
-  background: #ffd166;
-  color: #1b2238;
 }
 .panel .links {
   display: flex;

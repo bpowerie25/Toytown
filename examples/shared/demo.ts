@@ -19,14 +19,26 @@ export interface DemoOptions {
 const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const pretty = (category: string) => category.replace(/_/g, ' ').replace(/^landmark /, '');
 
-/** The skins in the picker, by theme name. */
+/** Skins with a dark background, which get the dark panel. */
+const DARK = new Set(['night', 'neon', 'blueprint', 'halloween']);
+
+/** The skins in the picker: theme name and label. */
 const SKINS: [string, string][] = [
   ['default', 'Day'],
   ['night', 'Night'],
   ['sitcom', 'Sitcom'],
   ['pastel', 'Pastel'],
-  ['winter', 'Winter'],
+  ['toybox', 'Toybox'],
+  ['retro', 'Retro handheld'],
+  ['neon', 'Neon'],
+  ['vintage', 'Vintage'],
+  ['sketch', 'Ink sketch'],
   ['blueprint', 'Blueprint'],
+  ['autumn', 'Autumn'],
+  ['winter', 'Winter'],
+  ['christmas', 'Christmas'],
+  ['halloween', 'Halloween'],
+  ['shamrock', 'Shamrock'],
 ];
 
 /** A full-screen toy-town demo: map, landmark fly-to panel, skin picker and click popups. */
@@ -34,7 +46,7 @@ export function startDemo(o: DemoOptions): { map: maplibregl.Map; toy: ToyTown }
   const params = new URLSearchParams(location.search);
   let theme = THEMES[params.get('theme') ?? ''] ? params.get('theme')! : 'default';
   const paint = () => {
-    document.body.classList.toggle('night', theme === 'night');
+    document.body.classList.toggle('night', DARK.has(theme));
     document.body.style.background = THEMES[theme]!.style.land!;
   };
   paint();
@@ -88,25 +100,21 @@ export function startDemo(o: DemoOptions): { map: maplibregl.Map; toy: ToyTown }
   const query = () => (theme === 'default' ? '' : `?theme=${theme}`);
   panel.innerHTML = `<h1>${escape(o.title)}</h1>
     ${o.landmarks.map((l, i) => `<button data-i="${i}">${escape(l.name)}</button>`).join('')}
-    <div class="skins" role="group" aria-label="Skin">${SKINS.map(
+    <label class="skins">Skin <select aria-label="Skin">${SKINS.map(
       ([name, label]) =>
-        `<button data-theme="${name}" aria-pressed="${name === theme}">${label}</button>`,
-    ).join('')}</div>
+        `<option value="${name}"${name === theme ? ' selected' : ''}>${label}</option>`,
+    ).join('')}</select></label>
     <div class="links"><a class="other" href="${o.other.href}${query()}">${escape(o.other.title)} →</a></div>`;
+  panel.querySelector('select')!.addEventListener('change', (ev) => {
+    // Switch live: no reload, the map keeps its view.
+    theme = (ev.target as HTMLSelectElement).value;
+    paint();
+    void toy.setTheme(theme);
+    history.replaceState(null, '', `${location.pathname}${query()}`);
+    panel.querySelector<HTMLAnchorElement>('a.other')!.href = `${o.other.href}${query()}`;
+  });
   panel.addEventListener('click', (ev) => {
     const target = ev.target as HTMLElement;
-    const skin = target.dataset.theme;
-    if (skin && skin !== theme) {
-      // Switch live: no reload, the map keeps its view.
-      theme = skin;
-      paint();
-      void toy.setTheme(theme);
-      history.replaceState(null, '', `${location.pathname}${query()}`);
-      panel.querySelector<HTMLAnchorElement>('a.other')!.href = `${o.other.href}${query()}`;
-      for (const b of panel.querySelectorAll<HTMLElement>('[data-theme]'))
-        b.setAttribute('aria-pressed', String(b.dataset.theme === theme));
-      return;
-    }
     const i = target.dataset.i;
     if (i === undefined) return;
     const l = o.landmarks[Number(i)]!;

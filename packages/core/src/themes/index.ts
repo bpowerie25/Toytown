@@ -4,6 +4,15 @@ import blueprintTheme from './blueprint.json';
 import pastelTheme from './pastel.json';
 import sitcomTheme from './sitcom.json';
 import winterTheme from './winter.json';
+import neonTheme from './neon.json';
+import vintageTheme from './vintage.json';
+import toyboxTheme from './toybox.json';
+import retroTheme from './retro.json';
+import autumnTheme from './autumn.json';
+import sketchTheme from './sketch.json';
+import christmasTheme from './christmas.json';
+import halloweenTheme from './halloween.json';
+import shamrockTheme from './shamrock.json';
 
 /** Building look: colours, roof rules and window settings. All colours are exact hex. */
 export interface BuildingTheme {
@@ -174,7 +183,10 @@ export const WINTER_THEME = winterTheme as unknown as Theme;
 /** An architect's drawing: blue paper, white line work on every edge, flat shading. */
 export const BLUEPRINT_THEME = blueprintTheme as unknown as Theme;
 
-/** Built-in themes by name. */
+/**
+ * Built-in themes (skins) by name: `default`, `night`, `sitcom`, `pastel`, `winter`, `blueprint`,
+ * `neon`, `vintage`, `toybox`, `retro`, `autumn`, `sketch`, `christmas`, `halloween`, `shamrock`.
+ */
 export const THEMES: Record<string, Theme> = {
   default: DEFAULT_THEME,
   night: NIGHT_THEME,
@@ -182,6 +194,15 @@ export const THEMES: Record<string, Theme> = {
   pastel: PASTEL_THEME,
   winter: WINTER_THEME,
   blueprint: BLUEPRINT_THEME,
+  neon: neonTheme as unknown as Theme,
+  vintage: vintageTheme as unknown as Theme,
+  toybox: toyboxTheme as unknown as Theme,
+  retro: retroTheme as unknown as Theme,
+  autumn: autumnTheme as unknown as Theme,
+  sketch: sketchTheme as unknown as Theme,
+  christmas: christmasTheme as unknown as Theme,
+  halloween: halloweenTheme as unknown as Theme,
+  shamrock: shamrockTheme as unknown as Theme,
 };
 
 /** A theme by name (`default`, `night`) or as an object; undefined means the default theme. */

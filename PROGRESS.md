@@ -34,7 +34,14 @@ Updated at the end of each phase.
   - **`winter`** (snowy ground and roofs, evergreen trees, cool light, windows glowing warm at
     half strength) and **`blueprint`** (every colour mapped to paper blue by lightness, solid
     white line work, flat shading) followed on request. Both are theme JSON only.
-  - The demos have a Day / Night / Sitcom / Pastel / Winter / Blueprint picker that switches live and keeps `?theme=`
+  - Nine more theme-only skins followed: `toybox`, `retro` (four Game Boy-style greens), `neon`,
+    `vintage`, `sketch`, `autumn`, `christmas`, `halloween` and `shamrock`. They're generated
+    from `default.json` by `scripts/make-skins.py`. Retro's first pass blended buildings into
+    the ground (its two light greens are nearly equal), so walls and flat roofs use the darker
+    shades.
+  - The demo picker became a dropdown of all 15 skins (dark skins get the dark panel). The e2e
+    test walks every skin in the dropdown and screenshots each on Tramore.
+  - Earlier, the picker was buttons (Day / Night / Sitcom / Pastel / Winter / Blueprint) that switches live and keeps `?theme=`
     in the URL. A new e2e test covers the picker with sitcom and pastel baselines. The night
     baseline was refreshed for the new panel.
 
