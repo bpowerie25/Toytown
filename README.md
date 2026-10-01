@@ -25,14 +25,27 @@ churches and more.
 - **Open spaces**: parks, gardens and cemeteries with trees; striped pitches with real markings,
   goals and GAA posts; playgrounds; racecourses and running tracks with white rails.
 - **Trees**, from mapped trees and seeded scatter in parks.
-- **20 skins**: `default`, `night`, `sitcom`, `pastel`, `toybox`, `retro`, `neon`, `vintage`,
-  `sketch`, `blueprint`, `autumn`, `winter`, `christmas`, `halloween`, `shamrock`; three with
-  effects, `comic` (halftone shadows), `handdrawn` (wobbly ink on paper) and `golden` (haze); and
-  two with their own model sets, `voxel` (built from blocks) and `chunky` (squash-and-stretch). Switch
-  live with `toy.setTheme('neon')`. Skins are JSON themes, so you can make your own. Switch live with
-  `toy.setTheme('sitcom')`. Skins are JSON themes, so you can make your own.
+- **20 skins**: from `default` and `night` to `sitcom`, `toybox`, `voxel`, `neon`, `blueprint`
+  and `comic`, switched live with `toy.setTheme('neon')`. See [Skins](#skins).
 - **Fast**: meshing in Web Workers, one draw call per chunk, instanced models, levels of detail by
   zoom, and lazy loading. See [performance](docs/performance.md).
+
+## Skins
+
+One town, 20 looks. Pick one with `new ToyTown({ theme: 'sitcom' })` and `ToyTown.style({ theme:
+'sitcom' })`, or switch live with `toy.setTheme('sitcom')`; the map keeps its view. Try them on the
+[live demos](https://bpowerie25.github.io/Toytown/) with the skin picker.
+
+![The same Tramore street in all 20 skins](docs/skins/grid.jpg)
+
+| Skins                 |                                                                                                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Colour                | `default`, `night`, `sitcom`, `pastel`, `toybox`, `retro`, `neon`, `vintage`, `sketch`, `blueprint`, `autumn`, `winter`, `christmas`, `halloween`, `shamrock` |
+| With effects          | `comic` (halftone shadows), `handdrawn` (wobbly ink, paper grain), `golden` (haze); `winter` and `christmas` have falling snow                                |
+| With their own models | `voxel` (everything built from blocks), `chunky` (squash-and-stretch cartoon)                                                                                 |
+
+A skin is a JSON theme (colours, outlines, shading, optional effects and model set), so you can
+make your own; see [rendering.md](docs/rendering.md#themes).
 
 ## Quick start
 
