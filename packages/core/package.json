@@ -1,6 +1,6 @@
 {
   "name": "toytown-gl",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Drop-in MapLibre plugin that renders OpenStreetMap as a cartoony toy town.",
   "license": "MIT",
   "type": "module",

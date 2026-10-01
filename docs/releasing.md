@@ -22,8 +22,8 @@ git tag v0.2.0 && git push && git push origin v0.2.0
 
 Pushing the tag runs `.github/workflows/release.yml`. It:
 
-1. checks the tag matches the packages' versions, and builds the release notes from their
-   changelogs;
+1. builds the release notes from the changelogs of the packages at the tag's version (packages
+   at another version, like an unchanged CLI, aren't in the release), failing if there are none;
 2. lints, builds and tests;
 3. publishes `toytown-gl`, `@toytown/models` and `@toytown/cli` to npm with provenance
    (`pnpm -r publish`, which skips private packages and already-published versions);

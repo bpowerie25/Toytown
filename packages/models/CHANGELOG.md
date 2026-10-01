@@ -1,5 +1,13 @@
 # @toytown/models
 
+## 0.2.0
+
+### Minor Changes
+
+- a552192: Skin model sets: `models/skins/voxel` (every model rebuilt from cubes) and `models/skins/chunky`
+  (squash-and-stretch cartoon), each a full set of the generic models and props under the same
+  names, with its own `manifest.json` and preview.
+
 ## 0.1.0
 
 ### Minor Changes
