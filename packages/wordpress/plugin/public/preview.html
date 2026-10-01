@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Toytown Map preview</title>
+    <link rel="stylesheet" href="vendor/maplibre-gl.css" />
+    <link rel="stylesheet" href="toytown-map.css" />
+    <style>
+      html, body { margin: 0; height: 100%; }
+      .toytown-map { height: 100%; border-radius: 0; }
+    </style>
+    <script src="vendor/toytown-gl.umd.js"></script>
+  </head>
+  <body>
+    <div class="toytown-map"><div class="toytown-map__canvas"></div><div class="toytown-map__status" role="status">Loading the map…</div></div>
+    <script type="module">
+      // The block editor's preview: the same view module, configured from the URL hash.
+      const root = document.querySelector('.toytown-map');
+      root.dataset.config = decodeURIComponent(location.hash.slice(1));
+      const { mount } = await import('./view.js');
+      mount(root);
+      // Tell the editor where the preview has been moved to, for its "Use this view" button.
+      const { map } = root.toytown;
+      const { preview } = JSON.parse(root.dataset.config);
+      map.on('moveend', () => {
+        const c = map.getCenter();
+        const view = { preview, lat: c.lat, lng: c.lng, zoom: map.getZoom(), pitch: map.getPitch(), bearing: map.getBearing() };
+        window.top.postMessage({ toytownView: view }, location.origin);
+      });
+    </script>
+  </body>
+</html>

@@ -162,6 +162,15 @@ importers:
 
   packages/models: {}
 
+  packages/wordpress:
+    dependencies:
+      maplibre-gl:
+        specifier: ^6.11.2
+        version: 6.11.2
+      toytown-gl:
+        specifier: workspace:*
+        version: link:../core
+
 packages:
 
   '@bokuweb/zstd-wasm@0.0.27':

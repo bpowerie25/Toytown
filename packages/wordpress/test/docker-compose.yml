@@ -1,0 +1,37 @@
+# A throwaway WordPress for testing the plugin: http://localhost:8089
+#   docker compose -f packages/wordpress/test/docker-compose.yml up -d && node packages/wordpress/test/setup.mjs
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_RANDOM_ROOT_PASSWORD: '1'
+  wordpress:
+    image: wordpress:php8.3-apache
+    depends_on: [db]
+    ports: ['8089:80']
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+      - ../dist/toytown-map:/var/www/html/wp-content/plugins/toytown-map:ro
+  cli:
+    image: wordpress:cli-php8.3
+    depends_on: [wordpress]
+    user: '33:33'
+    entrypoint: ['sleep', 'infinity']
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+      - ../dist/toytown-map:/var/www/html/wp-content/plugins/toytown-map:ro
+volumes:
+  wp:

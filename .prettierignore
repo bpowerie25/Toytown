@@ -10,3 +10,6 @@ packages/models/models/
 
 # Written by assets/generator/generate_models.py (checked by check_reproducible.py, not by hand).
 assets/models/**/manifest.json
+
+# WordPress plugin sources follow the WordPress coding standards (tabs, spaced parentheses).
+packages/wordpress/plugin/

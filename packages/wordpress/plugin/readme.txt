@@ -1,0 +1,76 @@
+=== Toytown Map ===
+Contributors: bpowerie
+Tags: map, 3d, openstreetmap, town, maplibre
+Requires at least: 6.5
+Tested up to: 7.1
+Requires PHP: 7.4
+Stable tag: 0.1.0
+License: MIT
+License URI: https://opensource.org/licenses/MIT
+
+Show any village or town as a cartoony 3D toy town, built from OpenStreetMap. 20 skins, no API keys.
+
+== Description ==
+
+Toytown Map turns OpenStreetMap into a friendly 3D toy town: every building becomes a little toy with a roof and windows, landmarks like churches, pubs and schools get their own low-poly models, and parks, pitches and racecourses are drawn too.
+
+* **Any place in the world.** Search for a village or town, pick how big an area to show, and the map is built from OpenStreetMap in the visitor’s browser. No data files, no API keys.
+* **20 skins**: Day, Night, Sitcom, Pastel, Toybox, Voxel, Chunky, Retro handheld, Neon, Vintage, Ink sketch, Hand-drawn, Comic, Blueprint, Golden hour, Autumn, Winter, Christmas, Halloween and Shamrock.
+* **A block and a shortcode.** The block has a live preview; the shortcode works in any editor.
+* **Light on your pages.** Maps load only when they scroll into view, and page scrolling is never trapped: visitors use Ctrl/⌘ + scroll (or two fingers) to move the map.
+
+It’s built on [toytown-gl](https://github.com/bpowerie25/Toytown), an open-source MapLibre plugin, and its CC0 model kit.
+
+= Shortcode =
+
+`[toytown lat="52.1655" lng="-8.8265" size="1.5" skin="sitcom" height="480"]`
+
+* `lat`, `lng`: the centre (required).
+* `size`: the area shown, in km across (0.3 to 3.4; default 1.5).
+* `skin`: one of `default`, `night`, `sitcom`, `pastel`, `toybox`, `voxel`, `chunky`, `retro`, `neon`, `vintage`, `sketch`, `handdrawn`, `comic`, `blueprint`, `golden`, `autumn`, `winter`, `christmas`, `halloween`, `shamrock`.
+* `height` (px), `zoom` (13 to 19), `pitch` (tilt, 0 to 70), `bearing` (rotation).
+* `data`: optional URL of a data file made with `npx @toytown/cli build-data`, for towns bigger than the browser builds.
+
+= Map data =
+
+Map data © OpenStreetMap contributors, available under the Open Database Licence. The attribution is shown on every map.
+
+== External services ==
+
+The maps are drawn in your visitors’ browsers, which contact these services directly:
+
+* **OpenFreeMap** (https://openfreemap.org), for the base map tiles. Sent: the map tiles in view. [Terms](https://openfreemap.org/tos/).
+* **VersaTiles** (https://versatiles.org), for the map label fonts. Sent: font ranges for the labels in view.
+* **Overpass API** (https://overpass-api.de), for the buildings and places in the chosen area, from OpenStreetMap. Sent: the area’s coordinates. Responses are cached in the visitor’s browser for a week. Not used when a map has a data file. [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API).
+* **Nominatim** (https://nominatim.openstreetmap.org), in the block editor only, when an editor searches for a place. Sent: the search text. [Usage policy](https://operations.osmfoundation.org/policies/nominatim/), [OSMF privacy policy](https://osmfoundation.org/wiki/Privacy_Policy).
+
+Like any web request, these services see the visitor’s IP address. No cookies are set and nothing is sent to the plugin author.
+
+== Installation ==
+
+1. Install and activate the plugin.
+2. Add the **Toytown Map** block to a page, search for a place and choose a skin. Or use the `[toytown]` shortcode.
+
+== Frequently Asked Questions ==
+
+= Can I show a whole city? =
+
+The browser builds areas up to about 12 km² (3.4 km across), which covers a village or a town centre. For bigger areas, build a data file with `npx @toytown/cli build-data --bbox west,south,east,north --out town.geojson`, upload it, and set it as the block’s data file (or `data` in the shortcode).
+
+= A building looks wrong or is missing. =
+
+Everything comes from OpenStreetMap, so the fix is to improve the map there: https://www.openstreetmap.org. Changes appear within a day or so (the browser keeps a copy of an area for up to a week).
+
+== Screenshots ==
+
+1. The same street in all 20 skins.
+2. The block in the editor: place search, area size and skin.
+
+== Changelog ==
+
+= 0.1.0 =
+* First release: block with place search and live preview, `[toytown]` shortcode, 20 skins, areas built in the browser from OpenStreetMap.
+
+== Licences ==
+
+The plugin’s code is MIT. Bundled libraries: toytown-gl (MIT), three.js (MIT), MapLibre GL JS (BSD-3-Clause). The 3D models are CC0.

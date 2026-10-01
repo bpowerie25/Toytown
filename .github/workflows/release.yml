@@ -38,6 +38,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
       - name: GitHub release with the models zip
-        run: gh release create "$GITHUB_REF_NAME" packages/models/dist/*.zip --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-notes.md"
+        run: gh release create "$GITHUB_REF_NAME" packages/models/dist/*.zip packages/wordpress/dist/toytown-map.zip --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/release-notes.md"
         env:
           GH_TOKEN: ${{ github.token }}

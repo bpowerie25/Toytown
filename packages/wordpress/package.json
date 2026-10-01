@@ -1,0 +1,15 @@
+{
+  "name": "@toytown/wordpress",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Toytown Map: the WordPress plugin (block and shortcode) for toytown-gl.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "maplibre-gl": "^6.11.2",
+    "toytown-gl": "workspace:*"
+  }
+}

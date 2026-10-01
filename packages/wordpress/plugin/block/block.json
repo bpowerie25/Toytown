@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "toytown/map",
+  "version": "0.1.0",
+  "title": "Toytown Map",
+  "category": "embed",
+  "icon": "location-alt",
+  "description": "Any village or town as a cartoony 3D toy town, built from OpenStreetMap.",
+  "keywords": ["map", "3d", "town", "openstreetmap", "toy"],
+  "textdomain": "toytown-map",
+  "attributes": {
+    "lat": { "type": "number" },
+    "lng": { "type": "number" },
+    "place": { "type": "string", "default": "" },
+    "size": { "type": "number", "default": 1.5 },
+    "skin": { "type": "string", "default": "default" },
+    "height": { "type": "number", "default": 480 },
+    "zoom": { "type": "number", "default": 16.2 },
+    "pitch": { "type": "number", "default": 55 },
+    "bearing": { "type": "number", "default": 0 },
+    "data": { "type": "string", "default": "" }
+  },
+  "supports": { "align": ["wide", "full"], "html": false },
+  "editorScript": "file:./edit.js"
+}

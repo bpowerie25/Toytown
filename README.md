@@ -97,6 +97,14 @@ The full API is in [docs/api.md](docs/api.md). Without a bundler, use the UMD bu
 `ToyTownGL`, with MapLibre 6 imported in a `<script type="module">` (see the
 [package README](packages/core/README.md)).
 
+## WordPress
+
+The **Toytown Map** plugin adds a block (search for a place, pick a skin, frame the view in a live
+preview) and a `[toytown lat="52.162" lng="-7.15" skin="sitcom"]` shortcode. Maps are built from
+OpenStreetMap in the visitor's browser, with everything bundled in the plugin. Download
+`toytown-map.zip` from the [latest release](https://github.com/bpowerie25/Toytown/releases/latest)
+and upload it under Plugins → Add New. See [packages/wordpress](packages/wordpress/README.md).
+
 ## Add your own buildings
 
 Design a building in Blender (or anything that exports `.glb`) and put it on your map, without

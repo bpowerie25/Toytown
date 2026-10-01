@@ -18,3 +18,4 @@ overpass-*.json
 blob-report/
 packages/models/models/
 packages/models/dist/
+packages/wordpress/dist/

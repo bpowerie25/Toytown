@@ -17,6 +17,27 @@ Updated at the end of each phase.
 
 ## After phase 7 (2026-09-30)
 
+- **WordPress plugin, "Toytown Map" (2026-10-01)**, for the public (WordPress.org). It's in
+  `packages/wordpress`. It has a block (Nominatim place search, area size, skin, view, a live
+  preview in an iframe, and "Use this view" to save a view framed in the preview) and a
+  `[toytown]` shortcode. It builds the area in the visitor's browser via `area`, and bundles
+  MapLibre, toytown-gl's UMD build and the kit (no CDN code, as WordPress.org requires). Maps
+  start when scrolled into view and use cooperative gestures, so page scrolling isn't trapped.
+  The readme discloses every external service.
+  - Tested in WordPress 7.1.2 in Docker: the shortcode and block pages render; the editor
+    preview renders and follows the settings; insert, search and "Use this view" work. Official
+    Plugin Check passes with no errors. PHP lints clean on 7.4 and 8.3.
+  - Bugs found by the tests:
+    - Clicking the iframe preview didn't select the block, so a cover now passes the first
+      click to the editor.
+    - Changing only the iframe's `#hash` didn't reload it, so the preview is now re-keyed,
+      debounced 0.6 s.
+    - A first pick briefly loaded a preview with no coordinates.
+    - Nominatim ranked an electoral area (its centre in fields) above the town, so places now
+      rank first.
+    - The build deleted `dist/`, which broke Docker's bind mount, so it now empties it in place.
+  - The zip is attached to GitHub releases. Submitting to WordPress.org needs your account.
+
 - **Building data in the browser (2026-10-01)**, the first step towards a WordPress plugin for the
   public. The pure pipeline (OSM parsing, polygon assembly, `buildData`, the Overpass client) moved
   from `packages/cli` into `packages/core/src/build`. The CLI keeps its Node-only parts and
