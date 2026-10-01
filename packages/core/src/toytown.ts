@@ -1,5 +1,6 @@
 import type { LngLat as MaplibreLngLat, Map as MaplibreMap, MapMouseEvent } from 'maplibre-gl';
 import { Box3 } from 'three';
+import { buildAreaData } from './build/browser';
 import { areaLayers, planAreaProps, type AreaFeature, type AreaLayers } from './areas';
 import { tileCenter, tileOf, type LngLat } from './geometry';
 import { parseManifest, parsePackManifest, type Manifest, type ModelEntry } from './manifest';
@@ -43,8 +44,18 @@ export interface DataCollection {
 }
 
 export interface ToyTownOptions {
-  /** URL of a `toytown build-data` GeoJSON file, or the collection itself. */
-  data: string | DataCollection;
+  /** URL of a `toytown build-data` GeoJSON file, or the collection itself. Or use `area`. */
+  data?: string | DataCollection;
+  /**
+   * Instead of `data`: an area `[west, south, east, north]` in degrees, built in the browser from
+   * OpenStreetMap (via Overpass) with the kit's tag map. Needs `models`. Good for a village or a
+   * town centre (up to `maxAreaKm2`); for bigger areas build a data file with the CLI.
+   */
+  area?: [number, number, number, number];
+  /** Overpass interpreter for `area` (default overpass-api.de). */
+  overpass?: string;
+  /** Largest `area` built in the browser, in km² (default 12). */
+  maxAreaKm2?: number;
   /** URL of a model kit `manifest.json`. Without it, only procedural buildings are drawn. */
   models?: string;
   /** A built-in theme name (`default`, `night`) or a theme object. */
@@ -73,7 +84,13 @@ export interface ToyTownClickEvent extends BuildingInfo {
   originalEvent: MouseEvent;
 }
 
-type Events = { click: ToyTownClickEvent };
+/** Progress of loading the town: `loading` (with a message), `ready`, or `error`. */
+export interface ToyTownStatusEvent {
+  state: 'loading' | 'ready' | 'error';
+  message: string;
+}
+
+type Events = { click: ToyTownClickEvent; status: ToyTownStatusEvent };
 
 /** Drop-in toy-town buildings, models and trees for a MapLibre map. */
 export class ToyTown {
@@ -97,6 +114,7 @@ export class ToyTown {
   private readonly loaded: Promise<void>;
   private readonly listeners: { [K in keyof Events]: Set<(e: Events[K]) => void> } = {
     click: new Set(),
+    status: new Set(),
   };
   private readonly overrides = new Map<string, string>();
   /** Categories given a model with setCategoryModel; a skin's model set never replaces them. */
@@ -115,6 +133,8 @@ export class ToyTown {
   private manifest: Manifest | null = null;
   private modelsBase = '';
   private applying: Promise<void> = Promise.resolve();
+  /** Stops waiting for the style, when addTo is still waiting to start. */
+  private cancelStart?: () => void;
 
   constructor(private readonly options: ToyTownOptions) {
     this.theme = resolveTheme(options.theme);
@@ -132,14 +152,36 @@ export class ToyTown {
 
   addTo(map: MaplibreMap): this {
     this.map = map;
-    const start = () => void this.start().catch((e: unknown) => console.error('[toytown-gl]', e));
+    const start = () =>
+      void this.start().catch((e: unknown) => {
+        console.error('[toytown-gl]', e);
+        this.emit('status', {
+          state: 'error',
+          message: e instanceof Error ? e.message : String(e),
+        });
+      });
+    // Start once the style is loaded. 'load' fires only once per map, so a ToyTown added later
+    // (e.g. after another was removed, while the style settles) waits for 'styledata' or 'idle'.
     if (map.isStyleLoaded()) start();
-    else map.once('load', start);
+    else {
+      const events = ['load', 'styledata', 'idle'] as const;
+      const when = () => {
+        if (!map.isStyleLoaded()) return;
+        this.cancelStart?.();
+        start();
+      };
+      for (const e of events) map.on(e, when);
+      this.cancelStart = () => {
+        for (const e of events) map.off(e, when);
+        this.cancelStart = undefined;
+      };
+    }
     map.on('click', this.onClick);
     return this;
   }
 
   remove(): void {
+    this.cancelStart?.();
     this.pool?.terminate();
     this.overlay?.remove();
     this.effects?.remove();
@@ -246,7 +288,8 @@ export class ToyTown {
   };
 
   private async start(): Promise<void> {
-    const map = this.map!;
+    const map = this.map;
+    if (!map) return; // removed before the style was ready
     this.layer = new ToyTownLayer(this.id, this.theme, this.options.lod);
     // Draw under the labels.
     const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
@@ -255,18 +298,15 @@ export class ToyTown {
     this.effects.set(this.theme.effects);
     if (this.options.debug) this.overlay = new DebugOverlay(map, () => this.layer?.stats());
 
-    const [data, manifest] = await Promise.all([
-      typeof this.options.data === 'string'
-        ? fetch(this.options.data).then((r) => r.json() as Promise<DataCollection>)
-        : this.options.data,
-      this.options.models
-        ? fetch(this.options.models).then(async (r) => parseManifest(await r.json()))
-        : Promise.resolve(null as Manifest | null),
-    ]);
+    const manifest = this.options.models
+      ? await fetch(this.options.models).then(async (r) => parseManifest(await r.json()))
+      : null;
+    const data = await this.loadData(manifest);
+    if (this.map !== map) return; // removed while loading
     this.manifest = manifest;
     this.modelsBase = this.options.models ? new URL(this.options.models, location.href).href : '';
     const split = splitData(data);
-    const bbox = data.bbox ?? bboxOf(split.buildings);
+    const bbox = data.bbox ?? this.options.area ?? bboxOf(split.buildings);
     const info = new Map<string, { category: string; name?: string; height?: number }>();
     for (const f of data.features) {
       const { id, category, name, height } = f.properties;
@@ -284,6 +324,39 @@ export class ToyTown {
     this.pool = new ChunkPool();
     await this.reapply();
     this.resolveLoaded();
+    this.emit('status', { state: 'ready', message: `${split.buildings.length} buildings` });
+  }
+
+  /** The town's data: the `data` file or collection, or `area` built in the browser. */
+  private async loadData(manifest: Manifest | null): Promise<DataCollection> {
+    const { data, area } = this.options;
+    if (data !== undefined) {
+      if (typeof data !== 'string') return data;
+      this.emit('status', { state: 'loading', message: 'Loading the town' });
+      return fetch(data).then((r) => r.json() as Promise<DataCollection>);
+    }
+    if (!area) throw new Error('new ToyTown needs `data` or `area`');
+    if (!manifest || !this.options.models)
+      throw new Error('`area` needs `models`: its tag map classifies the buildings');
+    this.emit('status', { state: 'loading', message: 'Fetching OpenStreetMap data' });
+    const tagMap = await fetch(
+      new URL('tag-map.json', new URL(this.options.models, location.href)),
+    ).then((r) => r.json() as Promise<unknown>);
+    const built = await buildAreaData(area, {
+      tagMap,
+      models: Object.keys(manifest.models),
+      ...(this.options.overpass ? { overpass: this.options.overpass } : {}),
+      ...(this.options.maxAreaKm2 ? { maxAreaKm2: this.options.maxAreaKm2 } : {}),
+      log: (m) => {
+        if (/waiting|retrying/.test(m)) this.emit('status', { state: 'loading', message: m });
+      },
+    });
+    this.emit('status', { state: 'loading', message: 'Building the town' });
+    return built as unknown as DataCollection;
+  }
+
+  private emit<K extends keyof Events>(type: K, event: Events[K]) {
+    for (const l of this.listeners[type]) l(event);
   }
 
   /** A skin's model set, `<kit>/manifest.json` next to the main manifest, loaded once. */

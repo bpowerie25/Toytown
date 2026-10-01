@@ -17,6 +17,17 @@ Updated at the end of each phase.
 
 ## After phase 7 (2026-09-30)
 
+- **Building data in the browser (2026-10-01)**, the first step towards a WordPress plugin for the
+  public. The pure pipeline (OSM parsing, polygon assembly, `buildData`, the Overpass client) moved
+  from `packages/cli` into `packages/core/src/build`. The CLI keeps its Node-only parts and
+  imports the rest; rebuilt Castlemagner and Tramore datasets are byte-identical.
+  `new ToyTown({ area, models })` fetches Overpass and builds in the page: 2.2 s for Castlemagner,
+  0.4 s on reload from the browser cache. There's a 12 km² default limit (bigger areas point at
+  the CLI), and a `status` event reports `loading`, `ready` and `error`.
+  - Bug fixed: `addTo` waited for MapLibre's `load` event, which fires only once per map, so a
+    ToyTown added after another was removed could wait forever. `remove()` also left that pending
+    start behind, and it later crashed on the removed map.
+
 - **Skins (2026-10-01)**: two new built-in themes and live switching, for v0.2.0 (changeset added,
   not released).
   - **`sitcom`** is a TV-cartoon look: flat saturated walls, solid `#1A1A22` outlines (2.2 px

@@ -56,6 +56,9 @@ Overpass or a PBF extract:
 npx @toytown/cli build-data --bbox -7.17,52.22,-7.05,52.28 --out public/data/town.geojson
 ```
 
+No data file? Skip this step: `new ToyTown({ area: [w, s, e, n], models })` builds a village or
+town centre (up to 12 km²) in the browser, straight from OpenStreetMap.
+
 **2. Install** (`npm i toytown-gl maplibre-gl @toytown/models`), copy the model kit into your
 static files (`cp -r node_modules/@toytown/models/models public/models`), **and add it to a
 MapLibre map:**

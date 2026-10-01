@@ -18,14 +18,17 @@ Returns the toy-town MapLibre style (a fresh copy each time):
 
 ## `new ToyTown(options)`
 
-| Option   | Meaning                                                                                                               |
-| -------- | --------------------------------------------------------------------------------------------------------------------- |
-| `data`   | URL of a `toytown build-data` GeoJSON file, or the collection itself. **Required.**                                   |
-| `models` | URL of a model kit `manifest.json`. Without it, only procedural buildings are drawn.                                  |
-| `theme`  | A built-in skin name (see [rendering.md](rendering.md#themes)) or a theme object.                                     |
-| `lod`    | `{ minZoom: 14, fullZoom: 15, modelZoom: 16, outlineZoom: 17, keepMs: 20000 }`; see [performance.md](performance.md). |
-| `debug`  | Show the FPS / draw-call overlay.                                                                                     |
-| `id`     | MapLibre layer id (default `"toytown"`).                                                                              |
+| Option       | Meaning                                                                                                                                                                                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`       | URL of a `toytown build-data` GeoJSON file, or the collection itself. This or `area` is **required**.                                                                                                                                                      |
+| `area`       | Instead of `data`: `[west, south, east, north]`, built in the browser from OpenStreetMap via Overpass, with the kit's `tag-map.json`. Needs `models`. For a village or town centre (default limit 12 km²); responses are cached in the browser for a week. |
+| `overpass`   | Overpass interpreter URL for `area` (default `https://overpass-api.de/api/interpreter`).                                                                                                                                                                   |
+| `maxAreaKm2` | Largest `area` built in the browser (default 12).                                                                                                                                                                                                          |
+| `models`     | URL of a model kit `manifest.json`. Without it, only procedural buildings are drawn.                                                                                                                                                                       |
+| `theme`      | A built-in skin name (see [rendering.md](rendering.md#themes)) or a theme object.                                                                                                                                                                          |
+| `lod`        | `{ minZoom: 14, fullZoom: 15, modelZoom: 16, outlineZoom: 17, keepMs: 20000 }`; see [performance.md](performance.md).                                                                                                                                      |
+| `debug`      | Show the FPS / draw-call overlay.                                                                                                                                                                                                                          |
+| `id`         | MapLibre layer id (default `"toytown"`).                                                                                                                                                                                                                   |
 
 ### Methods
 
@@ -35,6 +38,7 @@ Returns the toy-town MapLibre style (a fresh copy each time):
 | `remove()`                             | Remove from the map and free everything.                                                                                                                                                                                      |
 | `ready`                                | A promise that resolves when the current view is drawn: data in, visible chunks meshed, and at model zoom, their models loaded. Await it again after moving the map.                                                          |
 | `on('click', fn)` / `off('click', fn)` | Clicks on buildings, models, props and trees. `fn` receives a `BuildingInfo` plus `lngLat` and `originalEvent`.                                                                                                               |
+| `on('status', fn)`                     | Loading progress: `fn({ state, message })` with `state` `loading` ("Fetching OpenStreetMap data", "Building the town"…), `ready`, or `error` (e.g. an `area` that's too big).                                                 |
 | `pick({ x, y })`                       | What's under a point, in CSS pixels from the map's top-left: a `BuildingInfo` or `null`.                                                                                                                                      |
 | `setCategoryModel(category, url)`      | Use your own GLB for a category, replacing its kit model and variants. Its footprint is measured from the file for fitting. Materials named by palette keys follow the theme; others keep their colours. Returns a promise.   |
 | `setTheme(theme)`                      | Switch skin live, without reloading the map: a built-in name or a theme object. Recolours the toy-town base style in place, restyles open spaces, and rebuilds buildings and models in the new colours. Returns a promise.    |
