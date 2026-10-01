@@ -16,8 +16,8 @@ pnpm changeset   # pick the packages and bump (patch / minor / major), then desc
 
 ```sh
 pnpm version-packages          # applies the changesets: bumps versions, writes CHANGELOG.md
-git commit -am "Release v0.2.0"
-git tag v0.2.0 && git push && git push origin v0.2.0
+git commit -am "Release v0.3.0"
+git tag v0.3.0 && git push && git push origin v0.3.0
 ```
 
 Pushing the tag runs `.github/workflows/release.yml`. It:
@@ -27,7 +27,8 @@ Pushing the tag runs `.github/workflows/release.yml`. It:
 2. lints, builds and tests;
 3. publishes `toytown-gl`, `@toytown/models` and `@toytown/cli` to npm with provenance
    (`pnpm -r publish`, which skips private packages and already-published versions);
-4. creates a GitHub release with `toytown-models-<version>.zip` attached.
+4. creates a GitHub release with `toytown-models-<version>.zip` and the WordPress plugin
+   (`toytown-map.zip`) attached.
 
 ## One-time setup
 

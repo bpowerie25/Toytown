@@ -1,5 +1,20 @@
 # toytown-gl
 
+## 0.3.0
+
+### Minor Changes
+
+- Build a town's data in the browser: `new ToyTown({ area: [w, s, e, n], models })` fetches
+  OpenStreetMap from Overpass and runs the `toytown build-data` pipeline in the page, so a village
+  or town centre needs no data file. `data` is now optional; new options are `area`, `overpass`
+  (the interpreter URL) and `maxAreaKm2` (default 12; bigger areas should use the CLI). Overpass
+  responses are cached in the browser for a week. A new `status` event reports `loading`, `ready`
+  and `error`. The pipeline is exported too (`buildData`, `buildAreaData`, `bboxAreaKm2`, the
+  Overpass client and OSM parsing).
+
+  Fixed: a ToyTown added after another was removed could wait forever for the map's `load` event,
+  and `remove()` during that wait left a pending start that later crashed.
+
 ## 0.2.0
 
 ### Minor Changes

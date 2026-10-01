@@ -24,5 +24,7 @@ if (!out.length) {
   console.error(`No package is at ${tag}. Run "pnpm version-packages" and commit before tagging.`);
   process.exit(1);
 }
-out.push('Map data © OpenStreetMap contributors (ODbL). The models zip is CC0.');
+out.push(
+  'Map data © OpenStreetMap contributors (ODbL). The models zip is CC0. `toytown-map.zip` is the WordPress plugin.',
+);
 console.log(out.join('\n'));
