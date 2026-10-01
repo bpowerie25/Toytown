@@ -7,3 +7,6 @@ assets/models/manifest.json
 PLAN.md
 examples/*/public/data/
 packages/models/models/
+
+# Written by assets/generator/generate_models.py (checked by check_reproducible.py, not by hand).
+assets/models/**/manifest.json
