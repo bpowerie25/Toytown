@@ -1,7 +1,9 @@
 import defaultTheme from './default.json';
 import nightTheme from './night.json';
+import blueprintTheme from './blueprint.json';
 import pastelTheme from './pastel.json';
 import sitcomTheme from './sitcom.json';
+import winterTheme from './winter.json';
 
 /** Building look: colours, roof rules and window settings. All colours are exact hex. */
 export interface BuildingTheme {
@@ -167,6 +169,10 @@ export const NIGHT_THEME = nightTheme as unknown as Theme;
 export const SITCOM_THEME = sitcomTheme as unknown as Theme;
 /** Soft, light colours with gentle shading and faint tinted edges. */
 export const PASTEL_THEME = pastelTheme as unknown as Theme;
+/** Snow on the ground and roofs, evergreen trees, cool light and warm glowing windows. */
+export const WINTER_THEME = winterTheme as unknown as Theme;
+/** An architect's drawing: blue paper, white line work on every edge, flat shading. */
+export const BLUEPRINT_THEME = blueprintTheme as unknown as Theme;
 
 /** Built-in themes by name. */
 export const THEMES: Record<string, Theme> = {
@@ -174,6 +180,8 @@ export const THEMES: Record<string, Theme> = {
   night: NIGHT_THEME,
   sitcom: SITCOM_THEME,
   pastel: PASTEL_THEME,
+  winter: WINTER_THEME,
+  blueprint: BLUEPRINT_THEME,
 };
 
 /** A theme by name (`default`, `night`) or as an object; undefined means the default theme. */

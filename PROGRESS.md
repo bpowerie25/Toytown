@@ -31,7 +31,10 @@ Updated at the end of each phase.
     colours are baked into chunk meshes and model geometry. A switch takes about 0.8 s on Tramore.
   - Theme `outline` gains `inkShade` and `inkMix` (the defaults keep the old look exactly), and
     `hullWidth: 0` hides model hulls.
-  - The demos have a Day / Night / Sitcom / Pastel picker that switches live and keeps `?theme=`
+  - **`winter`** (snowy ground and roofs, evergreen trees, cool light, windows glowing warm at
+    half strength) and **`blueprint`** (every colour mapped to paper blue by lightness, solid
+    white line work, flat shading) followed on request. Both are theme JSON only.
+  - The demos have a Day / Night / Sitcom / Pastel / Winter / Blueprint picker that switches live and keeps `?theme=`
     in the URL. A new e2e test covers the picker with sitcom and pastel baselines. The night
     baseline was refreshed for the new panel.
 

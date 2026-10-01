@@ -25,6 +25,8 @@ const SKINS: [string, string][] = [
   ['night', 'Night'],
   ['sitcom', 'Sitcom'],
   ['pastel', 'Pastel'],
+  ['winter', 'Winter'],
+  ['blueprint', 'Blueprint'],
 ];
 
 /** A full-screen toy-town demo: map, landmark fly-to panel, skin picker and click popups. */

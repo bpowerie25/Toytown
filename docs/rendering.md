@@ -139,8 +139,8 @@ overlapping geometry always draws the same way, whatever order the workers finis
 
 ## Themes
 
-A theme (a "skin") is JSON in `packages/core/src/themes/`: `default`, `night`, `sitcom` and
-`pastel`. Pass one to `new ToyTown({ theme })` and `ToyTown.style({ theme })`, or switch live with
+A theme (a "skin") is JSON in `packages/core/src/themes/`: `default`, `night`, `sitcom`,
+`pastel`, `winter` and `blueprint`. Pass one to `new ToyTown({ theme })` and `ToyTown.style({ theme })`, or switch live with
 `toy.setTheme(name)`. That recolours the toy-town base style in place (`recolourStyle`), restyles
 the open-space layers, and re-plans the town: building colours are baked into the chunk meshes
 in the worker and model colours into the model geometry, so both are rebuilt in the new theme.
@@ -170,6 +170,10 @@ sky `#8CD3F5`, yellow `#FFD34E`, orange `#FFB067` on houses), `#1A1A22` ink at 2
 `inkMix: 1`, 0.3 m model hulls, two toon steps and no fill light. `pastel` is soft: light walls
 (`#F7C1CD`, `#D6C4F0`, `#BFE6D2`, `#FBE3A6`, `#C2DDF4`, `#F8D2B8` on houses), three toon steps
 with a high ambient, faint tinted edges (`inkShade: 0.72`, `inkMix: 0.2`) and no model outlines.
+`winter` puts snow on the ground (`#EEF3F7`) and roofs (`#F8FBFD`), turns trees evergreen
+(`#4E7F66`), cools the light and lets windows glow warm `#FFD98A` at half strength.
+`blueprint` maps every colour to a shade of paper blue by its lightness, on `#1F4C8A`, and draws
+every edge as solid `#F2F8FF` line work (`inkShade: 1`, `inkMix: 1`) over nearly flat shading.
 Screenshots: [docs/skins/](skins/).
 
 ## Picking

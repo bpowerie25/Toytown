@@ -26,7 +26,8 @@ churches and more.
   goals and GAA posts; playgrounds; racecourses and running tracks with white rails.
 - **Trees**, from mapped trees and seeded scatter in parks.
 - **Skins**: `default`, `night` (glowing windows), `sitcom` (flat saturated colours, solid black
-  outlines, hard shading) and `pastel` (soft colours, gentle shading). Switch live with
+  outlines, hard shading), `pastel` (soft colours, gentle shading), `winter` (snow, evergreens,
+  warm windows) and `blueprint` (white line work on blue paper). Switch live with
   `toy.setTheme('sitcom')`. Skins are JSON themes, so you can make your own.
 - **Fast**: meshing in Web Workers, one draw call per chunk, instanced models, levels of detail by
   zoom, and lazy loading. See [performance](docs/performance.md).

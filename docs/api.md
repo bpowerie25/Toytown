@@ -10,7 +10,7 @@ Returns the toy-town MapLibre style (a fresh copy each time):
 
 | Option        | Meaning                                                                                          |
 | ------------- | ------------------------------------------------------------------------------------------------ |
-| `theme`       | `'default'`, `'night'`, `'sitcom'`, `'pastel'` or a theme object; recolours the base map.        |
+| `theme`       | `'default'`, `'night'`, `'sitcom'`, `'pastel'`, `'winter'`, `'blueprint'` or a theme object.     |
 | `tiles`       | A TileJSON URL or `{z}/{x}/{y}` templates, for OpenMapTiles-schema tiles (default: OpenFreeMap). |
 | `maxzoom`     | Max zoom of the templates (default 14).                                                          |
 | `glyphs`      | Glyph URL template (default: VersaTiles; the fonts are `nunito_bold` and `nunito_extrabold`).    |
@@ -22,7 +22,7 @@ Returns the toy-town MapLibre style (a fresh copy each time):
 | -------- | --------------------------------------------------------------------------------------------------------------------- |
 | `data`   | URL of a `toytown build-data` GeoJSON file, or the collection itself. **Required.**                                   |
 | `models` | URL of a model kit `manifest.json`. Without it, only procedural buildings are drawn.                                  |
-| `theme`  | `'default'`, `'night'`, `'sitcom'`, `'pastel'` or a theme object (see `packages/core/src/themes/*.json`).             |
+| `theme`  | `'default'`, `'night'`, `'sitcom'`, `'pastel'`, `'winter'`, `'blueprint'` or a theme object (`themes/*.json`).        |
 | `lod`    | `{ minZoom: 14, fullZoom: 15, modelZoom: 16, outlineZoom: 17, keepMs: 20000 }`; see [performance.md](performance.md). |
 | `debug`  | Show the FPS / draw-call overlay.                                                                                     |
 | `id`     | MapLibre layer id (default `"toytown"`).                                                                              |

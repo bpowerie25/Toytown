@@ -52,11 +52,12 @@ body.night .panel {
 }
 .panel .skins {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   margin-top: 10px;
 }
 .panel .skins button {
-  flex: 1;
+  flex: 1 1 30%;
   margin: 0;
   padding: 4px 0;
   background: #f1ece0;

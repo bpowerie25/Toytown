@@ -21,6 +21,8 @@ export {
   NIGHT_THEME,
   SITCOM_THEME,
   PASTEL_THEME,
+  WINTER_THEME,
+  BLUEPRINT_THEME,
   THEMES,
   resolveTheme,
   wallPalette,
