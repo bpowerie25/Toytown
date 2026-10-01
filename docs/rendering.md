@@ -139,7 +139,13 @@ overlapping geometry always draws the same way, whatever order the workers finis
 
 ## Themes
 
-A theme is JSON (`packages/core/src/themes/default.json`, `night.json`):
+A theme (a "skin") is JSON in `packages/core/src/themes/`: `default`, `night`, `sitcom` and
+`pastel`. Pass one to `new ToyTown({ theme })` and `ToyTown.style({ theme })`, or switch live with
+`toy.setTheme(name)`. That recolours the toy-town base style in place (`recolourStyle`), restyles
+the open-space layers, and re-plans the town: building colours are baked into the chunk meshes
+in the worker and model colours into the model geometry, so both are rebuilt in the new theme.
+
+A theme has:
 
 - `style`: the base-map palette. `ToyTown.style({ theme })` recolours the style through an explicit
   map of layer paint properties to palette keys in the style's metadata (`toytown:colors`), so keys
@@ -147,7 +153,10 @@ A theme is JSON (`packages/core/src/themes/default.json`, `night.json`):
 - `buildings`: wall palettes per category, roofs, flat roofs, windows and `windowGlow` (1 = windows
   shown at full colour whatever the light, for night).
 - `lighting`: ambient, sun and toon steps.
-- `outline`: ink colour, hull width, edge width and fade.
+- `outline`: ink colour, hull width (0: no model outlines), edge width (0: no edges) and fade.
+  `inkShade` and `inkMix` set the edge ink: the face's colour times `inkShade` (default 0.45),
+  mixed towards the ink colour by `inkMix` (default 0.35). `sitcom` uses `inkMix: 1` for solid
+  black lines.
 - `areas`: open-space fills per area category, pitch stripes and markings, track surfaces and
   rails, and label colours. Optional in custom themes, which fall back to the default's.
 - `models`: palette overrides for the kit, `glow` palette keys (shown unlit, e.g. `window` at
@@ -155,6 +164,13 @@ A theme is JSON (`packages/core/src/themes/default.json`, `night.json`):
 
 The night theme uses background `#1B2238` and windows `#FFD166`. Walls and roofs are the day
 colours blended 35–45% towards the background, and the moon is lower and cooler than the sun.
+
+`sitcom` is a TV-cartoon look: saturated walls (pink `#F59BBE`, lilac `#C3A0E6`, lime `#A8DE6E`,
+sky `#8CD3F5`, yellow `#FFD34E`, orange `#FFB067` on houses), `#1A1A22` ink at 2.2 px with
+`inkMix: 1`, 0.3 m model hulls, two toon steps and no fill light. `pastel` is soft: light walls
+(`#F7C1CD`, `#D6C4F0`, `#BFE6D2`, `#FBE3A6`, `#C2DDF4`, `#F8D2B8` on houses), three toon steps
+with a high ambient, faint tinted edges (`inkShade: 0.72`, `inkMix: 0.2`) and no model outlines.
+Screenshots: [docs/skins/](skins/).
 
 ## Picking
 

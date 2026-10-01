@@ -1,6 +1,6 @@
 import type { LngLat as MaplibreLngLat, Map as MaplibreMap, MapMouseEvent } from 'maplibre-gl';
 import { Box3 } from 'three';
-import { areaLayers, planAreaProps, type AreaFeature } from './areas';
+import { areaLayers, planAreaProps, type AreaFeature, type AreaLayers } from './areas';
 import { tileCenter, tileOf, type LngLat } from './geometry';
 import { parseManifest, parsePackManifest, type Manifest, type ModelEntry } from './manifest';
 import {
@@ -18,7 +18,7 @@ import type { LodOptions } from './render/lod';
 import { loadModel } from './render/models';
 import { DebugOverlay } from './render/overlay';
 import { ChunkPool } from './render/pool';
-import { setBaseBuildingsVisible, toytownStyle, type StyleOptions } from './style';
+import { recolourStyle, setBaseBuildingsVisible, toytownStyle, type StyleOptions } from './style';
 import { resolveTheme, type Theme } from './themes';
 
 interface DataFeature {
@@ -88,7 +88,8 @@ export class ToyTown {
   private layer?: ToyTownLayer;
   private pool?: ChunkPool;
   private overlay?: DebugOverlay;
-  private readonly theme: Theme;
+  private theme: Theme;
+  private areaData?: AreaLayers;
   private readonly id: string;
   private resolveLoaded!: () => void;
   private readonly loaded: Promise<void>;
@@ -193,6 +194,36 @@ export class ToyTown {
     return this.reapply();
   }
 
+  /**
+   * Switch to another theme without reloading the map: a built-in name (`default`, `night`,
+   * `sitcom`, `pastel`) or a theme object. The toy-town base style is recoloured in place (other
+   * styles are left alone), open spaces are restyled, and buildings and models are rebuilt in the
+   * new colours. Resolves when the town is re-planned; await `ready` for the redraw.
+   */
+  setTheme(theme: string | Theme): Promise<void> {
+    this.theme = resolveTheme(theme);
+    const map = this.map;
+    if (map) {
+      const restyle = () => {
+        if (this.map !== map) return;
+        recolourStyle(map, this.theme);
+        if (this.areaData) {
+          removeAreaLayers(map, this.id);
+          addAreaLayers(map, this.id, this.areaData, this.theme, this.id);
+        }
+      };
+      if (map.isStyleLoaded()) restyle();
+      else map.once('load', restyle);
+    }
+    this.layer?.setTheme(this.theme);
+    return this.reapply();
+  }
+
+  /** The theme in use. */
+  getTheme(): Theme {
+    return this.theme;
+  }
+
   /** Layer statistics (level of detail, chunks, instances, draw calls), for debugging. */
   stats() {
     return this.layer?.stats();
@@ -236,8 +267,10 @@ export class ToyTown {
       info,
       frame: new SceneFrame([(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]),
     };
-    if (split.areas.length)
-      addAreaLayers(map, this.id, areaLayers(split.areas), this.theme, this.id);
+    if (split.areas.length) {
+      this.areaData = areaLayers(split.areas);
+      addAreaLayers(map, this.id, this.areaData, this.theme, this.id);
+    }
     this.pool = new ChunkPool();
     await this.reapply();
     this.resolveLoaded();

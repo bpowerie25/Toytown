@@ -19,6 +19,7 @@ import {
   Scene,
   Vector3,
   WebGLRenderer,
+  type Light,
   type Material,
   type Sphere,
 } from 'three';
@@ -126,9 +127,10 @@ export class ToyTownLayer implements CustomLayerInterface {
   private readonly frustum = new Frustum();
   private readonly chunks = new Map<string, ChunkSlot>();
   private readonly groups = new Map<string, ModelGroup>();
-  private readonly buildingMaterial: Material;
-  private readonly modelMaterial: Material;
-  private readonly hullMaterial: Material;
+  private buildingMaterial!: Material;
+  private modelMaterial!: Material;
+  private hullMaterial!: Material;
+  private lights: Light[] = [];
   private readonly lod: LodOptions;
   private frame?: SceneFrame;
   private manifest?: Manifest;
@@ -147,15 +149,34 @@ export class ToyTownLayer implements CustomLayerInterface {
 
   constructor(
     readonly id: string,
-    private readonly theme: Theme,
+    private theme: Theme,
     lod: Partial<LodOptions> = {},
   ) {
     this.lod = { ...DEFAULT_LOD, ...lod };
+    this.camera.matrixAutoUpdate = false;
+    this.applyTheme(theme);
+  }
+
+  /**
+   * Switch theme: new materials and lights now. Chunk meshes and model colours are baked from the
+   * theme, so the caller re-plans (`clear()` and `setData()`) to rebuild them.
+   */
+  setTheme(theme: Theme): void {
+    for (const m of [this.buildingMaterial, this.modelMaterial, this.hullMaterial])
+      disposeMaterial(m);
+    for (const l of this.lights)
+      this.scene.remove(l, ...(l instanceof DirectionalLight ? [l.target] : []));
+    this.applyTheme(theme);
+    this.map?.triggerRepaint();
+  }
+
+  private applyTheme(theme: Theme): void {
+    this.theme = theme;
     this.buildingMaterial = createBuildingMaterial(theme);
     this.modelMaterial = createModelMaterial(theme);
     this.hullMaterial = createHullMaterial(theme);
-    this.camera.matrixAutoUpdate = false;
-    for (const light of createLights(theme)) {
+    this.lights = createLights(theme);
+    for (const light of this.lights) {
       this.scene.add(light);
       if (light instanceof DirectionalLight) this.scene.add(light.target);
     }
@@ -402,6 +423,7 @@ export class ToyTownLayer implements CustomLayerInterface {
     // Instances are culled per chunk before upload; three's whole-mesh culling doesn't apply.
     mesh.frustumCulled = hull.frustumCulled = false;
     mesh.name = hull.name = `model ${name}`;
+    hull.visible = this.theme.outline.hullWidth > 0;
     g.mesh = mesh;
     g.hull = hull;
     g.capacity = capacity;

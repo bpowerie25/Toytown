@@ -224,6 +224,30 @@ test.describe('demo', () => {
     await expect(page).toHaveScreenshot('waterford-night.png');
   });
 
+  test('skin picker switches live: sitcom and pastel', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.goto('/tramore/');
+    await page.waitForFunction(() => !!(window as unknown as D).toy);
+    await ready(page);
+    const bg = () =>
+      page.evaluate(() =>
+        (window as unknown as D).map.getPaintProperty('background', 'background-color'),
+      );
+    for (const [label, land, shot] of [
+      ['Sitcom', '#B3E07C', 'tramore-sitcom.png'],
+      ['Pastel', '#FAF1E4', 'tramore-pastel.png'],
+    ] as const) {
+      await page.getByRole('button', { name: label, exact: true }).click();
+      await ready(page);
+      await page.waitForTimeout(1_000);
+      expect(await bg()).toBe(land);
+      await expect(page).toHaveURL(new RegExp(`theme=${label.toLowerCase()}`));
+      await expect(page).toHaveScreenshot(shot);
+    }
+    expect(errors).toEqual([]);
+  });
+
   test('setCategoryModel and addPack re-plan the town', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));

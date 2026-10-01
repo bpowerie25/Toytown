@@ -7,13 +7,20 @@ export type {
   PropEntry,
   PropAttach,
 } from './manifest';
-export { toytownStyle, setBaseBuildingsVisible, BASE_BUILDING_LAYER_ID } from './style';
-export type { StyleOptions, LayerHost } from './style';
+export {
+  toytownStyle,
+  recolourStyle,
+  setBaseBuildingsVisible,
+  BASE_BUILDING_LAYER_ID,
+} from './style';
+export type { StyleOptions, LayerHost, StyleHost } from './style';
 export * from './geometry';
 export * from './classify';
 export {
   DEFAULT_THEME,
   NIGHT_THEME,
+  SITCOM_THEME,
+  PASTEL_THEME,
   THEMES,
   resolveTheme,
   wallPalette,

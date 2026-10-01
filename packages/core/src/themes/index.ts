@@ -1,5 +1,7 @@
 import defaultTheme from './default.json';
 import nightTheme from './night.json';
+import pastelTheme from './pastel.json';
+import sitcomTheme from './sitcom.json';
 
 /** Building look: colours, roof rules and window settings. All colours are exact hex. */
 export interface BuildingTheme {
@@ -83,10 +85,16 @@ export interface LightingTheme {
 
 export interface OutlineTheme {
   color: string;
-  /** Inverted-hull thickness on hero models, in metres. */
+  /** Inverted-hull thickness on hero models, in metres (0 for no outline). */
   hullWidth: number;
-  /** Edge line width on procedural buildings, in pixels. */
+  /** Edge line width on procedural buildings, in pixels (0 for none). */
   edgeWidth: number;
+  /**
+   * Edge ink on procedural buildings is the face's own colour times `inkShade` (default 0.45),
+   * mixed towards `color` by `inkMix` (default 0.35). `inkMix: 1` draws solid `color` lines.
+   */
+  inkShade?: number;
+  inkMix?: number;
   /** Edges and windows fade out between these ground resolutions (metres per pixel). */
   fadeStart: number;
   fadeEnd: number;
@@ -155,9 +163,18 @@ export interface Theme {
 
 export const DEFAULT_THEME = defaultTheme as unknown as Theme;
 export const NIGHT_THEME = nightTheme as unknown as Theme;
+/** Flat saturated colours, solid black outlines and hard two-band shading, like a TV cartoon. */
+export const SITCOM_THEME = sitcomTheme as unknown as Theme;
+/** Soft, light colours with gentle shading and faint tinted edges. */
+export const PASTEL_THEME = pastelTheme as unknown as Theme;
 
 /** Built-in themes by name. */
-export const THEMES: Record<string, Theme> = { default: DEFAULT_THEME, night: NIGHT_THEME };
+export const THEMES: Record<string, Theme> = {
+  default: DEFAULT_THEME,
+  night: NIGHT_THEME,
+  sitcom: SITCOM_THEME,
+  pastel: PASTEL_THEME,
+};
 
 /** A theme by name (`default`, `night`) or as an object; undefined means the default theme. */
 export function resolveTheme(theme?: string | Theme): Theme {

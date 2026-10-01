@@ -71,6 +71,36 @@ export interface LayerHost {
   setLayoutProperty(layer: string, name: string, value: unknown): unknown;
 }
 
+/** The slice of a MapLibre `Map` that `recolourStyle` needs. */
+export interface StyleHost {
+  getStyle(): { metadata?: unknown; layers: { id: string }[] } | undefined;
+  setPaintProperty(layer: string, name: string, value: unknown): unknown;
+}
+
+/**
+ * Recolour a map that's showing the toy-town style with a theme's `style` palette, in place
+ * (no style reload). Uses the colour map in the style's metadata, so it's a no-op on other styles.
+ * Returns the number of paint properties changed.
+ */
+export function recolourStyle(map: StyleHost, theme: string | Theme): number {
+  const style = map.getStyle();
+  const colors = (style?.metadata as Record<string, Record<string, string>> | undefined)?.[
+    'toytown:colors'
+  ];
+  if (!style || !colors) return 0;
+  const palette = resolveTheme(theme).style;
+  const ids = new Set(style.layers.map((l) => l.id));
+  let n = 0;
+  for (const [path, key] of Object.entries(colors)) {
+    const slash = path.indexOf('/');
+    const layer = path.slice(0, slash);
+    if (!ids.has(layer) || !palette[key]) continue;
+    map.setPaintProperty(layer, path.slice(slash + 1), palette[key]);
+    n++;
+  }
+  return n;
+}
+
 /**
  * Show or hide the style's flat 2D building layer. The 3D layer calls this with `false`
  * when it is added and `true` when it is removed. A no-op if the layer isn't in the style.

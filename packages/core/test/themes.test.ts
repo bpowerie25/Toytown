@@ -3,8 +3,15 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { parsePackManifest, parseManifest, ManifestError } from '../src/manifest';
-import { toytownStyle } from '../src/style';
-import { DEFAULT_THEME, NIGHT_THEME, resolveTheme, THEMES } from '../src/themes';
+import { recolourStyle, toytownStyle } from '../src/style';
+import {
+  DEFAULT_THEME,
+  NIGHT_THEME,
+  PASTEL_THEME,
+  SITCOM_THEME,
+  resolveTheme,
+  THEMES,
+} from '../src/themes';
 
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), '../../../assets/models');
 const HEX = /^#[0-9A-F]{6}$/;
@@ -30,11 +37,34 @@ describe('themes', () => {
     for (const [path, c] of colours(theme)) expect(c, path).toMatch(HEX);
   });
 
-  it('night has the same keys as default everywhere it matters', () => {
-    expect(Object.keys(NIGHT_THEME.style).sort()).toEqual(Object.keys(DEFAULT_THEME.style).sort());
-    expect(Object.keys(NIGHT_THEME.buildings.walls).sort()).toEqual(
-      Object.keys(DEFAULT_THEME.buildings.walls).sort(),
-    );
+  it.each(Object.entries(THEMES))(
+    '%s has the same keys as default everywhere it matters',
+    (_n, t) => {
+      expect(Object.keys(t.style).sort()).toEqual(Object.keys(DEFAULT_THEME.style).sort());
+      expect(Object.keys(t.buildings.walls).sort()).toEqual(
+        Object.keys(DEFAULT_THEME.buildings.walls).sort(),
+      );
+      expect(Object.keys(t.buildings.windowStyles).sort()).toEqual(
+        Object.keys(DEFAULT_THEME.buildings.windowStyles).sort(),
+      );
+      expect(Object.keys(t.areas!.fill).sort()).toEqual(
+        Object.keys(DEFAULT_THEME.areas!.fill).sort(),
+      );
+      expect(t.lighting.toonSteps.length).toBeGreaterThanOrEqual(2);
+    },
+  );
+
+  it('sitcom: solid black ink, thick edges, hard two-band shading', () => {
+    expect(resolveTheme('sitcom')).toBe(SITCOM_THEME);
+    expect(SITCOM_THEME.outline.inkMix).toBe(1);
+    expect(SITCOM_THEME.outline.edgeWidth).toBeGreaterThan(DEFAULT_THEME.outline.edgeWidth);
+    expect(SITCOM_THEME.lighting.toonSteps).toHaveLength(2);
+  });
+
+  it('pastel: no model outlines, faint tinted edges', () => {
+    expect(resolveTheme('pastel')).toBe(PASTEL_THEME);
+    expect(PASTEL_THEME.outline.hullWidth).toBe(0);
+    expect(PASTEL_THEME.outline.inkMix).toBeLessThan(0.5);
   });
 
   it('night: #1B2238 background, #FFD166 glowing windows', () => {
@@ -49,6 +79,42 @@ describe('themes', () => {
     expect((style.metadata as Record<string, unknown>)['toytown:palette']).toEqual(
       DEFAULT_THEME.style,
     );
+  });
+});
+
+describe('recolourStyle', () => {
+  /** A fake map holding a style, recording paint changes. */
+  const host = (style: ReturnType<typeof toytownStyle>) => {
+    const set: Record<string, unknown> = {};
+    return {
+      set,
+      getStyle: () => style,
+      setPaintProperty: (layer: string, name: string, value: unknown) => {
+        set[`${layer}/${name}`] = value;
+      },
+    };
+  };
+
+  it('recolours a live toy-town style to match a freshly themed one', () => {
+    const map = host(toytownStyle());
+    const n = recolourStyle(map, 'sitcom');
+    expect(n).toBeGreaterThan(20);
+    const themed = toytownStyle({ theme: 'sitcom' });
+    for (const [path, value] of Object.entries(map.set)) {
+      const [id, prop] = path.split('/') as [string, string];
+      const layer = themed.layers.find((l) => l.id === id) as { paint?: Record<string, unknown> };
+      expect(value, path).toBe(layer.paint![prop]);
+    }
+  });
+
+  it('leaves styles without the toy-town colour map alone', () => {
+    const map = host({
+      version: 8,
+      sources: {},
+      layers: [{ id: 'bg', type: 'background' }],
+    } as never);
+    expect(recolourStyle(map, 'night')).toBe(0);
+    expect(map.set).toEqual({});
   });
 });
 

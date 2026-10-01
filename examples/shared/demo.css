@@ -50,6 +50,31 @@ body.night .panel {
 .panel button:hover {
   background: #e0b85c;
 }
+.panel .skins {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+}
+.panel .skins button {
+  flex: 1;
+  margin: 0;
+  padding: 4px 0;
+  background: #f1ece0;
+  font-size: 12px;
+  text-align: center;
+}
+.panel .skins button[aria-pressed='true'] {
+  background: #2b2d42;
+  color: #ffffff;
+}
+body.night .panel .skins button {
+  background: #3a4265;
+  color: #e8e6f0;
+}
+body.night .panel .skins button[aria-pressed='true'] {
+  background: #ffd166;
+  color: #1b2238;
+}
 .panel .links {
   display: flex;
   justify-content: space-between;

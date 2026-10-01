@@ -17,6 +17,24 @@ Updated at the end of each phase.
 
 ## After phase 7 (2026-09-30)
 
+- **Skins (2026-10-01)**: two new built-in themes and live switching, for v0.2.0 (changeset added,
+  not released).
+  - **`sitcom`** is a TV-cartoon look: flat saturated walls, solid `#1A1A22` outlines (2.2 px
+    edges, 0.3 m model hulls) and hard two-band shading. It's inspired by that style of cartoon,
+    with no copied characters, names or landmarks.
+  - **`pastel`**: soft walls, three gentle toon steps, faint tinted edges and no model outlines.
+    The first pass was too washed out (the walls vanished into the ground), so saturation and
+    shading were raised.
+  - **`toy.setTheme(name | theme)`** switches without reloading the map. It recolours the base
+    style in place (new `recolourStyle`, driven by the style's `toytown:colors` map), re-adds the
+    open-space layers, swaps the layer's materials and lights, and re-plans the town, since
+    colours are baked into chunk meshes and model geometry. A switch takes about 0.8 s on Tramore.
+  - Theme `outline` gains `inkShade` and `inkMix` (the defaults keep the old look exactly), and
+    `hullWidth: 0` hides model hulls.
+  - The demos have a Day / Night / Sitcom / Pastel picker that switches live and keeps `?theme=`
+    in the URL. A new e2e test covers the picker with sitcom and pastel baselines. The night
+    baseline was refreshed for the new panel.
+
 - **Released v0.1.0 (2026-09-30).** `toytown-gl`, `@toytown/models` and `@toytown/cli` are on npm
   with provenance, the GitHub release has the models zip, and the demos are live at
   https://bpowerie25.github.io/Toytown/. Checked afterwards from the real registry:

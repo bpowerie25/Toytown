@@ -222,6 +222,7 @@ export function createBuildingMaterial(theme: Theme): MeshToonMaterial {
       uInk: { value: vec(o.color) },
       uFloor: { value: b.floorHeight },
       uEdgeWidth: { value: o.edgeWidth },
+      uInkTone: { value: [o.inkShade ?? 0.45, o.inkMix ?? 0.35] },
       uFade: { value: [o.fadeStart, o.fadeEnd] },
       uWindowGlow: { value: b.windowGlow },
     });
@@ -255,6 +256,7 @@ uniform vec3 uDoor;
 uniform vec3 uInk;
 uniform float uFloor;
 uniform float uEdgeWidth;
+uniform vec2 uInkTone; // face shade, mix towards uInk
 uniform vec2 uFade;
 uniform float uWindowGlow;
 varying vec4 vWall; // u along edge, height, edge length (0 = no windows), eave height
@@ -293,9 +295,9 @@ if (vEdge.w < 0.5) bc.y = 1.0; // quad: skip the diagonal
 // smoothstep is undefined when both edges are equal: constant channels (decks, the quad's
 // ignored y) have fwidth 0, so keep the upper edge above zero.
 vec3 aa = smoothstep(vec3(0.0), max(fwidth(bc) * uEdgeWidth, vec3(1e-5)), bc);
-float ink = (1.0 - min(min(aa.x, aa.y), aa.z)) * detail;
+float ink = uEdgeWidth > 0.0 ? (1.0 - min(min(aa.x, aa.y), aa.z)) * detail : 0.0;
 // Ink is a darker tone of the face itself, nudged towards the theme's ink colour.
-gl_FragColor.rgb = mix(gl_FragColor.rgb, mix(gl_FragColor.rgb * 0.45, uInk, 0.35), ink);`,
+gl_FragColor.rgb = mix(gl_FragColor.rgb, mix(gl_FragColor.rgb * uInkTone.x, uInk, uInkTone.y), ink);`,
       );
   };
   return m;
