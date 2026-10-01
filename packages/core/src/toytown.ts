@@ -99,6 +99,9 @@ export class ToyTown {
     click: new Set(),
   };
   private readonly overrides = new Map<string, string>();
+  /** Categories given a model with setCategoryModel; a skin's model set never replaces them. */
+  private readonly userCategories = new Set<string>();
+  private readonly skinKits = new Map<string, Promise<Manifest | null>>();
   private readonly packs: string[] = [];
   // Set once data is in.
   private data?: {
@@ -283,6 +286,34 @@ export class ToyTown {
     this.resolveLoaded();
   }
 
+  /** A skin's model set, `<kit>/manifest.json` next to the main manifest, loaded once. */
+  private skinKit(kit: string): Promise<Manifest | null> {
+    let p = this.skinKits.get(kit);
+    if (!p) {
+      const url = this.modelsBase && new URL(`${kit}/manifest.json`, this.modelsBase).href;
+      p = !url
+        ? Promise.resolve(null)
+        : fetch(url)
+            .then(async (r) => {
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              const m = parseManifest(await r.json());
+              const abs = (f: string) => new URL(f, url).href;
+              for (const e of Object.values(m.models)) {
+                e.file = abs(e.file);
+                for (const v of e.variants ?? []) v.file = abs(v.file);
+              }
+              for (const e of Object.values(m.props ?? {})) e.file = abs(e.file);
+              return m;
+            })
+            .catch((e: unknown) => {
+              console.warn(`[toytown-gl] skin model set "${kit}" not loaded, using the kit`, e);
+              return null;
+            });
+      this.skinKits.set(kit, p);
+    }
+    return p;
+  }
+
   /** Apply packs and model overrides to the kit, then (re)plan the town. Queued, one at a time. */
   private reapply(): Promise<void> {
     this.applying = this.applying
@@ -321,6 +352,7 @@ export class ToyTown {
     this.packs.length = 0;
 
     for (const [category, url] of this.overrides) {
+      this.userCategories.add(category);
       manifest ??= { version: 1, units: 'metres', up: '+Y', front: '+Z', palette: {}, models: {} };
       const model = await loadModel(url, manifest, this.theme);
       const box = new Box3().setFromBufferAttribute(
@@ -346,6 +378,12 @@ export class ToyTown {
     }
     this.overrides.clear();
     this.manifest = manifest;
+    // A skin with its own model set (theme.models.kit) restyles the kit's models for this plan;
+    // packs and setCategoryModel stay as they are.
+    if (manifest && this.theme.models.kit) {
+      const skin = await this.skinKit(this.theme.models.kit);
+      if (skin) manifest = withSkinKit(manifest, skin, this.userCategories);
+    }
 
     const kit = manifest ? planKit(manifest) : null;
     const { buildings, points, trees, areas, frame } = this.data;
@@ -368,6 +406,26 @@ export class ToyTown {
       this.modelsBase,
     );
   }
+}
+
+/**
+ * The kit with a skin's model set swapped in: each model the skin has replaces the kit's model of
+ * the same name (variants included), except categories in `keep` (the user's own models), and
+ * each prop it has replaces the kit's prop of the same name. Packs' landmark models stay.
+ */
+export function withSkinKit(
+  base: Manifest,
+  skin: Manifest,
+  keep: Set<string> = new Set(),
+): Manifest {
+  const models = { ...base.models };
+  for (const [name, m] of Object.entries(skin.models)) {
+    if (!models[name] || keep.has(name)) continue;
+    models[name] = { ...m, pack: models[name]!.pack };
+  }
+  const props = { ...base.props };
+  for (const [name, p] of Object.entries(skin.props ?? {})) if (props[name]) props[name] = p;
+  return { ...base, palette: { ...skin.palette, ...base.palette }, models, props };
 }
 
 /** Group buildings and extra placements into chunks by tile, in a fixed order. */

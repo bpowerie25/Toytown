@@ -249,6 +249,7 @@ export function createBuildingMaterial(theme: Theme): MeshToonMaterial {
       uEdgeWidth: { value: o.edgeWidth },
       uInkTone: { value: [o.inkShade ?? 0.45, o.inkMix ?? 0.35] },
       uWobble: { value: theme.effects?.wobble ?? 0 },
+      uBlocks: { value: theme.effects?.blocks ?? 0 },
       uHalftone: halftoneUniform(theme),
       uFade: { value: [o.fadeStart, o.fadeEnd] },
       uWindowGlow: { value: b.windowGlow },
@@ -285,6 +286,7 @@ uniform float uFloor;
 uniform float uEdgeWidth;
 uniform vec2 uInkTone; // face shade, mix towards uInk
 uniform float uWobble;
+uniform float uBlocks;
 uniform vec2 uFade;
 uniform float uWindowGlow;
 varying vec4 vWall; // u along edge, height, edge length (0 = no windows), eave height
@@ -318,6 +320,17 @@ if (vWall.z > 1.2) {
   vec3 far = mix(diffuseColor.rgb, uWindow, 0.12);
   diffuseColor.rgb = mix(far, near, detail);
   glass *= detail;
+}
+// Voxel look: a block grid in the building's own frame (along the wall and up it; across the roof
+// in plan), each block a slightly different shade.
+if (uBlocks > 0.0) {
+  vec2 q = vWall.z > 0.0 ? vWall.xy : vLocal.xy;
+  vec2 cell = floor(q / uBlocks);
+  vec2 g = abs(fract(q / uBlocks) - 0.5) * uBlocks;
+  float px = max(length(fwidth(q)), 1e-4);
+  float line = smoothstep(uBlocks * 0.5 - px * 1.5, uBlocks * 0.5, max(g.x, g.y));
+  float jitter = hash12(cell + vec2(vWall.z * 1.7, vWall.w)) - 0.5;
+  diffuseColor.rgb *= (1.0 + 0.07 * jitter * detail) * (1.0 - 0.22 * line * detail);
 }
 // Flat roof decks (faces with no ink edges): faint panel lines.
 if (vEdge.x > 0.99 && vEdge.y > 0.99 && vEdge.z > 0.99) {

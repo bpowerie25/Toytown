@@ -45,6 +45,15 @@ Updated at the end of each phase.
     uses for stable screenshots. They're used by three new skins, `comic`, `handdrawn` and
     `golden`, and by snow on `winter` and `christmas`. Golden's first haze (0.85) turned the whole
     scene orange, so it's now 0.6.
+  - **Skin model sets**: `assets/models/skins/voxel` and `skins/chunky` are generated from the
+    generic kit (30 models, 6 variants, 7 props each) by `voxelize` and `chunkify` in the
+    generator. Voxelize keeps only outward cube faces, colours each cube from the nearest original
+    face (plain numpy; trimesh's `closest_point` needs `rtree`, a new dependency, so I avoided it),
+    and coarsens the cubes until the model fits its budget. Chunkify subdivides first; without
+    that, box walls had no vertices to bulge. A theme's `models.kit` swaps a set in by name, live,
+    keeping `setCategoryModel` categories and pack landmarks. The `voxel` (plus a `blocks` grid
+    effect and flat tops on procedural buildings) and `chunky` (steep, tall roofs) skins use them.
+    All 130 models pass the kit tests and the reproducibility check.
   - The demo picker became a dropdown of all the skins (dark skins get the dark panel). The e2e
     test walks every skin in the dropdown and screenshots each on Tramore.
   - Earlier, the picker was buttons (Day / Night / Sitcom / Pastel / Winter / Blueprint) that switches live and keeps `?theme=`

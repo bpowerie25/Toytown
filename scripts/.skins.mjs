@@ -7,7 +7,7 @@ await page.goto('http://localhost:4310/waterford/');
 await page.evaluate(() => document.querySelector('.panel')?.remove());
 await page.waitForFunction(() => !!window.toy);
 await page.evaluate(() =>
-  window.map.jumpTo({ center: [-7.1105, 52.2605], zoom: 17.2, bearing: -20, pitch: 60 }),
+  window.map.jumpTo({ center: [-7.1105, 52.2605], zoom: 18.2, bearing: -20, pitch: 60 }),
 );
 await page.evaluate(() => window.toy.ready);
 for (const s of process.argv.slice(2)) {

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { LocalProjection, type LngLat } from '../src/geometry';
 import { SceneFrame } from '../src/render/frame';
 import { instanceMatrix, shouldDraw3D } from '../src/render/layer';
-import { splitData } from '../src/toytown';
+import { splitData, withSkinKit } from '../src/toytown';
 
 describe('splitData', () => {
   it('splits buildings, POI points and trees, and normalises polygons to parts', () => {
@@ -116,5 +116,61 @@ describe('shouldDraw3D', () => {
     expect(shouldDraw3D(0)).toBe(true);
     expect(shouldDraw3D(0.3)).toBe(false);
     expect(shouldDraw3D(1)).toBe(false);
+  });
+});
+
+describe('withSkinKit', () => {
+  const entry = (file: string) => ({
+    file,
+    pack: 'generic',
+    osm_tags: [],
+    materials: ['white'],
+    footprint_m: [10, 8] as [number, number],
+    height_m: 7,
+  });
+  const base = {
+    version: 1,
+    units: 'metres' as const,
+    up: '+Y' as const,
+    front: '+Z' as const,
+    palette: { white: '#FFFFFF' },
+    models: {
+      house: entry('generic/house.glb'),
+      pub: entry('generic/pub.glb'),
+      landmark_x: { ...entry('ireland/x.glb'), pack: 'ireland' },
+    },
+    props: {
+      spire: {
+        file: 'props/spire.glb',
+        categories: ['church'],
+        attach: { at: 'front-edge' as const, z: 'ground' as const },
+        materials: ['white'],
+        footprint_m: [2, 2] as [number, number],
+        height_m: 20,
+      },
+    },
+  };
+  const skin = {
+    ...base,
+    palette: { white: '#FFFFFF', brick: '#E07A5F' },
+    models: {
+      house: entry('https://x/skins/voxel/house.glb'),
+      pub: entry('https://x/skins/voxel/pub.glb'),
+    },
+    props: { spire: { ...base.props.spire, file: 'https://x/skins/voxel/spire.glb' } },
+  };
+
+  it('swaps in the skin models and props by name, keeping landmarks', () => {
+    const m = withSkinKit(base, skin);
+    expect(m.models.house!.file).toBe('https://x/skins/voxel/house.glb');
+    expect(m.models.landmark_x!.file).toBe('ireland/x.glb');
+    expect(m.props!.spire!.file).toBe('https://x/skins/voxel/spire.glb');
+    expect(m.palette.brick).toBe('#E07A5F');
+  });
+
+  it("never replaces the user's own models", () => {
+    const m = withSkinKit(base, skin, new Set(['pub']));
+    expect(m.models.pub!.file).toBe('generic/pub.glb');
+    expect(m.models.house!.file).toBe('https://x/skins/voxel/house.glb');
   });
 });

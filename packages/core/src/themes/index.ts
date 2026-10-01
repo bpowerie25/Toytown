@@ -16,6 +16,8 @@ import shamrockTheme from './shamrock.json';
 import comicTheme from './comic.json';
 import handdrawnTheme from './handdrawn.json';
 import goldenTheme from './golden.json';
+import voxelTheme from './voxel.json';
+import chunkyTheme from './chunky.json';
 
 /** Building look: colours, roof rules and window settings. All colours are exact hex. */
 export interface BuildingTheme {
@@ -133,6 +135,11 @@ export interface FitRules {
 }
 
 export interface ModelsTheme {
+  /**
+   * A model set that restyles the kit's shapes: a folder next to the kit's `manifest.json` (e.g.
+   * `skins/voxel`) holding its own `manifest.json` with models of the same names.
+   */
+  kit?: string;
   /** Colours for kit palette keys, overriding the manifest palette. */
   palette: Record<string, string>;
   /** Categories that never get hero models. */
@@ -175,6 +182,8 @@ export interface EffectsTheme {
   haze?: { color: string; amount: number };
   /** Falling snow, density 0–1. Off for users who prefer reduced motion. */
   snow?: { density: number };
+  /** Block grid on procedural buildings (walls and roofs), block size in metres, for voxel looks. */
+  blocks?: number;
 }
 
 export interface Theme {
@@ -204,7 +213,7 @@ export const BLUEPRINT_THEME = blueprintTheme as unknown as Theme;
 /**
  * Built-in themes (skins) by name: `default`, `night`, `sitcom`, `pastel`, `winter`, `blueprint`,
  * `neon`, `vintage`, `toybox`, `retro`, `autumn`, `sketch`, `christmas`, `halloween`, `shamrock`,
- * `comic`, `handdrawn`, `golden`.
+ * `comic`, `handdrawn`, `golden`, `voxel`, `chunky`.
  */
 export const THEMES: Record<string, Theme> = {
   default: DEFAULT_THEME,
@@ -225,6 +234,8 @@ export const THEMES: Record<string, Theme> = {
   comic: comicTheme as unknown as Theme,
   handdrawn: handdrawnTheme as unknown as Theme,
   golden: goldenTheme as unknown as Theme,
+  voxel: voxelTheme as unknown as Theme,
+  chunky: chunkyTheme as unknown as Theme,
 };
 
 /** A theme by name (`default`, `night`) or as an object; undefined means the default theme. */

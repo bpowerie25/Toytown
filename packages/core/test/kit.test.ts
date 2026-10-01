@@ -2,7 +2,7 @@
  * Checks the bundled model kit in assets/models: the manifest parses, every GLB
  * exists, passes the Khronos glTF validator, and follows the kit conventions.
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -20,6 +20,25 @@ const variants = entries.flatMap(([base, m]) =>
 );
 /** Every model and variant, with its manifest data. */
 const looks = [...entries.map(([n, m]) => [n, m] as const), ...variants];
+/** Skin model sets (skins/<kit>/manifest.json): the generic models restyled under the same names. */
+const SKINS = join(MODELS, 'skins');
+const skinKits = (existsSync(SKINS) ? readdirSync(SKINS) : [])
+  .filter((k) => existsSync(join(SKINS, k, 'manifest.json')))
+  .map(
+    (kit) =>
+      [
+        kit,
+        parseManifest(JSON.parse(readFileSync(join(SKINS, kit, 'manifest.json'), 'utf8'))),
+      ] as const,
+  );
+const skinLooks = skinKits.flatMap(([kit, m]) =>
+  Object.entries(m.models).flatMap(([n, e]) => [
+    [`${kit}/${n}`, { ...e, file: `skins/${kit}/${e.file}` }] as const,
+    ...(e.variants ?? []).map(
+      (v) => [`${kit}/${v.name}`, { ...v, file: `skins/${kit}/${v.file}` }] as const,
+    ),
+  ]),
+);
 
 function glbFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {
@@ -108,12 +127,37 @@ describe('model kit', () => {
         expect(areaProp(p) ? areaCategories.has(c) : c in manifest.models).toBe(true);
   });
 
+  it('has voxel and chunky skin kits covering every generic model, under the same names', () => {
+    expect(skinKits.map(([k]) => k).sort()).toEqual(['chunky', 'voxel']);
+    const generic = entries.filter(([, m]) => m.pack === 'generic').map(([n]) => n);
+    for (const [, m] of skinKits) {
+      expect(Object.keys(m.models).sort()).toEqual([...generic].sort());
+      expect(Object.keys(m.props ?? {}).sort()).toEqual(props.map(([n]) => n).sort());
+      for (const [n, e] of Object.entries(m.models))
+        expect((e.variants ?? []).map((v) => v.name)).toEqual(
+          (manifest.models[n]!.variants ?? []).map((v) => v.name),
+        );
+    }
+  });
+
   it('lists every GLB on disk, and nothing else', () => {
-    const listed = [...looks, ...props].map(([, m]) => m.file).sort();
+    const skinPropFiles = skinKits.flatMap(([kit, m]) =>
+      Object.values(m.props ?? {}).map((p) => `skins/${kit}/${p.file}`),
+    );
+    const listed = [
+      ...[...looks, ...props, ...skinLooks].map(([, m]) => m.file),
+      ...skinPropFiles,
+    ].sort();
     expect(glbFiles(MODELS).sort()).toEqual(listed);
   });
 
-  describe.each(props)('prop %s', (_name, prop) => {
+  const skinProps = skinKits.flatMap(([kit, m]) =>
+    Object.entries(m.props ?? {}).map(
+      ([n, p]) => [`${kit}/${n}`, { ...p, file: `skins/${kit}/${p.file}` }] as const,
+    ),
+  );
+
+  describe.each([...props, ...skinProps])('prop %s', (_name, prop) => {
     const bytes = new Uint8Array(readFileSync(join(MODELS, prop.file)));
     const gltf = readGlbJson(bytes);
 
@@ -148,7 +192,7 @@ describe('model kit', () => {
       expect(manifest.models[c]!.variants, c).toHaveLength(2);
   });
 
-  describe.each(looks)('%s', (_name, model) => {
+  describe.each([...looks, ...skinLooks])('%s', (_name, model) => {
     const bytes = new Uint8Array(readFileSync(join(MODELS, model.file)));
 
     it('passes the glTF validator with no errors', async () => {

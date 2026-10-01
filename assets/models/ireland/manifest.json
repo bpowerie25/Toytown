@@ -13,10 +13,20 @@
   "models": {
     "landmark_metal_man": {
       "file": "landmark_metal_man.glb",
-      "materials": ["offwhite", "white", "garda_blue", "skin"],
-      "footprint_m": [17.6, 3.6],
+      "materials": [
+        "offwhite",
+        "white",
+        "garda_blue",
+        "skin"
+      ],
+      "footprint_m": [
+        17.6,
+        3.6
+      ],
       "height_m": 22.7,
-      "osm_tags": ["landmark override by OSM id"]
+      "osm_tags": [
+        "landmark override by OSM id"
+      ]
     }
   },
   "landmarks": [

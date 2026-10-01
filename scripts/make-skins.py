@@ -60,7 +60,7 @@ def by_lum(*shades):
 
 def skin(name, *, style, wall, houses, roofs, flat_roof, windows, frame, door, lighting,
          outline, areas, model_extra=None, model_map=None, window_glow=0, glow=(),
-         effects=None, buildings_extra=None):
+         effects=None, buildings_extra=None, kit=None):
     t = copy.deepcopy(D)
     t['name'] = name
     t['style'] = style
@@ -70,7 +70,8 @@ def skin(name, *, style, wall, houses, roofs, flat_roof, windows, frame, door, l
         b['walls'][k] = houses
     b.update({'roofs': roofs, 'flatRoof': flat_roof, 'windows': windows, 'frame': frame,
               'door': door, 'windowGlow': window_glow})
-    b.update(buildings_extra or {})
+    for k, v in (buildings_extra or {}).items():
+        b[k] = {**b[k], **v} if isinstance(v, dict) and isinstance(b.get(k), dict) else v
     t['lighting'] = lighting
     t['outline'] = outline
     t['models']['palette'] = walk(D['models']['palette'], model_map or wall)
@@ -78,6 +79,8 @@ def skin(name, *, style, wall, houses, roofs, flat_roof, windows, frame, door, l
                                    'roof_red': roofs[0], 'roof_slate': roofs[1 % len(roofs)]})
     t['models']['palette'].update(model_extra or {})
     t['models']['glow'] = list(glow)
+    if kit:
+        t['models']['kit'] = kit
     fills = areas.pop('fill')
     t['areas'] = {'fill': {k: fills.get(k, fills['default']) for k in D['areas']['fill']}, **areas}
     if effects:
@@ -329,6 +332,57 @@ SKINS['golden'] = lambda: skin(
     areas=area_set('#D9C98A', '#C4C276', '#D98F6E', '#F3D08E', '#B8A066', '#B5B56A', '#FFF1D6',
                    '#D7865F', '#B5B56A', '#5A3418', '#FFF1D6'),
     effects={'haze': {'color': '#FFC98A', 'amount': 0.6}},
+)
+
+# Voxel: everything built from blocks. Models come from the voxel model set; procedural buildings
+# get flat tops and a block grid.
+SKINS['voxel'] = lambda: skin(
+    'voxel',
+    style=style('#86C25A', '#3F76E4', '#79B84E', '#4E8A2E', '#E2D49A', '#A8A59C', '#6E6C66',
+                '#B9B5AA', '#6E6C66', '#6E6C66', '#FFFFFF', '#2B2B2B', '#B08A5A', '#5E4630'),
+    wall=lambda h: ['#B08A5A', '#9E9E9E', '#C9B27C', '#D8D2C4', '#A0603C'][int(hsv(h)[0] * 5 + lum(h) * 4) % 5],
+    houses=['#B08A5A', '#C9A36A', '#9E9E9E', '#D8D2C4', '#A0603C'],
+    roofs=['#7A5634', '#5E5E5E'], flat_roof='#8A8A8A', windows='#A8D8F0', frame='#7A5634',
+    door='#6B4A2E',
+    lighting={'ambient': 0.6, 'sun': 0.4, 'sunDirection': [-0.45, -0.6, 0.66],
+              'toonSteps': [0.3, 0.65, 1.0]},
+    outline={'color': '#2B2B2B', 'hullWidth': 0.08, 'edgeWidth': 1.2, 'inkShade': 0.4,
+             'inkMix': 0.6, 'fadeStart': 0.5, 'fadeEnd': 1.2},
+    model_map=lambda h: h,
+    model_extra={'leaf': '#4E9A2E', 'trunk': '#6B4A2E'},
+    areas=area_set('#79B84E', '#5FA83E', '#A0603C', '#E2D49A', '#4E8A2E', '#58A038', '#FFFFFF',
+                   '#A8A59C', '#58A038', '#FFFFFF', '#2B2B2B'),
+    buildings_extra={'pitchedRoofs': {'categories': []},
+                     'flat': {'bevel': 0, 'parapetHeight': 0.5, 'parapetWidth': 0.5}},
+    effects={'blocks': 1.0},
+    kit='skins/voxel',
+)
+
+# Chunky cartoon: squat bulging walls and tall steep roofs, from the chunky model set; procedural
+# buildings get steep, tall roofs with deep eaves.
+SKINS['chunky'] = lambda: skin(
+    'chunky',
+    style=style('#F6E7C1', '#6EC6EA', '#A6DB8C', '#5DB35A', '#F8DFA0', '#FFFFFF', '#3A3046',
+                '#FFE08A', '#3A3046', '#8F8597', '#3A3046', '#FFFFFF', '#EBD9B4', '#3A3046'),
+    wall=lambda h: from_hsv(hsv(h)[0], min(0.55, hsv(h)[1] * 1.6 + 0.08), min(1, hsv(h)[2] * 1.02)),
+    houses=['#F6D8A8', '#F4B7A0', '#FBE59A', '#B9DAF2', '#C6E8C0', '#FFF4E0'],
+    roofs=['#D9573E', '#5A6BB0', '#3E9A6A'], flat_roof='#D9CDB8', windows='#9DD7F0',
+    frame='#FFFFFF', door='#8A4B2E',
+    lighting={'ambient': 0.58, 'sun': 0.42, 'sunDirection': [-0.45, -0.6, 0.66],
+              'toonSteps': [0.15, 0.6, 1.0]},
+    outline={'color': '#3A3046', 'hullWidth': 0.22, 'edgeWidth': 1.9, 'inkShade': 0.25,
+             'inkMix': 0.9, 'fadeStart': 0.7, 'fadeEnd': 1.6},
+    model_map=lambda h: from_hsv(hsv(h)[0], min(0.6, hsv(h)[1] * 1.4 + 0.05), min(1, hsv(h)[2] * 1.03)),
+    model_extra={'leaf': '#5DB35A'},
+    areas=area_set('#A6DB8C', '#7CC96A', '#E0896A', '#FBE59A', '#3A3046', '#6EBE5E', '#FFFFFF',
+                   '#E0896A', '#6EBE5E', '#3A3046', '#FFFFFF'),
+    buildings_extra={'pitchedRoofs': {
+        'categories': ['house', 'bungalow', 'semi_detached', 'terraced_house', 'apartment', 'pub',
+                       'church', 'school', 'shop', 'cafe', 'pharmacy', 'bank', 'hotel', 'library',
+                       'town_hall', 'police_station', 'fire_station', 'train_station', 'generic'],
+        'minRectangularity': 0.75, 'pitchDeg': 55, 'maxRoofHeightRatio': 0.7,
+        'maxRoofHeight': 11, 'overhang': 0.8}},
+    kit='skins/chunky',
 )
 
 if __name__ == '__main__':

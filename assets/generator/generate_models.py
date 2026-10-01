@@ -527,6 +527,106 @@ PROPS = [
     (prop_playset, ["playground"], {"at": "area-centre", "z": "ground"}),
 ]
 
+# --- Skin model sets -----------------------------------------------------------------------
+# Whole-kit restyles for skins that change shapes, not just colours. Each transform takes a
+# finished Model and returns a new one with the same name and palette keys, so it follows the
+# same conventions (Z-up here, front -Y, base at z = 0) and drops in by category name.
+
+def _combined(mdl):
+    parts = [(c, trimesh.util.concatenate(ms)) for c, ms in mdl.parts.items()]
+    allm = trimesh.util.concatenate([m for _, m in parts])
+    labels = np.concatenate([np.full(len(m.faces), i) for i, (_, m) in enumerate(parts)])
+    return parts, allm, labels
+
+def _nearest_faces(mesh, points):
+    """Index of the nearest face to each point: by distance to the face's plane where the point
+    projects inside the face, else to its centroid (plain numpy, no spatial index needed)."""
+    tri = mesh.triangles
+    cen = tri.mean(axis=1)
+    n = mesh.face_normals
+    best = np.empty(len(points), dtype=int)
+    for i, p in enumerate(points):
+        d = p - cen
+        plane = np.abs((d * n).sum(1))
+        # Barycentric inside test of the point projected onto each face's plane.
+        q = p - ((p - tri[:, 0]) * n).sum(1)[:, None] * n
+        v0, v1 = tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]
+        v2 = q - tri[:, 0]
+        d00, d01, d11 = (v0 * v0).sum(1), (v0 * v1).sum(1), (v1 * v1).sum(1)
+        d20, d21 = (v2 * v0).sum(1), (v2 * v1).sum(1)
+        den = d00 * d11 - d01 * d01
+        den[den == 0] = 1e-12
+        b1 = (d11 * d20 - d01 * d21) / den
+        b2 = (d00 * d21 - d01 * d20) / den
+        inside = (b1 >= -0.05) & (b2 >= -0.05) & (b1 + b2 <= 1.05)
+        dist = np.where(inside, plane, np.linalg.norm(d, axis=1) + 0.25)
+        best[i] = int(np.argmin(dist))
+    return best
+
+def voxelize(mdl, max_tris=1900):
+    """Rebuild a model from cubes: voxelize it, keep only the cube faces that face outwards, and
+    colour each cube like the nearest original surface. The cube size grows until the model fits
+    the triangle budget."""
+    parts, allm, labels = _combined(mdl)
+    cube = trimesh.creation.box(extents=[1, 1, 1])
+    dirs = [np.array(d) for d in ([1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1])]
+    tmpl = {tuple(d): cube.triangles[np.isclose(cube.face_normals @ d, 1)] for d in dirs}
+    pitch = max(0.5, float(allm.extents.max()) / 18)
+    while True:
+        vg = allm.voxelized(pitch)
+        try:
+            vg = vg.fill()
+        except Exception:
+            pass
+        occ = np.pad(vg.matrix, 1)
+        faces = []
+        for d in dirs:
+            nb = np.roll(occ, shift=tuple(-d), axis=(0, 1, 2))
+            idx = np.argwhere(occ & ~nb) - 1
+            if len(idx): faces.append((d, idx))
+        if sum(len(i) for _, i in faces) * 2 <= max_tris or pitch > 3: break
+        pitch *= 1.15
+    out = Model(mdl.name, mdl.pack)
+    tris = {}
+    for d, idx in faces:
+        centres = vg.indices_to_points(idx)
+        tri = _nearest_faces(allm, centres)
+        for c, lab in zip(centres, labels[tri]):
+            tris.setdefault(int(lab), []).append(tmpl[tuple(d)] * pitch + c)
+    bottom = min(float(np.min(np.array(t)[..., 2])) for t in tris.values())
+    for lab, ts in sorted(tris.items()):
+        v = np.array(ts).reshape(-1, 3) - [0, 0, bottom]
+        m = trimesh.Trimesh(v, np.arange(len(v)).reshape(-1, 3), process=True)
+        out.add(m, parts[lab][0])
+    return out
+
+def chunkify(mdl, max_tris=1900):
+    """Squash-and-stretch cartoon: squat walls that bulge out at mid-height, and roofs (the top
+    45% of the model) pulled up tall. Meshes are subdivided first so flat walls can bend; the
+    subdivision is as fine as the triangle budget allows."""
+    _, allm, _ = _combined(mdl)
+    H = float(allm.bounds[1][2])
+    eave = 0.55 * H
+    for edge in (H / 6, H / 4, H / 3, H / 2, None):  # None: no subdivision, the original mesh
+        out = Model(mdl.name, mdl.pack)
+        n = 0
+        for color, meshes in mdl.parts.items():
+            for m in meshes:
+                v, f = ((m.vertices, m.faces) if edge is None else
+                        trimesh.remesh.subdivide_to_size(m.vertices, m.faces, max_edge=edge, max_iter=6))
+                z = v[:, 2]
+                bulge = 1.0 + 0.16 * np.sin(np.pi * np.clip(z / max(eave, 1e-6), 0, 1))
+                v = v.copy()
+                v[:, 0] *= 1.04 * bulge
+                v[:, 1] *= 1.04 * bulge
+                v[:, 2] = np.where(z > eave, eave * 0.8 + (z - eave) * 1.8, z * 0.8)
+                out.add(trimesh.Trimesh(v, f, process=False), color)
+                n += len(f)
+        if n <= max_tris: return out
+    return out
+
+SKIN_KITS = {"voxel": voxelize, "chunky": chunkify}
+
 def entry(mdl, path):
     bounds = trimesh.util.concatenate([x for ms in mdl.parts.values() for x in ms]).bounds
     return {"file": f"{mdl.pack}/{os.path.basename(path)}", "materials": list(mdl.parts.keys()),
@@ -555,6 +655,30 @@ def hand_packs():
                 out.append((d, name, spec))
     return out
 
+def render_preview(models, path):
+    """A contact sheet of models, shaded with a fixed light, for README previews."""
+    import matplotlib; matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    light = np.array([-0.5, -0.8, 1.0]); light /= np.linalg.norm(light)
+    cols_n = 6; rows_n = int(np.ceil(len(models) / cols_n))
+    fig = plt.figure(figsize=(cols_n * 3.4, rows_n * 3.6), facecolor="#FAF6EE")
+    for i, mdl in enumerate(models):
+        ax = fig.add_subplot(rows_n, cols_n, i + 1, projection="3d"); ax.set_facecolor("#FAF6EE")
+        tris, cols = [], []
+        for color, meshes in mdl.parts.items():
+            mm = trimesh.util.concatenate(meshes); base = np.array(rgba(PALETTE[color])[:3])
+            shade = 0.55 + 0.45 * np.clip(mm.face_normals @ light, 0, 1)
+            tris.extend(mm.triangles); cols.extend([np.append(base * s, 1) for s in shade])
+        ax.add_collection3d(Poly3DCollection(tris, facecolors=cols, edgecolors="#2B2D42", linewidths=0.12))
+        allv = np.vstack(tris).reshape(-1, 3); mn, mx = allv.min(0), allv.max(0)
+        c = (mn + mx) / 2; r = (mx - mn).max() / 2
+        ax.set_xlim(c[0] - r, c[0] + r); ax.set_ylim(c[1] - r, c[1] + r); ax.set_zlim(0, 2 * r)
+        ax.set_box_aspect([1, 1, 1]); ax.view_init(elev=25, azim=-60); ax.axis("off")
+        label = mdl.pack if mdl.pack != "generic" and not mdl.pack.startswith("skins/") else ""
+        ax.set_title(mdl.name + (f" ({label})" if label else ""), fontsize=11, color="#2B2D42")
+    plt.tight_layout(); plt.savefig(path, dpi=80, facecolor="#FAF6EE"); plt.close(fig)
+
 if __name__ == "__main__":
     # Remove only files this generator made last time (hand-made GLBs and other files stay).
     old = os.path.join(OUT, "manifest.json")
@@ -568,14 +692,20 @@ if __name__ == "__main__":
     for f in GENERATED:
         if os.path.exists(os.path.join(OUT, f)): os.remove(os.path.join(OUT, f))
 
+    skins_dir = os.path.join(OUT, "skins")
+    if os.path.isdir(skins_dir): shutil.rmtree(skins_dir)  # skin kits are entirely generated
+
     manifest = {}
     models = []
+    built = []  # (model, tags, variants) of the generic kit, for the skin kits
     for b, tags in BUILDERS:
         mdl = b(); path = mdl.export(); models.append(mdl)
         manifest[mdl.name] = {**entry(mdl, path), "pack": mdl.pack, "osm_tags": tags}
+        vms = []
         for v in VARIANTS.get(mdl.name, []):
-            vm = v(); vpath = vm.export(); models.append(vm)
+            vm = v(); vpath = vm.export(); models.append(vm); vms.append(vm)
             manifest[mdl.name].setdefault("variants", []).append({"name": vm.name, **entry(vm, vpath)})
+        if mdl.pack == "generic": built.append((mdl, tags, vms))
     for pack, name, spec in hand_packs():
         if SRC != os.path.abspath(OUT):  # regenerating elsewhere (e.g. the reproducibility check): bring the file along
             os.makedirs(os.path.join(OUT, pack), exist_ok=True)
@@ -586,9 +716,11 @@ if __name__ == "__main__":
         else:
             manifest[name] = {**e, "pack": pack, "osm_tags": spec.get("osm_tags", [])}
     props = {}
+    built_props = []
     for b, categories, attach in PROPS:
         mdl = b(); path = mdl.export(); models.append(mdl)
         props[mdl.name] = {**entry(mdl, path), "categories": categories, "attach": attach}
+        built_props.append((mdl, categories, attach))
     json.dump({"version": 1, "units": "metres", "up": "+Y", "front": "+Z",
                "palette": PALETTE, "models": manifest, "props": props}, open(os.path.join(OUT, "manifest.json"), "w"), indent=2)
     print(len(manifest), "models,", sum(len(m.get("variants", [])) for m in manifest.values()), "variants,", len(props), "props")
@@ -612,23 +744,30 @@ if __name__ == "__main__":
                    "landmarks": [{"osm": l["osm"], "category": l["category"]} for l in landmarks]},
                   open(os.path.join(OUT, pack, "manifest.json"), "w"), indent=2)
 
-    import matplotlib; matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-    light = np.array([-0.5, -0.8, 1.0]); light /= np.linalg.norm(light)
-    cols_n = 6; rows_n = int(np.ceil(len(models) / cols_n))
-    fig = plt.figure(figsize=(cols_n * 3.4, rows_n * 3.6), facecolor="#FAF6EE")
-    for i, mdl in enumerate(models):
-        ax = fig.add_subplot(rows_n, cols_n, i + 1, projection="3d"); ax.set_facecolor("#FAF6EE")
-        tris, cols = [], []
-        for color, meshes in mdl.parts.items():
-            mm = trimesh.util.concatenate(meshes); base = np.array(rgba(PALETTE[color])[:3])
-            shade = 0.55 + 0.45 * np.clip(mm.face_normals @ light, 0, 1)
-            tris.extend(mm.triangles); cols.extend([np.append(base * s, 1) for s in shade])
-        ax.add_collection3d(Poly3DCollection(tris, facecolors=cols, edgecolors="#2B2D42", linewidths=0.12))
-        allv = np.vstack(tris).reshape(-1, 3); mn, mx = allv.min(0), allv.max(0)
-        c = (mn + mx) / 2; r = (mx - mn).max() / 2
-        ax.set_xlim(c[0] - r, c[0] + r); ax.set_ylim(c[1] - r, c[1] + r); ax.set_zlim(0, 2 * r)
-        ax.set_box_aspect([1, 1, 1]); ax.view_init(elev=25, azim=-60); ax.axis("off")
-        ax.set_title(mdl.name + ("" if mdl.pack == "generic" else f" ({mdl.pack})"), fontsize=11, color="#2B2D42")
-    plt.tight_layout(); plt.savefig(os.path.join(OUT, "preview.png"), dpi=80, facecolor="#FAF6EE")
+    # Skin kits (skins/<kit>/manifest.json): the generic models restyled, under the same names,
+    # for themes whose models.kit names them. Paths are relative to the kit's folder.
+    skin_models = {}
+    for kit, transform in SKIN_KITS.items():
+        kit_models = {}
+        skin_models[kit] = []
+        for mdl, tags, vms in built:
+            sk = transform(mdl); sk.pack = f"skins/{kit}"; path = sk.export(); skin_models[kit].append(sk)
+            kit_models[mdl.name] = {**entry(sk, path), "file": os.path.basename(path), "pack": "generic", "osm_tags": tags}
+            for vm in vms:
+                sv = transform(vm); sv.pack = f"skins/{kit}"; vpath = sv.export()
+                kit_models[mdl.name].setdefault("variants", []).append(
+                    {"name": vm.name, **entry(sv, vpath), "file": os.path.basename(vpath)})
+        kit_props = {}
+        for mdl, categories, attach in built_props:
+            sp = transform(mdl, max_tris=290); sp.pack = f"skins/{kit}"; ppath = sp.export(); skin_models[kit].append(sp)
+            kit_props[mdl.name] = {**entry(sp, ppath), "file": os.path.basename(ppath), "categories": categories, "attach": attach}
+        used = sorted({k for m in [*kit_models.values(), *kit_props.values()]
+                       for x in [m] + m.get("variants", []) for k in x["materials"]})
+        json.dump({"version": 1, "units": "metres", "up": "+Y", "front": "+Z",
+                   "palette": {k: PALETTE[k] for k in used}, "models": kit_models, "props": kit_props},
+                  open(os.path.join(skins_dir, kit, "manifest.json"), "w"), indent=2)
+        print(f"skin kit {kit}:", len(kit_models), "models")
+
+    render_preview(models, os.path.join(OUT, "preview.png"))
+    for kit, kmodels in skin_models.items():
+        render_preview(kmodels, os.path.join(skins_dir, kit, "preview.png"))

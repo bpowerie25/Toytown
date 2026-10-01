@@ -1,0 +1,228 @@
+{
+  "name": "voxel",
+  "buildings": {
+    "windows": "#A8D8F0",
+    "roofs": ["#7A5634", "#5E5E5E"],
+    "flatRoof": "#8A8A8A",
+    "walls": {
+      "default": ["#A0603C", "#A0603C", "#A0603C"],
+      "house": ["#B08A5A", "#C9A36A", "#9E9E9E", "#D8D2C4", "#A0603C"],
+      "bungalow": ["#B08A5A", "#C9A36A", "#9E9E9E", "#D8D2C4", "#A0603C"],
+      "semi_detached": ["#B08A5A", "#C9A36A", "#9E9E9E", "#D8D2C4", "#A0603C"],
+      "terraced_house": ["#B08A5A", "#C9A36A", "#9E9E9E", "#D8D2C4", "#A0603C"],
+      "apartment": ["#A0603C", "#A0603C", "#A0603C"],
+      "tower_block": ["#D8D2C4", "#A0603C"],
+      "shop": ["#B08A5A", "#D8D2C4", "#A0603C", "#9E9E9E"],
+      "supermarket": ["#A0603C", "#D8D2C4"],
+      "cafe": ["#D8D2C4", "#A0603C", "#B08A5A"],
+      "pub": ["#D8D2C4", "#A0603C", "#C9B27C"],
+      "pharmacy": ["#A0603C"],
+      "bank": ["#D8D2C4"],
+      "office": ["#B08A5A", "#D8D2C4"],
+      "hotel": ["#A0603C", "#A0603C"],
+      "petrol_station": ["#A0603C"],
+      "hospital": ["#A0603C", "#A0603C"],
+      "school": ["#C9B27C", "#A0603C"],
+      "library": ["#C9B27C", "#D8D2C4"],
+      "town_hall": ["#D8D2C4"],
+      "police_station": ["#A0603C"],
+      "fire_station": ["#C9B27C"],
+      "church": ["#D8D2C4"],
+      "train_station": ["#C9B27C"],
+      "warehouse": ["#9E9E9E", "#D8D2C4", "#B08A5A"],
+      "factory": ["#9E9E9E", "#D8D2C4"],
+      "barn": ["#9E9E9E"],
+      "parking_garage": ["#D8D2C4"],
+      "round_tower": ["#D8D2C4"],
+      "lighthouse": ["#A0603C"],
+      "generic": ["#A0603C", "#D8D2C4", "#A0603C"]
+    },
+    "pitchedRoofs": {
+      "categories": [],
+      "minRectangularity": 0.85,
+      "pitchDeg": 35,
+      "maxRoofHeightRatio": 0.45,
+      "maxRoofHeight": 8,
+      "overhang": 0.3,
+      "hipShare": {
+        "default": 0.4,
+        "church": 0,
+        "pub": 0,
+        "terraced_house": 0,
+        "school": 1,
+        "apartment": 0.7
+      }
+    },
+    "flat": {
+      "bevel": 0,
+      "parapetHeight": 0.5,
+      "parapetWidth": 0.5
+    },
+    "windowsOff": ["barn", "parking_garage"],
+    "minWindowHeight": 3.5,
+    "floorHeight": 3,
+    "windowGlow": 0,
+    "frame": "#7A5634",
+    "door": "#6B4A2E",
+    "windowStyles": {
+      "grid": {
+        "spacing": 3.0,
+        "width": 0.42,
+        "height": 0.46,
+        "frame": true
+      },
+      "house": {
+        "spacing": 3.6,
+        "width": 0.36,
+        "height": 0.44,
+        "frame": true,
+        "door": true
+      },
+      "shop": {
+        "spacing": 3.2,
+        "width": 0.38,
+        "height": 0.44,
+        "frame": true,
+        "shopfront": true
+      },
+      "church": {
+        "spacing": 4.2,
+        "width": 0.26,
+        "height": 0,
+        "tall": true
+      },
+      "strip": {
+        "spacing": 4.0,
+        "width": 0.9,
+        "height": 0,
+        "strip": true
+      },
+      "sparse": {
+        "spacing": 4.6,
+        "width": 0.3,
+        "height": 0.4,
+        "frame": true
+      }
+    },
+    "windowStyleFor": {
+      "default": "grid",
+      "house": "house",
+      "bungalow": "house",
+      "semi_detached": "house",
+      "terraced_house": "house",
+      "shop": "shop",
+      "cafe": "shop",
+      "pub": "shop",
+      "pharmacy": "shop",
+      "bank": "shop",
+      "supermarket": "shop",
+      "church": "church",
+      "factory": "strip",
+      "warehouse": "strip",
+      "generic": "sparse"
+    }
+  },
+  "lighting": {
+    "ambient": 0.6,
+    "sun": 0.4,
+    "sunDirection": [-0.45, -0.6, 0.66],
+    "toonSteps": [0.3, 0.65, 1.0]
+  },
+  "outline": {
+    "color": "#2B2B2B",
+    "hullWidth": 0.08,
+    "edgeWidth": 1.2,
+    "inkShade": 0.4,
+    "inkMix": 0.6,
+    "fadeStart": 0.5,
+    "fadeEnd": 1.2
+  },
+  "models": {
+    "palette": {
+      "roof_red": "#7A5634",
+      "roof_slate": "#5E5E5E",
+      "wall_pink": "#EFC6BA",
+      "wall_yellow": "#F1DC9E",
+      "wall_blue": "#C4D6E6",
+      "wall_mint": "#CFE3D2",
+      "wall_cream": "#F3E9DA",
+      "window": "#A8D8F0",
+      "brick": "#D98C74",
+      "awning": "#EDB25E",
+      "red": "#D95B5B",
+      "fire_red": "#CC4A4A",
+      "pub_green": "#3F7A5E",
+      "barn_red": "#B55A62",
+      "glass": "#A8D8F0",
+      "glass_band": "#5E8894",
+      "leaf": "#4E9A2E",
+      "roof_flat": "#8A8A8A",
+      "stone": "#D3CBBE",
+      "concrete": "#DDD8CE",
+      "offwhite": "#F6F3EC",
+      "trunk": "#6B4A2E"
+    },
+    "exclude": ["generic", "tree"],
+    "fit": {
+      "minScale": 0.75,
+      "maxScale": 1.3,
+      "aspectTolerance": 0.35,
+      "minRectangularity": 0.8,
+      "minCoverage": 0.6,
+      "heightTolerance": 1.6,
+      "detachedOnly": true,
+      "heightExempt": ["church", "round_tower", "lighthouse"]
+    },
+    "trees": {
+      "minScale": 0.8,
+      "maxScale": 1.25
+    },
+    "glow": [],
+    "kit": "skins/voxel"
+  },
+  "style": {
+    "land": "#86C25A",
+    "water": "#3F76E4",
+    "grass": "#79B84E",
+    "wood": "#4E8A2E",
+    "sand": "#E2D49A",
+    "road": "#A8A59C",
+    "road_casing": "#6E6C66",
+    "major_road": "#B9B5AA",
+    "major_road_casing": "#6E6C66",
+    "rail": "#6E6C66",
+    "label": "#FFFFFF",
+    "label_halo": "#2B2B2B",
+    "building": "#B08A5A",
+    "building_outline": "#5E4630"
+  },
+  "areas": {
+    "fill": {
+      "default": "#79B84E",
+      "park": "#79B84E",
+      "garden": "#79B84E",
+      "grass": "#79B84E",
+      "cemetery": "#79B84E",
+      "golf_course": "#79B84E",
+      "sports_ground": "#79B84E",
+      "pitch": "#5FA83E",
+      "pitch_soccer": "#5FA83E",
+      "pitch_gaa": "#5FA83E",
+      "pitch_court": "#A0603C",
+      "playground": "#E2D49A",
+      "racecourse": "#79B84E",
+      "track": "#79B84E"
+    },
+    "outline": "#4E8A2E",
+    "stripe": "#58A038",
+    "markings": "#FFFFFF",
+    "rail": "#FFFFFF",
+    "trackSurface": "#A8A59C",
+    "turfTrack": "#58A038",
+    "label": "#FFFFFF",
+    "labelHalo": "#2B2B2B"
+  },
+  "effects": {
+    "blocks": 1.0
+  }
+}

@@ -144,6 +144,26 @@ and check `docs/classification-report.md` to see how many buildings now use your
 building gets the model or keeps its procedural shape with props is decided by the fit rules in
 the theme (`models.fit`; see [rendering.md](rendering.md)).
 
+## Skin model sets
+
+`assets/models/skins/<kit>/` holds whole-kit restyles that a theme switches to with
+`models.kit` (e.g. `"kit": "skins/voxel"`). Each has a `manifest.json` in the usual format, with
+the generic models and props under the same names and paths relative to the kit folder. The
+generator makes them from the generic kit with a transform per kit (`SKIN_KITS` in
+`generate_models.py`):
+
+- `voxelize`: voxelizes each model. Only outward-facing cube faces are kept, each cube takes the
+  material of the nearest original surface, and the cube size grows until the model fits the
+  triangle budget (2,000, or 300 for props).
+- `chunkify`: subdivides each mesh as finely as the budget allows, bulges the walls out at
+  mid-height, squashes them, and stretches the top 45% (the roofs) up.
+
+When you add a generic model, its skin versions are generated with it, so add `LICENSES.md` rows
+for `skins/*/<name>.glb` too. To add a skin kit, write a transform (a `Model` in, a `Model` out,
+same name and palette keys) and add it to `SKIN_KITS`. In the plugin, a skin kit replaces kit
+models and props by name, but never a category set with `setCategoryModel`, and never a pack's
+landmark models.
+
 ## Regional packs
 
 A pack is a folder under `assets/models/` for region-specific content, such as `ireland/`:

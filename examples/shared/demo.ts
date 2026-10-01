@@ -29,6 +29,8 @@ const SKINS: [string, string][] = [
   ['sitcom', 'Sitcom'],
   ['pastel', 'Pastel'],
   ['toybox', 'Toybox'],
+  ['voxel', 'Voxel'],
+  ['chunky', 'Chunky'],
   ['retro', 'Retro handheld'],
   ['neon', 'Neon'],
   ['vintage', 'Vintage'],

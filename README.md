@@ -25,9 +25,10 @@ churches and more.
 - **Open spaces**: parks, gardens and cemeteries with trees; striped pitches with real markings,
   goals and GAA posts; playgrounds; racecourses and running tracks with white rails.
 - **Trees**, from mapped trees and seeded scatter in parks.
-- **18 skins**: `default`, `night`, `sitcom`, `pastel`, `toybox`, `retro`, `neon`, `vintage`,
-  `sketch`, `blueprint`, `autumn`, `winter`, `christmas`, `halloween`, `shamrock`, and three with
-  effects: `comic` (halftone shadows), `handdrawn` (wobbly ink on paper) and `golden` (haze). Switch
+- **20 skins**: `default`, `night`, `sitcom`, `pastel`, `toybox`, `retro`, `neon`, `vintage`,
+  `sketch`, `blueprint`, `autumn`, `winter`, `christmas`, `halloween`, `shamrock`; three with
+  effects, `comic` (halftone shadows), `handdrawn` (wobbly ink on paper) and `golden` (haze); and
+  two with their own model sets, `voxel` (built from blocks) and `chunky` (squash-and-stretch). Switch
   live with `toy.setTheme('neon')`. Skins are JSON themes, so you can make your own. Switch live with
   `toy.setTheme('sitcom')`. Skins are JSON themes, so you can make your own.
 - **Fast**: meshing in Web Workers, one draw call per chunk, instanced models, levels of detail by

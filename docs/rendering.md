@@ -139,28 +139,30 @@ overlapping geometry always draws the same way, whatever order the workers finis
 
 ## Themes
 
-A theme (a "skin") is JSON in `packages/core/src/themes/`. There are 18 built in:
+A theme (a "skin") is JSON in `packages/core/src/themes/`. There are 20 built in:
 
-| Skin        | Look                                                                             |
-| ----------- | -------------------------------------------------------------------------------- |
-| `default`   | Warm cream and terracotta, soft toon shading.                                    |
-| `night`     | Dark blue, glowing yellow windows.                                               |
-| `sitcom`    | Flat saturated colours, solid black outlines, hard two-band shading.             |
-| `pastel`    | Soft candy colours, gentle shading, faint tinted edges, no model outlines.       |
-| `toybox`    | Primary-coloured plastic bricks on a green baseplate, chunky outlines.           |
-| `retro`     | Four shades of green, like an old pocket game console.                           |
-| `neon`      | Synthwave night: dark purple, magenta line work, glowing cyan windows.           |
-| `vintage`   | An old postcard: aged paper, sepia walls, brown ink.                             |
-| `sketch`    | White buildings, black pen lines, cream paper.                                   |
-| `blueprint` | Paper blue, white line work on every edge, flat shading.                         |
-| `autumn`    | Orange trees, golden low light, warm brick.                                      |
-| `winter`    | Snow on the ground and roofs, evergreens, warm glowing windows.                  |
-| `christmas` | Snow, red and green houses, warm lights.                                         |
-| `halloween` | Purple dusk, orange glowing windows, bare dark trees.                            |
-| `shamrock`  | Greens, white and gold.                                                          |
-| `comic`     | Bold flat colours, black ink, halftone dots in the shadows (effect: `halftone`). |
-| `handdrawn` | Watercolour washes, wobbly brown ink, paper grain (effects: `wobble`, `paper`).  |
-| `golden`    | Low warm sun, long shadows, haze towards the horizon (effect: `haze`).           |
+| Skin        | Look                                                                                                           |
+| ----------- | -------------------------------------------------------------------------------------------------------------- |
+| `default`   | Warm cream and terracotta, soft toon shading.                                                                  |
+| `night`     | Dark blue, glowing yellow windows.                                                                             |
+| `sitcom`    | Flat saturated colours, solid black outlines, hard two-band shading.                                           |
+| `pastel`    | Soft candy colours, gentle shading, faint tinted edges, no model outlines.                                     |
+| `toybox`    | Primary-coloured plastic bricks on a green baseplate, chunky outlines.                                         |
+| `retro`     | Four shades of green, like an old pocket game console.                                                         |
+| `neon`      | Synthwave night: dark purple, magenta line work, glowing cyan windows.                                         |
+| `vintage`   | An old postcard: aged paper, sepia walls, brown ink.                                                           |
+| `sketch`    | White buildings, black pen lines, cream paper.                                                                 |
+| `blueprint` | Paper blue, white line work on every edge, flat shading.                                                       |
+| `autumn`    | Orange trees, golden low light, warm brick.                                                                    |
+| `winter`    | Snow on the ground and roofs, evergreens, warm glowing windows.                                                |
+| `christmas` | Snow, red and green houses, warm lights.                                                                       |
+| `halloween` | Purple dusk, orange glowing windows, bare dark trees.                                                          |
+| `shamrock`  | Greens, white and gold.                                                                                        |
+| `comic`     | Bold flat colours, black ink, halftone dots in the shadows (effect: `halftone`).                               |
+| `handdrawn` | Watercolour washes, wobbly brown ink, paper grain (effects: `wobble`, `paper`).                                |
+| `golden`    | Low warm sun, long shadows, haze towards the horizon (effect: `haze`).                                         |
+| `voxel`     | Everything built from blocks: the voxel model set, flat-topped buildings with a block grid (effect: `blocks`). |
+| `chunky`    | Squash-and-stretch cartoon: the chunky model set, steep tall roofs with deep eaves.                            |
 
 `winter` and `christmas` also have falling snow (effect: `snow`).
 
@@ -192,11 +194,14 @@ A theme has:
   - `haze: { color, amount }`: a gradient from the top of the view, faded in as the map is
     pitched (none looking straight down, full from about 65°).
   - `snow: { density }`: falling flakes on a 2D canvas. Off for users who prefer reduced motion.
+  - `blocks`: a block size in metres. Procedural buildings get a block grid in their own frame
+    (along and up each wall, across the roof), each block a slightly different shade.
 
   Paper, haze and snow are DOM overlays above the map canvas and below the controls, so they
   cover the base map and the 3D layer alike.
 
-- `models`: palette overrides for the kit, `glow` palette keys (shown unlit, e.g. `window` at
+- `models`: `kit` (optional), a skin model set to use instead of the kit's models (see
+  [adding-models.md](adding-models.md#skin-model-sets)); palette overrides for the kit, `glow` palette keys (shown unlit, e.g. `window` at
   night), fit rules and tree sizes.
 
 The night theme uses background `#1B2238` and windows `#FFD166`. Walls and roofs are the day
