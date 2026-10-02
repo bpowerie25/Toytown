@@ -236,13 +236,23 @@ test.describe('demo', () => {
     });
     await ready(page);
     await page.locator('.maplibregl-popup-close-button').click();
+    // Search outward from the place's pin, which sits on the building: picking raycasts, and
+    // with software WebGL a full-screen scan is too slow.
     const spot = await page.evaluate(() => {
       const { map, toy } = window as unknown as D;
       const c = map.getCanvas();
-      for (let y = 0; y < c.clientHeight; y += 6)
-        for (let x = 0; x < c.clientWidth; x += 6)
-          if (toy.pick({ x, y })?.id === 'way/42744158' && document.elementFromPoint(x, y) === c)
+      const pin = document
+        .querySelector('.poi-pin[aria-label$="Christ Church Cathedral"]')!
+        .getBoundingClientRect();
+      const cx = pin.x + pin.width / 2;
+      const cy = pin.y + pin.height / 2;
+      for (let r = 20; r <= 200; r += 10)
+        for (let a = 0; a < 360; a += 30) {
+          const x = cx + r * Math.cos((a * Math.PI) / 180);
+          const y = cy + r * Math.sin((a * Math.PI) / 180);
+          if (document.elementFromPoint(x, y) === c && toy.pick({ x, y })?.id === 'way/42744158')
             return { x, y };
+        }
       return null;
     });
     expect(spot).not.toBeNull();
