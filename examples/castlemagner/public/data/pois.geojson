@@ -1,0 +1,151 @@
+{
+  "type": "FeatureCollection",
+  "notice": {
+    "title": "Visiting in person?",
+    "text": "Some of these places are on private farmland. Ask the landowner's permission before you cross their land, close gates behind you, and keep dogs on a lead."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-8.81446, 52.16716] },
+      "properties": {
+        "id": "castle",
+        "title": "Castle Magner",
+        "kind": "Tower house",
+        "group": "history",
+        "period": "Norman era",
+        "text": [
+          "The Norman-era tower house that gives the village its name, built by the Magner family east of the village, above the stream.",
+          "It was largely destroyed in the late 16th century. The estate was confiscated under Cromwell, and in 1658 a settler named Bretridge took possession of it. The stair turret and parts of the bawn wall still stand."
+        ],
+        "osm": "way/1375689442",
+        "access": "private",
+        "zoom": 17.6,
+        "bearing": -30,
+        "sources": [
+          { "title": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Castlemagner" },
+          {
+            "title": "Castlemagner Historical Society",
+            "url": "https://castlemagner-his-soc.com/?p=434"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-8.81326, 52.16689] },
+      "properties": {
+        "id": "holy-well",
+        "title": "St Brigid's Holy Well",
+        "kind": "Holy well",
+        "group": "history",
+        "period": "Stone surround 1787",
+        "text": [
+          "A holy well dedicated to St Brigid, by the stream about 80 m south-east of the castle. The first-edition Ordnance Survey map calls it Sunday Well. Like many Irish holy wells, it is thought to go back to pre-Christian times.",
+          "Its carved stone surround has a lintel inscribed by Owen Egan of Knocknanus in 1787. One carving is sometimes said to be a Sheela na gig."
+        ],
+        "access": "private",
+        "osm": "node/12737520715",
+        "accessNote": "The path runs past a farmhouse and down a steep wooded bank. Ask at the farm first.",
+        "zoom": 17.8,
+        "bearing": 20,
+        "sources": [
+          {
+            "title": "Holy Wells of Cork and Kerry",
+            "url": "https://holywellscorkandkerry.com/2016/03/16/st-brigets-well-castlemagner"
+          },
+          {
+            "title": "Castlemagner Historical Society",
+            "url": "https://castlemagner-his-soc.com/a-story-of-cures-at-castlemagner-holy-well/"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-8.81651, 52.16733] },
+      "properties": {
+        "id": "st-brigids-graveyard",
+        "title": "St Brigid's Graveyard",
+        "kind": "Graveyard",
+        "group": "history",
+        "period": "18th century and earlier",
+        "osm": "way/331400666",
+        "text": [
+          "The graveyard around the Church of Ireland church of St Bridget. The church itself dates from the early 19th century, but some gravestones here are from the 18th century and earlier."
+        ],
+        "zoom": 17.4,
+        "bearing": 0,
+        "sources": [{ "title": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Castlemagner" }]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-8.8275, 52.16533] },
+      "properties": {
+        "id": "st-marys",
+        "title": "Saint Mary's Church",
+        "kind": "Catholic church",
+        "group": "faith",
+        "period": "c. 1880",
+        "osm": "way/340657250",
+        "text": ["The village's Roman Catholic church, dedicated to Saint Mary, built around 1880."],
+        "access": "public",
+        "zoom": 18,
+        "bearing": 20,
+        "sources": [{ "title": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Castlemagner" }]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-8.82731, 52.16513] },
+      "properties": {
+        "id": "edel-quinn",
+        "title": "Edel Quinn Shrine",
+        "kind": "Shrine",
+        "group": "faith",
+        "period": "1907–1944",
+        "osm": "node/1068397427",
+        "text": [
+          "A shrine in the church grounds to Edel Quinn, born at Greenane in this parish on 14 September 1907.",
+          "She became the Legion of Mary's envoy to East Africa, died in 1944 and is buried in Nairobi. In 1994 Pope John Paul II declared her Venerable."
+        ],
+        "access": "public",
+        "zoom": 18.4,
+        "bearing": -40,
+        "sources": [{ "title": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Edel_Quinn" }]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-8.82473, 52.16658] },
+      "properties": {
+        "id": "geoffs-pub",
+        "title": "Geoff's Pub",
+        "kind": "Pub",
+        "group": "community",
+        "osm": "way/331400676",
+        "text": ["The village pub."],
+        "zoom": 18.2,
+        "bearing": -40
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-8.82333, 52.16584] },
+      "properties": {
+        "id": "castlemagner-gaa",
+        "title": "Castlemagner GAA",
+        "kind": "GAA club",
+        "group": "community",
+        "osm": "way/1375688879",
+        "text": [
+          "Castlemagner GAA fields Gaelic football and hurling teams in the Duhallow division of Cork GAA."
+        ],
+        "zoom": 17.4,
+        "bearing": 10,
+        "sources": [{ "title": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Castlemagner" }]
+      }
+    }
+  ]
+}

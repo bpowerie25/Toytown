@@ -178,25 +178,76 @@ test.describe('demo', () => {
     await page.goto('/waterford/');
     await page.waitForFunction(() => !!(window as unknown as D).toy);
     await ready(page);
-    // Find a clickable spot near the centre of the view.
-    const spot = await page.evaluate(() => {
+    // Find a clickable spot near the centre of the view: not a point of interest (those open
+    // their own popup) and not under one of their pins.
+    const pois = await page.evaluate(async () => {
+      const fc = (await (await fetch('./data/pois.geojson')).json()) as {
+        features: { properties: { osm?: string } }[];
+      };
+      return fc.features.map((f) => f.properties.osm).filter(Boolean) as string[];
+    });
+    const spot = await page.evaluate((pois) => {
       const { map, toy } = window as unknown as D;
       const c = map.getCanvas();
       for (let dy = 0; dy < 200; dy += 10) {
         for (let dx = -200; dx <= 200; dx += 10) {
           const p = { x: c.clientWidth / 2 + dx, y: c.clientHeight / 2 + dy };
           const hit = toy.pick(p);
-          if (hit?.osm) return { ...p, hit };
+          if (hit?.osm && !pois.includes(hit.id) && document.elementFromPoint(p.x, p.y) === c)
+            return { ...p, hit };
         }
       }
       return null;
-    });
+    }, pois);
     expect(spot).not.toBeNull();
     expect(spot!.hit.osm).toMatch(/^https:\/\/www\.openstreetmap\.org\/(node|way|relation)\/\d+$/);
     await page.mouse.click(spot!.x, spot!.y);
     const popup = page.locator('.maplibregl-popup-content');
     await expect(popup).toContainText('View on OpenStreetMap');
     await expect(popup.locator('a')).toHaveAttribute('href', spot!.hit.osm!);
+  });
+
+  test('points of interest: the tour list flies to a place and opens its story', async ({
+    page,
+  }) => {
+    await page.goto('/waterford/');
+    await page.waitForFunction(() => !!(window as unknown as D).toy);
+    await expect(page.locator('.poi-pin')).toHaveCount(15);
+    await page.locator('.poi-list button', { hasText: "Reginald's Tower" }).click();
+    const popup = page.locator('.poi-popup');
+    await expect(popup.locator('strong')).toHaveText("Reginald's Tower", { timeout: 15_000 });
+    await expect(popup).toContainText('Open to visitors.');
+    const c = await page.evaluate(() => (window as unknown as D).map.getCenter().toArray());
+    // The place sits below the middle of the view, under its popup.
+    expect(c[1]).toBeGreaterThan(52.26047);
+    // Next goes on to the second place.
+    await popup.getByRole('button', { name: 'Next place' }).click();
+    await expect(page.locator('.poi-popup strong')).toHaveText('Greyfriars (the French Church)', {
+      timeout: 15_000,
+    });
+  });
+
+  test("points of interest: clicking a place's building opens its story", async ({ page }) => {
+    await page.goto('/waterford/');
+    await page.waitForFunction(() => !!(window as unknown as D).toy);
+    await page.locator('.poi-list button', { hasText: 'Christ Church Cathedral' }).click();
+    await expect(page.locator('.poi-popup strong')).toHaveText('Christ Church Cathedral', {
+      timeout: 15_000,
+    });
+    await ready(page);
+    await page.locator('.maplibregl-popup-close-button').click();
+    const spot = await page.evaluate(() => {
+      const { map, toy } = window as unknown as D;
+      const c = map.getCanvas();
+      for (let y = 0; y < c.clientHeight; y += 6)
+        for (let x = 0; x < c.clientWidth; x += 6)
+          if (toy.pick({ x, y })?.id === 'way/42744158' && document.elementFromPoint(x, y) === c)
+            return { x, y };
+      return null;
+    });
+    expect(spot).not.toBeNull();
+    await page.mouse.click(spot!.x, spot!.y);
+    await expect(page.locator('.poi-popup strong')).toHaveText('Christ Church Cathedral');
   });
 
   test('landmark buttons fly to verified landmarks', async ({ page }) => {

@@ -1,11 +1,12 @@
 import { startDemo } from '@toytown/example-shared/demo';
-import { WATERFORD } from '@toytown/example-shared/landmarks';
 
 const { map, toy } = startDemo({
   title: 'Waterford City',
   data: './data/waterford.geojson',
   center: [-7.1085, 52.2615],
-  landmarks: WATERFORD,
+  // The points of interest replace the fly-to list.
+  landmarks: [],
+  pois: './data/pois.geojson',
   other: { title: 'Tramore', href: '../tramore/' },
 });
 

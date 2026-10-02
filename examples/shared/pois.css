@@ -1,0 +1,201 @@
+/* Points of interest: pins, popup, tour list and the visiting notice. */
+
+.poi-pin {
+  --poi: #6c757d;
+  /* No position, transform or scale here: MapLibre places markers with a transform, and those would
+     move or scale it. Grow a pin with its size instead. */
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: var(--poi);
+  color: #ffffff;
+  font:
+    800 14px/1 'Nunito',
+    system-ui,
+    sans-serif;
+  box-shadow: 0 2px 6px rgba(43, 45, 66, 0.35);
+  cursor: pointer;
+  transition:
+    width 0.15s,
+    height 0.15s;
+}
+.poi-pin:hover,
+.poi-pin:focus-visible,
+.poi-pin.selected {
+  width: 36px;
+  height: 36px;
+  font-size: 17px;
+  z-index: 1;
+}
+/* A ring that pulses out from each pin. CSS only, so the map doesn't redraw for it. */
+.poi-pin::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 3px solid var(--poi);
+  animation: poi-pulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+.poi-pin.selected::after {
+  animation-duration: 1.2s;
+}
+@keyframes poi-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poi-pin::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+.history {
+  --poi: #c8553d;
+}
+.faith {
+  --poi: #3b6ea5;
+}
+.community {
+  --poi: #2a9d8f;
+}
+
+/* Popup */
+.poi-popup p {
+  margin: 6px 0;
+}
+.poi-kind {
+  color: var(--poi, #6c757d);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.poi-access {
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.poi-access.private {
+  background: #fff1d6;
+  border-left: 4px solid #e09f3e;
+}
+.poi-access.private strong {
+  font-size: 12px;
+}
+.poi-access.public {
+  background: #e3f4ef;
+}
+.poi-approx {
+  color: #6c757d;
+  font-size: 12px;
+  font-style: italic;
+}
+.poi-links {
+  font-size: 12px;
+}
+.poi-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6c757d;
+}
+.poi-nav button {
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: #ffe8a3;
+  color: #2b2d42;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.poi-nav button:hover {
+  background: #e0b85c;
+}
+
+/* Tour list in the demo panel */
+.poi-list h2 {
+  margin: 4px 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+.poi-list ol {
+  max-height: 40vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.panel .poi-list button[data-poi] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.poi-num {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--poi, #6c757d);
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+.poi-lock {
+  margin-left: auto;
+  color: #b5651d;
+}
+.panel .poi-list .poi-visiting {
+  background: #fff1d6;
+  font-size: 13px;
+}
+
+/* Visiting notice */
+.poi-notice {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 3;
+  width: 360px;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-left: 6px solid #e09f3e;
+  border-radius: 12px;
+  background: #fff8e8;
+  color: #2b2d42;
+  font:
+    14px/1.4 'Nunito',
+    system-ui,
+    sans-serif;
+  box-shadow: 0 4px 16px rgba(43, 45, 66, 0.25);
+  transform: translateX(-50%);
+}
+.poi-notice p {
+  margin: 4px 0 8px;
+}
+.poi-notice button {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #e09f3e;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}

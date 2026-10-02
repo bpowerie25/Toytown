@@ -1,0 +1,470 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.1054,
+          52.26047
+        ]
+      },
+      "properties": {
+        "id": "reginalds-tower",
+        "title": "Reginald's Tower",
+        "kind": "Defensive tower",
+        "group": "history",
+        "period": "13th century",
+        "osm": "way/75780894",
+        "text": [
+          "A round tower at the end of the Quay, built by the Anglo-Normans, probably between 1253 and 1280, where a Viking fortification stood before. It is the only urban monument in Ireland to keep a Norse name, from Røgnvaldr, and is said to be the oldest civic building in Ireland.",
+          "It has been a mint, a prison and a military store. Its walls are 3 m thick at the base, and today it houses the Waterford Viking Museum."
+        ],
+        "access": "public",
+        "zoom": 17.8,
+        "bearing": -30,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Reginald%27s_Tower"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.10648,
+          52.26045
+        ]
+      },
+      "properties": {
+        "id": "greyfriars",
+        "title": "Greyfriars (the French Church)",
+        "kind": "Friary ruin",
+        "group": "history",
+        "period": "Founded 1240",
+        "osm": "relation/14562319",
+        "text": [
+          "The ruins of a Franciscan friary founded in 1240 by Sir Hugh Purcell. After it was suppressed in 1540 it became a charity, the Hospital of the Holy Ghost.",
+          "In the 1690s part of it was given to French Huguenots for worship, which is why it is known as the French Church."
+        ],
+        "zoom": 18,
+        "bearing": 10,
+        "sources": [
+          {
+            "title": "Heritage Ireland",
+            "url": "https://heritageireland.ie/places-to-visit/greyfriars-french-church/"
+          },
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/French_Church,_Waterford"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.10698,
+          52.25997
+        ]
+      },
+      "properties": {
+        "id": "medieval-museum",
+        "title": "Medieval Museum",
+        "kind": "Museum",
+        "group": "history",
+        "period": "13th–15th century chambers",
+        "osm": "way/772722685",
+        "text": [
+          "Part of Waterford Treasures, built around two medieval chambers: the 13th-century Choristers' Hall and the 15th-century Mayor's Wine Vault.",
+          "Among its treasures is a cap of maintenance that Henry VIII gave to Waterford's mayor in 1536."
+        ],
+        "access": "public",
+        "zoom": 18,
+        "bearing": -20,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Waterford_Treasures"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.1076,
+          52.25994
+        ]
+      },
+      "properties": {
+        "id": "christ-church",
+        "title": "Christ Church Cathedral",
+        "kind": "Church of Ireland cathedral",
+        "group": "faith",
+        "period": "1774–1792",
+        "osm": "way/42744158",
+        "text": [
+          "A Georgian cathedral designed by John Roberts, begun in 1774 and finished by 1792. The architectural historian Mark Girouard called it the finest 18th-century church building in Ireland.",
+          "The first church here was built in the 11th century. In 1170 the church on this site saw the wedding of Strongbow (Richard de Clare) and Aoife Ní Diarmait."
+        ],
+        "access": "public",
+        "zoom": 17.8,
+        "bearing": 20,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Christ_Church_Cathedral,_Waterford"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.10764,
+          52.25959
+        ]
+      },
+      "properties": {
+        "id": "bishops-palace",
+        "title": "Bishop's Palace",
+        "kind": "Museum",
+        "group": "history",
+        "period": "1741",
+        "osm": "way/72089538",
+        "text": [
+          "A Georgian palace designed by Richard Cassels in 1741 and finished by John Roberts. It's now one of the three Waterford Treasures museums of the Viking Triangle, with Reginald's Tower and the Medieval Museum."
+        ],
+        "access": "public",
+        "zoom": 18,
+        "bearing": 45,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Waterford_Treasures"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.10684,
+          52.25972
+        ]
+      },
+      "properties": {
+        "id": "city-hall",
+        "title": "City Hall and Theatre Royal",
+        "kind": "Theatre",
+        "group": "community",
+        "period": "1785",
+        "osm": "way/72089527",
+        "text": [
+          "The Theatre Royal was founded in 1785, with the playhouse and Assembly Rooms designed by the local architect John Roberts. Its first production was As You Like It.",
+          "The theatre took its present form in 1876 and seats 430. Oscar Wilde is among those who have appeared here, and a bust of the composer William Vincent Wallace stands outside."
+        ],
+        "access": "public",
+        "zoom": 18,
+        "bearing": 30,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Theatre_Royal,_Waterford"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.10691,
+          52.25897
+        ]
+      },
+      "properties": {
+        "id": "waterford-crystal",
+        "title": "House of Waterford Crystal",
+        "kind": "Glass factory",
+        "group": "community",
+        "period": "Since 1783",
+        "osm": "way/72089526",
+        "text": [
+          "Waterford Crystal began in 1783, when George and William Penrose started the Waterford Glassworks.",
+          "After the factory at Kilbarry closed in 2009, this working factory and visitor centre opened on The Mall in June 2010. It holds the world's largest collection of Waterford Crystal."
+        ],
+        "access": "public",
+        "zoom": 17.6,
+        "bearing": -60,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Waterford_Crystal"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.10872,
+          52.26017
+        ]
+      },
+      "properties": {
+        "id": "st-olafs",
+        "title": "St Olaf's Church",
+        "kind": "Church",
+        "group": "faith",
+        "period": "1730s, on a Viking-era site",
+        "osm": "way/770060220",
+        "text": [
+          "Named after Olaf II, the Norwegian king killed at Stiklestad in 1030 and made a saint in 1164: a reminder of Waterford's Viking founders. The first church on the site was probably built of wood around 1050.",
+          "The medieval church was in ruins by the early 17th century, and only an arched doorway survives in the present church, built in the 1730s for Bishop Thomas Milles. It was used for worship until 1970 and is now a community centre."
+        ],
+        "zoom": 18.2,
+        "bearing": 0,
+        "sources": [
+          {
+            "title": "The Irish Aesthete",
+            "url": "https://theirishaesthete.com/2023/10/06/st-olavs/"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.11087,
+          52.26102
+        ]
+      },
+      "properties": {
+        "id": "blackfriars",
+        "title": "Blackfriars Abbey",
+        "kind": "Friary ruin",
+        "group": "history",
+        "period": "Founded 1226",
+        "osm": "way/770700535",
+        "text": [
+          "The Dominicans settled here in 1226, on a site given by the citizens with Henry III's permission. An old tower had stood on the spot; a Viking leader, Gerald Macgillemory, is recorded as living in it at the time of the Norman invasion.",
+          "The bell tower was added in the late 15th century. After the friary was dissolved in 1540 it became a courthouse from 1617, and in 1746 a theatre."
+        ],
+        "zoom": 18.2,
+        "bearing": 20,
+        "sources": [
+          {
+            "title": "Waterford Civic Trust",
+            "url": "https://waterfordcivictrust.ie/blackfriars"
+          },
+          {
+            "title": "Archiseek",
+            "url": "https://www.archiseek.com/?p=8394"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.11112,
+          52.26151
+        ]
+      },
+      "properties": {
+        "id": "holy-trinity",
+        "title": "Cathedral of the Most Holy Trinity",
+        "kind": "Catholic cathedral",
+        "group": "faith",
+        "period": "1793",
+        "osm": "way/369437504",
+        "text": [
+          "Designed in 1793 by John Roberts, who also designed Christ Church Cathedral. It is the oldest post-Reformation Roman Catholic cathedral in Ireland.",
+          "Its ten crystal chandeliers were a gift from Waterford Crystal in 1979."
+        ],
+        "access": "public",
+        "zoom": 17.8,
+        "bearing": 0,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Cathedral_of_the_Most_Holy_Trinity,_Waterford"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.11147,
+          52.26222
+        ]
+      },
+      "properties": {
+        "id": "clock-tower",
+        "title": "Clock Tower",
+        "kind": "Clock tower",
+        "group": "history",
+        "period": "1861–62",
+        "osm": "way/772127186",
+        "text": [
+          "Built on the quay in 1861–62 to a design by Charles Tarrant, paid for by public subscription. It was first proposed as an illuminated clock for the benefit of shipping.",
+          "It was originally called the Fountain Clock: the three stone basins at its base were water troughs for working horses."
+        ],
+        "zoom": 18,
+        "bearing": -20,
+        "sources": [
+          {
+            "title": "National Inventory of Architectural Heritage",
+            "url": "https://www.buildingsofireland.ie/buildings-search/building/22502675/clock-tower-the-meaghers-quay-coal-quay-waterford-city-waterford-waterford"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.11336,
+          52.26155
+        ]
+      },
+      "properties": {
+        "id": "waterford-walls",
+        "title": "Waterford Walls",
+        "kind": "Street art festival",
+        "group": "community",
+        "period": "Since 2015",
+        "osm": "way/679502355",
+        "text": [
+          "Ireland's largest street art festival, started in 2015 by volunteers to brighten buildings left empty after the crash. Local and international artists paint the city every year at the end of August.",
+          "More than 200 murals have been painted across the city and county, and many stay up for good: look out for them on the way round."
+        ],
+        "zoom": 17.6,
+        "bearing": 0,
+        "sources": [
+          {
+            "title": "Visit Waterford",
+            "url": "https://visitwaterford.com/?p=3441"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.11432,
+          52.2573
+        ]
+      },
+      "properties": {
+        "id": "french-tower",
+        "title": "French Tower",
+        "kind": "City wall tower",
+        "group": "history",
+        "period": "13th–14th century",
+        "osm": "way/777580117",
+        "text": [
+          "One of the six surviving towers of the city walls, at the top of Castle Street where the wall turns a sharp corner. Its kidney shape gave defenders the widest view along the wall from the smallest space.",
+          "The upper floors were probably added in the 15th century for small guns. The name may come from the French Huguenots who settled in Waterford after 1690."
+        ],
+        "zoom": 18,
+        "bearing": -30,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/French_Tower"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.11193,
+          52.25646
+        ]
+      },
+      "properties": {
+        "id": "watch-tower",
+        "title": "Watch Tower",
+        "kind": "City wall tower",
+        "group": "history",
+        "period": "13th century",
+        "osm": "way/675001739",
+        "text": [
+          "One of six towers that survive from Waterford's medieval walls. When a Spanish visitor described the city in 1574, the walls had seventeen.",
+          "Its round shape suggests the 13th century, and gun loops were added low down later for artillery. Waterford Corporation restored it in 1988–89."
+        ],
+        "zoom": 17.8,
+        "bearing": 30,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Watch_Tower_(Waterford)"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -7.10479,
+          52.25633
+        ]
+      },
+      "properties": {
+        "id": "peoples-park",
+        "title": "People's Park",
+        "kind": "Park",
+        "group": "community",
+        "period": "Laid out after 1857",
+        "osm": "way/37300862",
+        "text": [
+          "Waterford's largest public park, 6.6 hectares, laid out on marshland that was drained in 1857. It has a Victorian bandstand, playgrounds and an iron bridge over to the Courthouse grounds.",
+          "In 1891 it was home to Ireland's first velodrome, the Goff cycle track."
+        ],
+        "access": "public",
+        "zoom": 16.8,
+        "bearing": 0,
+        "sources": [
+          {
+            "title": "Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/People%27s_Park,_Waterford"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -2,11 +2,12 @@
   "name": "@toytown/example-shared",
   "version": "0.0.0",
   "private": true,
-  "description": "Demo UI shared by the Waterford and Tramore examples: landmark fly-to, day/night toggle, click popups.",
+  "description": "Demo UI shared by the examples: landmark fly-to, skin picker, click popups and points of interest.",
   "type": "module",
   "exports": {
     "./demo": "./demo.ts",
-    "./landmarks": "./landmarks.ts"
+    "./landmarks": "./landmarks.ts",
+    "./pois": "./pois.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

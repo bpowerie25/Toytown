@@ -79,7 +79,9 @@ test('gif frames', async ({ browser }) => {
   const page = await ctx.newPage();
   for (const s of SEGMENTS) {
     await page.goto(s.url);
-    await page.evaluate(() => document.querySelector('.panel')?.remove());
+    await page.evaluate(() =>
+      document.querySelectorAll('.panel, .poi-pin, .poi-notice').forEach((el) => el.remove()),
+    );
     await page.waitForFunction(() => !!(window as unknown as W).toy);
     await capture(page, s.prefix, s.frames, s.at);
   }

@@ -3,6 +3,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { THEMES, ToyTown, VERSION, type ToyTownClickEvent } from 'toytown-gl';
 import type { Landmark } from './landmarks';
+import { addPois } from './pois';
 import './demo.css';
 
 // MapLibre 6 can't find its worker inside a bundle; Vite gives it a URL.
@@ -14,6 +15,8 @@ export interface DemoOptions {
   center: [number, number];
   landmarks: Landmark[];
   other: { title: string; href: string };
+  /** URL of a points-of-interest GeoJSON (see pois.ts): pins, popups and a tour list. */
+  pois?: string;
 }
 
 const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -46,7 +49,10 @@ const SKINS: [string, string][] = [
   ['shamrock', 'Shamrock'],
 ];
 
-/** A full-screen toy-town demo: map, landmark fly-to panel, skin picker and click popups. */
+/**
+ * A full-screen toy-town demo: map, landmark fly-to panel, skin picker, click popups and,
+ * optionally, points of interest.
+ */
 export function startDemo(o: DemoOptions): { map: maplibregl.Map; toy: ToyTown } {
   const params = new URLSearchParams(location.search);
   let theme = THEMES[params.get('theme') ?? ''] ? params.get('theme')! : 'default';
@@ -76,7 +82,10 @@ export function startDemo(o: DemoOptions): { map: maplibregl.Map; toy: ToyTown }
 
   // Click a building, model or tree: popup with its category and a link to OpenStreetMap.
   const popup = new maplibregl.Popup({ closeButton: true, maxWidth: '260px' });
+  // A click on a point of interest's building opens its story instead (set up below).
+  let poiClick: (e: ToyTownClickEvent) => boolean = () => false;
   toy.on('click', (e: ToyTownClickEvent) => {
+    if (poiClick(e)) return;
     const lines = [
       `<strong>${escape(e.name ?? pretty(e.category))}</strong>`,
       `${escape(pretty(e.category))}${e.height ? ` · ${Math.round(e.height)} m` : ''}`,
@@ -134,6 +143,8 @@ export function startDemo(o: DemoOptions): { map: maplibregl.Map; toy: ToyTown }
     });
   });
   document.body.appendChild(panel);
+
+  if (o.pois) poiClick = addPois(map, { url: o.pois, data: o.data, panel, popup });
 
   console.info(`toytown-gl ${VERSION}: ${o.title} demo`);
   return { map, toy };
