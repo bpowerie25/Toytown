@@ -105,8 +105,9 @@ OpenStreetMap in the visitor's browser, with everything bundled in the plugin. D
 `toytown-map.zip` from the [latest release](https://github.com/bpowerie25/Toytown/releases/latest)
 and upload it under Plugins → Add New. See [packages/wordpress](packages/wordpress/README.md).
 
-The plugin is published on WordPress.org by its author, Brian Power, as
-[imperialresources](https://profiles.wordpress.org/imperialresources/).
+The plugin's WordPress.org account is
+[imperialresources](https://profiles.wordpress.org/imperialresources/), which belongs to its
+author, Brian Power.
 
 ## Add your own buildings
 
