@@ -2,7 +2,7 @@
   "name": "@toytown/cli",
   "version": "0.1.0",
   "description": "toytown build-data: fetch OpenStreetMap buildings, open spaces and trees for any bbox, classify them, and write a compact data file for toytown-gl.",
-  "license": "MIT",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "author": "Brian Power",
   "repository": {
     "type": "git",
