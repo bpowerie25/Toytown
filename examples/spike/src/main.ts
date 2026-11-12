@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Phase 2.5 visual spike (throwaway): kit models on real classified Waterford buildings,
  * rendered with deck.gl's ScenegraphLayer over the toy-town base style.

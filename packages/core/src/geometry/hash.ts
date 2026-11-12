@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /** Deterministic 32-bit string hash (FNV-1a). Used for stable per-building choices. */
 export function hash32(s: string): number {
   let h = 0x811c9dc5;

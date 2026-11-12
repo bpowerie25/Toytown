@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /** A position as [longitude, latitude] in degrees (GeoJSON order). */
 export type LngLat = [number, number];
 /** A position in local metres: x east, y north. */

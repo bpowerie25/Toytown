@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Checks the bundled model kit in assets/models: the manifest parses, every GLB
  * exists, passes the Khronos glTF validator, and follows the kit conventions.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Build a town's data in the browser: the same pipeline as `toytown build-data`, fed from
  * Overpass directly, so a page can show any area with no data file. Responses are kept in the

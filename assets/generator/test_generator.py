@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 """
 Tests for the generator's hand-made model support and cleanup. Plain asserts, no test runner:
     python assets/generator/test_generator.py

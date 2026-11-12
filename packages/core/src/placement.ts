@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Where hero models, props and trees go. Pure functions: footprints and manifest in, placements
  * out. The renderer turns placements into instances.

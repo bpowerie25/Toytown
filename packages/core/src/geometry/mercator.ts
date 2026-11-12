@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { LngLat } from './project';
 
 /** Earth circumference at the equator, in metres (WGS84 semi-major axis), as MapLibre uses. */

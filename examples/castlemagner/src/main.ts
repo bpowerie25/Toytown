@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { startDemo } from '@toytown/example-shared/demo';
 
 const { map, toy } = startDemo({

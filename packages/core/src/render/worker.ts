@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /// <reference lib="webworker" />
 import { processChunk } from './chunk';
 import { transferables, type ChunkRequest, type ChunkResponse } from './protocol';

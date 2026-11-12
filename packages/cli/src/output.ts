@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { geojson as fgb } from 'flatgeobuf';

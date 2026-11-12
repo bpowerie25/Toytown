@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 """
 Procedural low-poly "toy town" building models.
 Units: metres. Output GLB is Y-up, building front faces +Z, origin at base centre.

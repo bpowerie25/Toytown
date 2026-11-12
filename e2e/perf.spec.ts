@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { test, type Page } from '@playwright/test';
 

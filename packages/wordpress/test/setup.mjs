@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Install WordPress in the test containers, activate Toytown Map, and add test posts.
 // The admin password is generated per run and written to .cache/wordpress-test.json (git-ignored).
 import { execFileSync } from 'node:child_process';

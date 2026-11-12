@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import defaultTheme from './default.json';
 import nightTheme from './night.json';
 import blueprintTheme from './blueprint.json';

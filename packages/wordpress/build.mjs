@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Assemble the Toytown Map WordPress plugin: plugin/ plus its bundled libraries and model kit,
 // into dist/toytown-map/; with --zip, also dist/toytown-map.zip (the file to upload or submit).
 //   pnpm --filter toytown-gl build && pnpm --filter @toytown/wordpress zip

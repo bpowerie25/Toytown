@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { processChunk } from './chunk';
 import type { ChunkRequest, ChunkResponse, ChunkResult } from './protocol';
 

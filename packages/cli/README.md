@@ -46,6 +46,6 @@ The pipeline and the output format are documented in
 
 ## Licence
 
-The CLI is MIT. **The data it writes is derived from OpenStreetMap**, so it's under the
+The CLI is PolyForm Noncommercial 1.0.0 (0.1.0 and earlier were MIT). **The data it writes is derived from OpenStreetMap**, so it's under the
 [ODbL](https://opendatacommons.org/licenses/odbl/): show "© OpenStreetMap contributors" on your
 map (the toytown-gl style does), and share any dataset you publish under the ODbL.

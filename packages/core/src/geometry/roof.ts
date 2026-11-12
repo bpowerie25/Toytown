@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { BuildingTheme } from '../themes';
 import { hashUnit } from './hash';
 import type { PolygonXY } from './polygon';

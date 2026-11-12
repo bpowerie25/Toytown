@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { describe, expect, it, vi } from 'vitest';
 import {
   BASE_BUILDING_LAYER_ID,

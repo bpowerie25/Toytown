@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { StyleSpecification } from 'maplibre-gl';
 import { resolveTheme, type Theme } from '../themes';
 import toytown from './toytown.json';

@@ -69,4 +69,5 @@ Full documentation: [API](https://github.com/bpowerie25/Toytown/blob/main/docs/a
 ## Attribution
 
 The map data is © OpenStreetMap contributors under the ODbL, and maps must show "© OpenStreetMap
-contributors". Building data you derive from OSM is ODbL too. The code is MIT; the models are CC0.
+contributors". Building data you derive from OSM is ODbL too. The code is PolyForm Noncommercial 1.0.0 (commercial licences available, see NOTICE; 0.3.0 and
+earlier were MIT); the models are CC0.

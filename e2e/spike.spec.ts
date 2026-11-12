@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { test, type Page } from '@playwright/test';
 
 // Phase 2.5 visual spike screenshots for docs/spike/. Not a regression test:

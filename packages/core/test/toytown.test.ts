@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { LocalProjection, type LngLat } from '../src/geometry';

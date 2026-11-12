@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { describe, expect, it } from 'vitest';
 import { joinRings, relationPolygons, rewind, wayPolygon } from '../src/build/assemble';
 import type { OsmData } from '../src/build/osm';

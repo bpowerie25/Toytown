@@ -41,7 +41,8 @@ For the model generator: `python3 -m venv .venv && .venv/bin/pip install -r asse
 
 ## Data and licences
 
-- Code is MIT and models are CC0.
+- Code is PolyForm Noncommercial 1.0.0 (new files carry an `SPDX-License-Identifier` header) and
+  models are CC0.
 - OSM-derived data is ODbL: never commit Overpass caches or raw OSM extracts (`.cache/` is
   ignored). Generated example datasets may be committed if under 10 MB each.
 
@@ -49,3 +50,12 @@ For the model generator: `python3 -m venv .venv && .venv/bin/pip install -r asse
 
 Keep commits small, with clear messages. CI (lint, unit tests, build, generator reproducibility,
 screenshot tests) must pass.
+
+## Contributor licence agreement (CLA)
+
+Contributions can only be accepted once the contributor has signed a CLA that lets the copyright
+holder relicense the contribution (needed to keep offering commercial licences alongside the
+noncommercial one).
+
+**PLACEHOLDER: the CLA text has not been supplied yet.** Until it is, please open an issue
+before sending a pull request. The CLA bot is not enabled.

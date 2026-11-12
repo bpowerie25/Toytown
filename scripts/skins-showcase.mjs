@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // The "one town, many looks" images: every built-in skin from the same view, as a grid and a GIF.
 //   node e2e/serve.mjs & node scripts/skins-showcase.mjs  → .cache/showcase/<skin>.png
 // then: .venv/bin/python scripts/skins-showcase.py  → docs/skins/grid.jpg, docs/skins/skins.gif

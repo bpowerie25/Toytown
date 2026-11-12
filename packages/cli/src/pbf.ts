@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Streaming reader for OSM PBF extracts (e.g. Geofabrik), with no dependencies beyond node:zlib.
  * It keeps only what build-data needs inside a bbox, so a country extract can be scanned with a

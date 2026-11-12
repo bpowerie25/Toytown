@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Demo fly-to targets. Ids and positions verified with Nominatim on 2026-09-29.
  */

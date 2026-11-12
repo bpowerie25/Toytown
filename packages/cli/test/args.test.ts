@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { describe, expect, it } from 'vitest';
 import { parseBBox, parseBuildDataArgs, parseCommand } from '../src/args';
 

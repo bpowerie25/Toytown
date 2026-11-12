@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Phase 7 acceptance: `npm i toytown-gl` plus the README quick start works in a fresh Vite
 // project. Runs against the packed tarballs (exactly what npm would publish), so it can pass
 // before anything is published. Used locally and in CI.

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Turn OSM ways and multipolygon relations into polygons (in lng/lat), including holes.
  */

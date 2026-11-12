@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import * as maplibregl from 'maplibre-gl';
 import type { ToyTownClickEvent } from 'toytown-gl';
 import './pois.css';

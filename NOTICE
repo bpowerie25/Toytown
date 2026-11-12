@@ -1,0 +1,15 @@
+toytown-gl
+
+Required Notice: Copyright (c) 2026 Imperial Resources Limited
+
+This software is licensed under the PolyForm Noncommercial License 1.0.0 (see LICENSE and
+https://polyformproject.org/licenses/noncommercial/1.0.0). Commercial use needs a separate
+commercial licence. Contact: brian@imperialresources.ie
+
+History: versions of toytown-gl up to and including 0.3.0 (and @toytown/cli up to 0.1.0) were
+released under the MIT licence and remain available under it.
+
+The 3D model kit in assets/models (and the @toytown/models package) is released under CC0 1.0
+Universal; see assets/models/LICENSES.md.
+
+Map data is (c) OpenStreetMap contributors, under the Open Database Licence.

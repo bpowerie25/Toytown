@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { XY } from '../geometry/project';
 
 export { hash32 } from '../geometry/hash';

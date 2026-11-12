@@ -187,7 +187,10 @@ python3 -m venv .venv && .venv/bin/pip install -r assets/generator/requirements.
 
 ## Attribution and licensing
 
-- **Code** is [MIT](LICENSE).
+- **Code** is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE): free
+  for personal, educational, research and charitable use, **not for commercial use** without a
+  separate commercial licence (see [NOTICE](NOTICE)). Versions up to and including 0.3.0 were
+  released under MIT and stay MIT. This is not an OSI-approved open-source licence.
 - **Models** in the kit are [CC0](assets/models/LICENSES.md). Contributed models must be CC0 or
   CC-BY.
 - **Map data** is © OpenStreetMap contributors, under the

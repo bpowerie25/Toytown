@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { Sphere, Vector3 } from 'three';
 import { tileBounds, type LngLat } from '../geometry';
 import type { SceneFrame } from './frame';

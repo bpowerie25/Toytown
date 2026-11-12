@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Release notes for a tag: the CHANGELOG section of each published package whose version is the
 // tag's. Packages at another version aren't in this release (pnpm publish skips versions already
 // on npm). Fails if no package is at the tag's version.

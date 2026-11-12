@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Check the test WordPress: both pages draw a map, the page scroll isn't trapped, no errors.
 import { readFileSync } from 'node:fs';
 import { chromium } from '@playwright/test';

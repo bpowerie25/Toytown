@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /** Test helper: a minimal OSM PBF encoder, just enough to exercise the reader. */
 import { deflateSync } from 'node:zlib';
 

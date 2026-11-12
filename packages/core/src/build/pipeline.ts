@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * build-data pipeline: OSM data in, classified toy-town features out.
  */

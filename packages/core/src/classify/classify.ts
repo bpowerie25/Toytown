@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { parseNumber, type Measures, type Tags } from './conditions';
 import type { TagMap, TagRule } from './tagmap';
 
