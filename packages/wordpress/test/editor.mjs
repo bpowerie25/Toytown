@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Check the block in the editor: the live preview renders, and a new block shows the place search.
 import { readFileSync } from 'node:fs';
 import { chromium } from '@playwright/test';

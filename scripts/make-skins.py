@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 """Derive the built-in skin themes from default.json.
 
 Each skin is written to packages/core/src/themes/<name>.json. The JSON files are the source of

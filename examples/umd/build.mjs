@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Assemble a no-bundler page: the UMD build, MapLibre's ES module build, the Tramore data and the
 // model kit, copied into dist/ as they'd be served from a CDN or static host.
 import { cpSync, mkdirSync, rmSync } from 'node:fs';

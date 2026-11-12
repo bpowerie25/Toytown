@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Serves each built example at /<name>/ from examples/<name>/dist. No dependencies, so it runs
 // unchanged inside the Playwright Docker image.
 import { createReadStream, existsSync, statSync } from 'node:fs';

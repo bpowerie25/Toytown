@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { ConditionError, parseCondition, type Condition } from './conditions';
 
 /** A rule as written in tag-map.json. */

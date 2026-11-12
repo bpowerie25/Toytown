@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { XY } from './project';
 
 /** A ring of positions. The closing position may or may not repeat the first. */

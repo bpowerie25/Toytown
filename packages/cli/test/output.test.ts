@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { geojson } from 'flatgeobuf';
 import { describe, expect, it } from 'vitest';
 import { toFlatGeobuf } from '../src/output';

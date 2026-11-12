@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { ChunkMesh, LngLat } from '../geometry';
 import type { Placement, PlanKit, PlannedBuilding } from '../placement';
 import type { Theme } from '../themes';

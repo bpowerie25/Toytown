@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { describe, expect, it } from 'vitest';
 import { roofRise, selectRoof, type PolygonXY, type XY } from '../src/geometry';
 import { DEFAULT_THEME } from '../src/themes';

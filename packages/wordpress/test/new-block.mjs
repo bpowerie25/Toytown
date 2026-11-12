@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // A new user's flow in the editor: insert the block, search for a place (one real Nominatim
 // query), pick it, and see the preview of that place.
 import { readFileSync } from 'node:fs';

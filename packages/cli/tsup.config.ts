@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { cpSync, mkdirSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'tsup';
 

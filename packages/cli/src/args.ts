@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { parseArgs } from 'node:util';
 import type { BBox } from 'toytown-gl';
 

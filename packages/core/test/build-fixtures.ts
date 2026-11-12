@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * A tiny synthetic town around (0, 0). Coordinates are built in metres and converted to degrees,
  * so tests can reason about distances. Everything here is made up.

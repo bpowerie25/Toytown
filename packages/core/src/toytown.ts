@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { LngLat as MaplibreLngLat, Map as MaplibreMap, MapMouseEvent } from 'maplibre-gl';
 import { Box3 } from 'three';
 import { buildAreaData } from './build/browser';

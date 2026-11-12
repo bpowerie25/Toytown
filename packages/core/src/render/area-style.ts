@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { LayerSpecification, Map as MaplibreMap } from 'maplibre-gl';
 import { RAILED, type AreaLayers } from '../areas';
 import { DEFAULT_THEME, type AreaTheme, type Theme } from '../themes';

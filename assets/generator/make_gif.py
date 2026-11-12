@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 """Assemble .cache/gif/*.png (from e2e/gif.spec.ts) into docs/demo.gif (~25 s)."""
 import glob, os
 from PIL import Image

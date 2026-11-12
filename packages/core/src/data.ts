@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * The three.js-free part of the core: classification, manifests and footprint geometry. Not a
  * published entry point. `@toytown/cli` bundles it from source in place of `toytown-gl`, so the CLI

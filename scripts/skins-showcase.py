@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 """Assemble .cache/showcase/<skin>.png into docs/skins/grid.jpg and docs/skins/skins.gif."""
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont

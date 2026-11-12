@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * The condition language used in `tag-map.json`. One condition per string:
  *

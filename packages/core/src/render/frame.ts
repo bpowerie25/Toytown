@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { Matrix4, Vector3 } from 'three';
 import { mercatorPerMetre, toMercator, type LngLat } from '../geometry';
 

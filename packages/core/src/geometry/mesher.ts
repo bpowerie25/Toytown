@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Procedural toy buildings: footprints in, merged vertex buffers out. No three.js objects are
  * created here (only its triangulator is used), so this runs in a Web Worker and in Node tests.

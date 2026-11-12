@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Open spaces: parks, pitches, playgrounds, racecourses and other areas from build-data
  * (`kind: "area"` polygons and `kind: "track"` lines). They're drawn flat on the base map, under

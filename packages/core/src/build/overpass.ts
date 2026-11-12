@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * The Overpass query for a toy town and a polite client for it: waits for a free slot, retries
  * busy responses with backoff, and surfaces Overpass runtime errors. Works in browsers and Node;

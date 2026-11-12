@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 // Capture fixed comparison views of the demos (for before/after design reviews).
 //   node scripts/views.mjs <label>   → .cache/views/<label>-<view>.png
 // Needs the demo server: node e2e/serve.mjs

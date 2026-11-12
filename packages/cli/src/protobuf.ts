@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * Minimal protobuf wire-format reader for OSM PBF. Values are JS numbers: OSM ids and
  * coordinates fit comfortably below 2^53.

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 """
 Regenerate the model kit into a temp dir and check it matches the committed kit.
 

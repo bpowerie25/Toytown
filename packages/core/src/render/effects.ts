@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { Map as MaplibreMap } from 'maplibre-gl';
 import type { EffectsTheme } from '../themes';
 

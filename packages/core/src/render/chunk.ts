@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { meshChunk, meshChunkPlain } from '../geometry/mesher';
 import { planBuildings } from '../placement';
 import type { ChunkRequest, ChunkResult } from './protocol';

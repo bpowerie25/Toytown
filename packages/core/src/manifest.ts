@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 /**
  * The model kit manifest (`assets/models/manifest.json`).
  *

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import type { LngLat } from './project';
 
 /** Buildings are grouped into chunks by the web-mercator tile (at this zoom) holding their first vertex. */

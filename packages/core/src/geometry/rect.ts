@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 import { convexHull, polygonArea, type PolygonXY, type Ring } from './polygon';
 import type { XY } from './project';
 
